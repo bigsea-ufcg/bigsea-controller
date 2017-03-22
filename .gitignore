@@ -1,2 +1,4 @@
 .tox
 .project
+/.pydevproject
+*.log
