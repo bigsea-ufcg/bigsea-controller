@@ -2,8 +2,9 @@ from service.api.actuator.basic_actuator import Basic_Actuator
 from service.api.actuator.instance_locator import Instance_Locator
 from service.api.actuator.remote_kvm import Remote_KVM
 
-class Actuator_Builder(object):
-    
+# TODO: documentation
+class Actuator_Builder:
+
     def get_actuator(self, name):
         if name == "basic":
             instance_locator = Instance_Locator()

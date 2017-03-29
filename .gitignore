@@ -3,3 +3,5 @@
 /.pydevproject
 *.log
 *.pyc
+/controller.cfg
+/monitor.cfg

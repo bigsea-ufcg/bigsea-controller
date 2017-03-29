@@ -1,0 +1,15 @@
+[flask]
+host = 
+port = 
+
+[policy]
+controller = 
+actuator = 
+
+[scaling]
+check_interval = 
+trigger_down = 
+trigger_up = 
+min_cap = 
+max_cap = 
+actuation_size = 
