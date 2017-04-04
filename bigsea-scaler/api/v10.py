@@ -31,6 +31,8 @@ controller = Controller_Builder().get_controller(controller_type)
 
 # API methods
 # TODO: use Telles' code here
+
+
 @app.route(SETUP_ROUTE, methods = ['POST'])
 def prepare_environment():
     ''' 
@@ -44,6 +46,8 @@ def prepare_environment():
     return "prepared_environment"
 
 # TODO: use Telles' code here
+
+
 @app.route(START_SCALING_ROUTE, methods = ['POST'])
 def start_application_scaling(app_id):
     '''
@@ -57,6 +61,8 @@ def start_application_scaling(app_id):
     return "started-scaling"
 
 # TODO: use Telles' code here
+
+
 @app.route(STOP_SCALING_ROUTE, methods = ['POST'])
 def stop_application_scaling(app_id):
     logger.log("%s-Stopped scaling for application %s" % (time.strftime("%H:%M:%S"), app_id))

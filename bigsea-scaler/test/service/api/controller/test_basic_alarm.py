@@ -6,6 +6,8 @@ from service.api.actuator.instance_locator import Instance_Locator
 from service.api.actuator.remote_kvm import Remote_KVM
 from service.api.controller.basic_alarm import Basic_Alarm
 from service.api.controller.monasca_metric_source import Monasca_Metric_Source
+from utils.ssh_utils import SSH_Utils
+
 
 class Test_Basic_Alarm(unittest.TestCase):
 
@@ -13,7 +15,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.application_id_0 = "app-00"
         self.application_id_1 = "app-01"
         self.application_id_2 = "app-02"
-        
+
         self.instance_name_1 = "instance1"
         self.instance_name_2 = "instance2"
 
@@ -22,14 +24,14 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.trigger_up = 10
         self.min_cap = 10
         self.max_cap = 100
-        self.actuation_size = 10        
+        self.actuation_size = 10
         self.expected_time = 100
         self.allocated_resources = 50
 
         self.instances = [self.instance_name_1, self.instance_name_2]
         self.metric_source = Monasca_Metric_Source()
         self.instance_locator = Instance_Locator()
-        self.remote_kvm = Remote_KVM()
+        self.remote_kvm = Remote_KVM(SSH_Utils())
         self.actuator = Basic_Actuator(self.instance_locator, self.remote_kvm)
 
         self.alarm = Basic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,

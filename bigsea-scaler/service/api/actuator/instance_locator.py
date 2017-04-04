@@ -1,6 +1,8 @@
 from subprocess import check_output
 
 # TODO: documentation
+
+
 class Instance_Locator(object):
 
     def __init__(self):

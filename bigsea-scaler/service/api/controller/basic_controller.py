@@ -9,18 +9,16 @@ from service.api.controller.monasca_metric_source import Monasca_Metric_Source
 from utils.logger import Log, configure_logging
 
 # TODO: documentation
+
+
 class Basic_Controller(Controller):
 
-    def __init__(self):
+    def __init__(self, config):
         # Set up logging
         self.logger = Log("basic.controller.log", "controller.log")
         configure_logging()
-        
 
-        # Read controller configuration
-        config = ConfigParser.RawConfigParser()
-        config.read("controller.cfg")
-
+        # Read configuration
         check_interval = config.get("scaling", "check_interval")
         trigger_down = config.get("scaling", "trigger_down")
         trigger_up = config.get("scaling", "trigger_up")
@@ -33,7 +31,7 @@ class Basic_Controller(Controller):
         # Start up actuator and alarm
         actuator = Actuator_Builder().get_actuator("basic")
         self.alarm = Basic_Alarm(actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, actuation_size)
-        
+
         # Start up controller thread
         # Create lock to access application list
         self.applications_lock = threading.RLock()
@@ -57,22 +55,26 @@ class Basic_Controller(Controller):
             else:
                 self.logger.log("Application %s not found" % (app_id))
 
+    def stop_controller(self):
+        self.controller.running = False
+
 
 class _Basic_Controller_Thread():
 
     def __init__(self, applications, applications_lock, alarm, check_interval):
         self.logger = Log("basic.controller_thread.log", "controller.log")
         configure_logging()
-        
+
         self.applications = applications
         self.applications_lock = applications_lock
         self.alarm = alarm
         self.check_interval = check_interval
+        self.running = True
 
     def start(self):
         self.logger.log("Starting controller thread")
 
-        while True:
+        while self.running:
             # acquire lock, check applications and wait
             with self.applications_lock:
                 self.logger.log("Monitoring applications: %s" % (str(self.applications.keys())))

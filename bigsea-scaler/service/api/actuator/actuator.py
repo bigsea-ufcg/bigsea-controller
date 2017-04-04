@@ -2,6 +2,8 @@ from abc import abstractmethod
 from abc import ABCMeta
 
 # TODO: documentation
+
+
 class Actuator:
     __metaclass__ = ABCMeta
 

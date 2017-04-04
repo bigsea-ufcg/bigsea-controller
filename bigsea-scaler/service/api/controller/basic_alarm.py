@@ -1,6 +1,8 @@
 from utils.logger import configure_logging, Log
 
 # TODO: documentation
+
+
 class Basic_Alarm:
 
     PROGRESS_METRIC_NAME = "spark.job_progress"
@@ -14,7 +16,7 @@ class Basic_Alarm:
         self.min_cap = min_cap
         self.max_cap = max_cap
         self.actuation_size = actuation_size
-        
+
         self.logger = Log("basic.alarm.log", "controller.log")
         configure_logging()
 

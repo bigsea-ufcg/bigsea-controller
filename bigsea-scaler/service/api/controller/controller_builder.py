@@ -1,4 +1,5 @@
 from service.api.controller.basic_controller import Basic_Controller
+import ConfigParser
 
 
 class Controller_Builder:
@@ -8,6 +9,8 @@ class Controller_Builder:
 
     def get_controller(self, name):
         if name == "basic":
-            return Basic_Controller()
+            config = ConfigParser.RawConfigParser()
+            config.read("controller.cfg")
+            return Basic_Controller(config)
         else:
             raise Exception("Unknown controller type")
