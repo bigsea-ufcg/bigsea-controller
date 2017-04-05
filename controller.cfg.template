@@ -1,3 +1,4 @@
+# TODO: Document this
 [flask]
 host = 
 port = 
@@ -5,6 +6,7 @@ port =
 [policy]
 controller = 
 actuator = 
+metric_source = 
 
 [scaling]
 check_interval = 
@@ -13,3 +15,4 @@ trigger_up =
 min_cap = 
 max_cap = 
 actuation_size = 
+metric_rounding =

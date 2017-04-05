@@ -4,6 +4,8 @@ import time
 import unittest
 
 from service.api.controller.basic_controller import Basic_Controller
+from service.api.controller.metric_source_builder import Metric_Source_Builder
+from service.api.actuator.actuator_builder import Actuator_Builder
 
 
 class Test_Basic_Controller(unittest.TestCase):
@@ -24,7 +26,13 @@ class Test_Basic_Controller(unittest.TestCase):
         config.get = MagicMock()
         config.get.side_effect = self.config_values
 
-        self.controller = Basic_Controller(config)
+        metric_source = Metric_Source_Builder().get_metric_source("nop")
+        actuator = Actuator_Builder().get_actuator("basic")
+
+        parameters = {"check_interval":self.CHECK_INTERVAL, "trigger_down":10, "trigger_up":10,
+                  "min_cap":10, "max_cap":100, "actuation_size":20, "metric_rounding":2}
+
+        self.controller = Basic_Controller(metric_source, actuator, parameters)
         self.application_id_1 = "app-01"
         self.application_id_2 = "app-02"
         self.instance_1 = "instance-1"

@@ -27,7 +27,6 @@ class Basic_Actuator(Actuator):
             self.remote_kvm.change_vcpu_quota(instances_locations[instance], instance, vm_data[instance])
 
     # TODO: validation
-    # TODO: test
     def get_allocated_resources(self, vm_id):
         host = self.instance_locator.locate(vm_id)
         return self.remote_kvm.get_allocated_resources(host, vm_id)

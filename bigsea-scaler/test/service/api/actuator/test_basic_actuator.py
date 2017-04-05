@@ -19,15 +19,15 @@ class Test_Basic_Actuator(unittest.TestCase):
         self.cap1 = 50
         self.cap2 = 78
 
-        self.instance_locator = Instance_Locator()
+        self.instance_locator = Instance_Locator(SSH_Utils())
         self.remote_kvm = Remote_KVM(SSH_Utils())
         self.actuator = Basic_Actuator(self.instance_locator, self.remote_kvm)
 
     def locator(self, vm_id):
         return {self.vm_id1:self.host_ip1, self.vm_id2:self.host_ip2}[vm_id]
 
-    # TODO more cases
-    def test_basic_actuator_locates_and_acts_correctly_1_instance(self):
+    # TODO: more cases
+    def test_prepare_environment_locates_and_acts_correctly_1_instance(self):
         vm_data = {self.vm_id1:self.cap1}
 
         self.instance_locator.locate = MagicMock(return_value=self.host_ip1)
@@ -41,7 +41,7 @@ class Test_Basic_Actuator(unittest.TestCase):
         # Actuator tries to change the cap
         self.remote_kvm.change_vcpu_quota.assert_called_once_with(self.host_ip1, self.vm_id1, self.cap1)
 
-    def test_basic_actuator_locates_and_acts_correctly_n_instances(self):
+    def test_prepare_environment_locates_and_acts_correctly_n_instances(self):
         vm_data = {self.vm_id1:self.cap1,self.vm_id2:self.cap2}
 
         self.instance_locator.locate = MagicMock()

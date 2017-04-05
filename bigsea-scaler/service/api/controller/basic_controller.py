@@ -1,36 +1,29 @@
-import ConfigParser
 import threading
 import time
 
-from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.basic_alarm import Basic_Alarm
 from service.api.controller.controller import Controller
-from service.api.controller.monasca_metric_source import Monasca_Metric_Source
 from utils.logger import Log, configure_logging
 
+
 # TODO: documentation
-
-
 class Basic_Controller(Controller):
 
-    def __init__(self, config):
+    def __init__(self, metric_source, actuator, parameters):
         # Set up logging
         self.logger = Log("basic.controller.log", "controller.log")
         configure_logging()
+        
+        check_interval = parameters["check_interval"]
+        trigger_down = parameters["trigger_down"]
+        trigger_up = parameters["trigger_up"]
+        min_cap = parameters["min_cap"]
+        max_cap = parameters["max_cap"]
+        actuation_size = parameters["actuation_size"]
+        metric_rounding = parameters["metric_rounding"]
 
-        # Read configuration
-        check_interval = config.get("scaling", "check_interval")
-        trigger_down = config.get("scaling", "trigger_down")
-        trigger_up = config.get("scaling", "trigger_up")
-        min_cap = config.get("scaling", "min_cap")
-        max_cap = config.get("scaling", "max_cap")
-        actuation_size = config.get("scaling", "actuation_size")
-
-        metric_source = Monasca_Metric_Source()
-
-        # Start up actuator and alarm
-        actuator = Actuator_Builder().get_actuator("basic")
-        self.alarm = Basic_Alarm(actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, actuation_size)
+        # Start alarm
+        self.alarm = Basic_Alarm(actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, actuation_size, metric_rounding)
 
         # Start up controller thread
         # Create lock to access application list

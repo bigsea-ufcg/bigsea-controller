@@ -10,8 +10,9 @@ class Actuator_Builder:
 
     def get_actuator(self, name):
         if name == "basic":
-            instance_locator = Instance_Locator()
+            instance_locator = Instance_Locator(SSH_Utils())
             remote_kvm = Remote_KVM(SSH_Utils())
             return Basic_Actuator(instance_locator, remote_kvm)
         else:
+            # FIXME: review this exception type
             raise Exception("Unknown actuator type")
