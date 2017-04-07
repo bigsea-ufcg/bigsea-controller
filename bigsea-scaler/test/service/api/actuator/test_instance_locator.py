@@ -19,10 +19,10 @@ class Test_Instance_Locator(unittest.TestCase):
         pass
 
     def located(self, command, user, host):
-        return {self.compute_1:"1", self.compute_2:"0"}[host]
+        return {self.compute_1:"1\n", self.compute_2:"0\n"}[host]
 
     def impossible_to_locate(self, command, user, host):
-        return {self.compute_1:"0", self.compute_2:"0"}[host]
+        return {self.compute_1:"0\n", self.compute_2:"0\n"}[host]
 
     def test_locate(self):
         self.ssh_utils.run_and_get_result = MagicMock()

@@ -11,7 +11,7 @@ Requests
 
 * Prepare environment
 Type: post
-Format: <host_ip>:5112/scaler/prepare_env
+Format: <host_ip>:5112/scaler/setup_env
 
 Sets the correct amount of resources to instances. It expects a json 
 with format {'vm_id':cap}.
