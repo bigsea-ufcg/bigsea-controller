@@ -1,15 +1,16 @@
 import ConfigParser
 
-from service.api.controller.basic_controller import Basic_Controller
+from service.api.controller.plugins.basic_controller import Basic_Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
+from service.api.controller.plugins.single_application_controller import Single_Application_Controller
 
 class Controller_Builder:
 
     def __init__(self):
         pass
 
-    def get_controller(self, name):
+    def get_controller(self, name, application_id, parameters):
         if name == "basic":
             config = ConfigParser.RawConfigParser()
             config.read("controller.cfg")
@@ -35,6 +36,8 @@ class Controller_Builder:
             actuator = Actuator_Builder().get_actuator(actuator_type)
             
             return Basic_Controller(metric_source, actuator, parameters)
+        elif name == "single":
+            return Single_Application_Controller(application_id, parameters)
         else:
             # FIXME: exception type
             raise Exception("Unknown controller type")

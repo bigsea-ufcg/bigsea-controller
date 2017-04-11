@@ -1,30 +1,61 @@
-*** HOW TO START THE SCALER ***
+# BigSea Scaler
 
-$ python cli/main.py
+### HOW TO START THE SCALER ###
 
-The scaler listens on port 5112
+* Configure the controller.cfg providing the following info:
+```
+[flask]
+# The ip used by the flask server
+host = <host ip>
+# The port used by the flask server
+port = <host port>
+```
+* Run the main python file to start the service
+```
+$ python bigsea-scaler/cli/main.py
+```
+
+### HOW TO USE THE SCALER API ###
 
 
-*** HOW TO USE THE SCALER API ***
+#### Prepare Environment
 
-Requests
-
-* Prepare environment
 Type: post
-Format: <host_ip>:5112/scaler/setup_env
+Format: /scaler/setup_env
 
-Sets the correct amount of resources to instances. It expects a json 
-with format {'vm_id':cap}.
+Sets the amount of resources to instances. 
 
-* Start scaling
+Request body:
+```javascript
+{
+	"vm_id0":cap0,
+	"vm_id1":cap1
+}
+```
+
+#### Start Scaling
+
 Type: post
-Format: <host_ip>:5112/scaler/start_scaling/<app_id>
+Format: /scaler/start_scaling/<app_id>
 
-Adds the application to the set of applications the scaler scales. It
-a json with format {'instances':[vm-id-0,vm-id-1]}
+Adds the application to the set of applications the scaler scales. 
 
-* Stop scaling
+Request body:
+```javascript
+{
+	"plugin":<scaling plugin>,
+	"actuator":<actuation plugin>,
+	"metric_source":<metrics plugin>,
+	"instances":["vm_id0", "vm_id1"],
+	"scaling-parameter-key0":"scaling-parameter-value0",
+	...
+	"scaling-parameter-keyN":"scaling-parameter-valueN"
+}
+```
+
+#### Stop scaling
+
 Type: post
-Format: <host_ip>:5112/scaler/stop_scaling/<app_id>
+Format: /scaler/stop_scaling/<app_id>
 
 Removes the application from the set of applications the scaler scales.

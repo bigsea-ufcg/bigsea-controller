@@ -4,7 +4,7 @@ import unittest
 from service.api.actuator.basic_actuator import Basic_Actuator
 from service.api.actuator.instance_locator import Instance_Locator
 from service.api.actuator.remote_kvm import Remote_KVM
-from service.api.controller.basic_alarm import Basic_Alarm
+from service.api.controller.plugins.basic_alarm import Basic_Alarm
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from utils.ssh_utils import SSH_Utils
 

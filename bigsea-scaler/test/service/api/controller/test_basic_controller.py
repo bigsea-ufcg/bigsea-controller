@@ -3,7 +3,7 @@ from mock.mock import MagicMock
 import time
 import unittest
 
-from service.api.controller.basic_controller import Basic_Controller
+from service.api.controller.plugins.basic_controller import Basic_Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
 

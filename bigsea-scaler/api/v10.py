@@ -1,10 +1,11 @@
 import ConfigParser
-from flask import Flask
-from flask import request
 import time
 
+from flask import Flask
+from flask import request
+
 from service.api.actuator.actuator_builder import Actuator_Builder
-from service.api.controller.controller_builder import Controller_Builder
+from service.api.controller.main_controller import Main_Controller
 from utils.logger import Log
 from utils.logger import configure_logging
 
@@ -27,7 +28,8 @@ controller_type = config.get("policy", "controller")
 actuator_type = config.get("policy", "actuator")
 
 actuator = Actuator_Builder().get_actuator(actuator_type)
-controller = Controller_Builder().get_controller(controller_type)
+
+main_controller = Main_Controller()
 
 # API methods
 # TODO: use Telles' code here
@@ -35,9 +37,6 @@ controller = Controller_Builder().get_controller(controller_type)
 
 @app.route(SETUP_ROUTE, methods = ['POST'])
 def prepare_environment():
-    ''' 
-        Expected format -> {'vm_id':cap}
-    '''
     data = request.json
     logger.log("%s-Preparing environment for instances %s" % (time.strftime("%H:%M:%S"), str(data)))
 
@@ -50,13 +49,10 @@ def prepare_environment():
 
 @app.route(START_SCALING_ROUTE, methods = ['POST'])
 def start_application_scaling(app_id):
-    '''
-        Expected format -> {'instances':[instance-id-0,instance-id-1,...]}
-    '''
     data = request.json
     logger.log("%s-Started scaling for application %s using parameters:%s" % (time.strftime("%H:%M:%S"), app_id, str(data)))
 
-    controller.start_application_scaling(app_id, data)
+    main_controller.start_application_scaling(app_id, data)
 
     return "started-scaling"
 
@@ -67,6 +63,6 @@ def start_application_scaling(app_id):
 def stop_application_scaling(app_id):
     logger.log("%s-Stopped scaling for application %s" % (time.strftime("%H:%M:%S"), app_id))
 
-    controller.stop_application_scaling(app_id)
+    main_controller.stop_application_scaling(app_id)
 
     return "stopped-scaling"
