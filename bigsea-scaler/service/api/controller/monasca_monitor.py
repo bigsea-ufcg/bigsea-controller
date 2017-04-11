@@ -38,11 +38,11 @@ class Monasca_Monitor:
 
     def first_measurement(self, name, dimensions):
         return [None, None, None] if self.get_measurements(name, dimensions) is None \
-            else self.get_measurements(name, dimensions)[0]
+            else self.get_measurements(name, dimensions)[0][1]
 
     def last_measurement(self, name, dimensions):
         return [None, None, None] if self.get_measurements(name, dimensions) is None \
-            else self.get_measurements(name, dimensions)[-1]
+            else self.get_measurements(name, dimensions)[-1][1]
 
     def _get_monasca_client(self):
 

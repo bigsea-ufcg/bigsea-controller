@@ -26,7 +26,6 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.min_cap = 10.0
         self.max_cap = 100.0
         self.actuation_size = 10.0
-        self.expected_time = 100.0
         self.allocated_resources = 50
         self.metric_round = 2
 
@@ -69,7 +68,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances, self.expected_time)
+        self.alarm.check_application_state(self.application_id_2, self.instances)
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_2})
@@ -90,7 +89,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_0, self.instances, self.expected_time)
+        self.alarm.check_application_state(self.application_id_0, self.instances)
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_0})
@@ -111,7 +110,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_1, self.instances, self.expected_time)
+        self.alarm.check_application_state(self.application_id_1, self.instances)
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_1})
@@ -138,7 +137,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_3, self.instances, self.expected_time)
+        self.alarm.check_application_state(self.application_id_3, self.instances)
         
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_3})
@@ -158,7 +157,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_4, self.instances, self.expected_time)
+        self.alarm.check_application_state(self.application_id_4, self.instances)
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_4})
@@ -185,7 +184,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_3, self.instances, self.expected_time)
+        self.alarm.check_application_state(self.application_id_3, self.instances)
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_3})
@@ -204,7 +203,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_4, self.instances, self.expected_time)
+        self.alarm.check_application_state(self.application_id_4, self.instances)
         
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_4})

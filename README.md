@@ -21,7 +21,7 @@ Type: post
 Format: <host_ip>:5112/scaler/start_scaling/<app_id>
 
 Adds the application to the set of applications the scaler scales. It
-a json with format {'expected_time':expected_time_value}
+a json with format {'instances':[vm-id-0,vm-id-1]}
 
 * Stop scaling
 Type: post

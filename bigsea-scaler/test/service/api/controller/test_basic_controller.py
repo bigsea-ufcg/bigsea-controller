@@ -39,10 +39,8 @@ class Test_Basic_Controller(unittest.TestCase):
         self.instance_2 = "instance-2"
         self.instances_1 = [self.instance_1, self.instance_2]
         self.instances_2 = [self.instance_2]
-        self.expected_time_1 = 500
-        self.expected_time_2 = 140
-        self.parameters_1 = {"instances":self.instances_1, "expected_time":self.expected_time_1}
-        self.parameters_2 = {"instances":self.instances_2, "expected_time":self.expected_time_2}
+        self.parameters_1 = {"instances":self.instances_1}
+        self.parameters_2 = {"instances":self.instances_2}
 
     def tearDown(self):
         self.controller.stop_controller()
@@ -59,13 +57,12 @@ class Test_Basic_Controller(unittest.TestCase):
         application_1_parameters = self.controller.applications.get(self.application_id_1)
 
         self.assertEqual(application_1_parameters.get("instances"), self.instances_1)
-        self.assertEqual(application_1_parameters.get("expected_time"), self.expected_time_1)
 
         # Sleep to assure the calls to alarm and stop the controller
         time.sleep(float(2*self.CHECK_INTERVAL))
 
         # Check if the alarm was called correctly
-        self.controller.alarm.check_application_state.assert_called_with(self.application_id_1, self.instances_1, self.expected_time_1)
+        self.controller.alarm.check_application_state.assert_called_with(self.application_id_1, self.instances_1)
 
     def test_start_application_scaling_2_applications(self):
         self.controller.alarm.check_application_state = MagicMock(return_value=None)
@@ -82,21 +79,19 @@ class Test_Basic_Controller(unittest.TestCase):
         application_1_parameters = self.controller.applications.get(self.application_id_1)
 
         self.assertEqual(application_1_parameters.get("instances"), self.instances_1)
-        self.assertEqual(application_1_parameters.get("expected_time"), self.expected_time_1)
 
         # Check application 2
         self.assertTrue(self.controller.applications.has_key(self.application_id_2))
         application_2_parameters = self.controller.applications.get(self.application_id_2)
 
         self.assertEqual(application_2_parameters.get("instances"), self.instances_2)
-        self.assertEqual(application_2_parameters.get("expected_time"), self.expected_time_2)
 
         # Sleep to assure the calls to alarm and stop the controller
         time.sleep(float(2*self.CHECK_INTERVAL))
 
         # Check if the alarm was called correctly
-        self.controller.alarm.check_application_state.assert_any_call(self.application_id_1, self.instances_1, self.expected_time_1)
-        self.controller.alarm.check_application_state.assert_any_call(self.application_id_2, self.instances_2, self.expected_time_2)
+        self.controller.alarm.check_application_state.assert_any_call(self.application_id_1, self.instances_1)
+        self.controller.alarm.check_application_state.assert_any_call(self.application_id_2, self.instances_2)
 
     def test_stop_application_scaling(self):
         self.controller.alarm.check_application_state = MagicMock(return_value=None)
@@ -113,7 +108,6 @@ class Test_Basic_Controller(unittest.TestCase):
         application_2_parameters = self.controller.applications.get(self.application_id_2)
 
         self.assertEqual(application_2_parameters.get("instances"), self.instances_2)
-        self.assertEqual(application_2_parameters.get("expected_time"), self.expected_time_2)
 
         # Stop scaling for application 2
         self.controller.stop_application_scaling(self.application_id_2)

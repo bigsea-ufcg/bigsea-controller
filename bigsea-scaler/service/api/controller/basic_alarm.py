@@ -23,7 +23,7 @@ class Basic_Alarm:
         self.logger = Log("basic.alarm.log", "controller.log")
         configure_logging()
 
-    def check_application_state(self, application_id, instances, expected_time):
+    def check_application_state(self, application_id, instances):
         # TODO: Check parameters
         self.logger.log("Getting progress")
         job_progress = float(self.metric_source.get_most_recent_value(Basic_Alarm.PROGRESS_METRIC_NAME,
@@ -33,21 +33,21 @@ class Basic_Alarm:
         time_progress = float(self.metric_source.get_most_recent_value(Basic_Alarm.ELAPSED_TIME_METRIC_NAME,
                                                                  {"application_id":application_id}))
         time_progress = round(time_progress, self.metric_rounding)
-        self.logger.log("Progress:%d|Time progress:%d" % (job_progress, time_progress))
+        self.logger.log("Progress:%f|Time progress:%f" % (job_progress, time_progress))
 
-        diff = job_progress - 100 * time_progress / expected_time
+        diff = job_progress - time_progress
 
         if diff > 0 and diff >= self.trigger_down:
             self.logger.log("Scaling down")
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = cap - self.actuation_size
+            new_cap = max(cap - self.actuation_size, self.min_cap)
             cap_instances = {instance:new_cap for instance in instances}
 
             self.actuator.adjust_resources(cap_instances)
         elif diff < 0 and abs(diff) >= self.trigger_up:
             self.logger.log("Scaling up")
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = cap + self.actuation_size
+            new_cap = min(cap + self.actuation_size, self.max_cap)
             cap_instances = {instance:new_cap for instance in instances}
 
             self.actuator.adjust_resources(cap_instances)

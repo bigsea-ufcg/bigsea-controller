@@ -51,7 +51,7 @@ def prepare_environment():
 @app.route(START_SCALING_ROUTE, methods = ['POST'])
 def start_application_scaling(app_id):
     '''
-        Expected format -> {expected_time:expected_time_value}
+        Expected format -> {'instances':[instance-id-0,instance-id-1,...]}
     '''
     data = request.json
     logger.log("%s-Started scaling for application %s using parameters:%s" % (time.strftime("%H:%M:%S"), app_id, str(data)))

@@ -77,9 +77,8 @@ class _Basic_Controller_Thread():
                 # for each application check state
                 for application_id in applications_ids:
                     instances = self.applications[application_id]["instances"]
-                    expected_time = self.applications[application_id]["expected_time"]
 
-                    self.logger.log("Checking application:%s|instances:%s|expected time:%s" % (application_id, instances, expected_time))
-                    self.alarm.check_application_state(application_id, instances, expected_time)
+                    self.logger.log("Checking application:%s|instances:%s" % (application_id, instances))
+                    self.alarm.check_application_state(application_id, instances)
 
             time.sleep(float(self.check_interval))

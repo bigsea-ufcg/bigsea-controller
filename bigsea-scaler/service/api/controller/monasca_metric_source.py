@@ -7,4 +7,4 @@ class Monasca_Metric_Source(Metric_Source):
         self.monasca = Monasca_Monitor()
 
     def get_most_recent_value(self, metric_name, options):
-        return self.monasca.last_measurement(metric_name, {"application_id":options["application_id"], "service":"spark-sahara"})
+        return 100*self.monasca.last_measurement(metric_name, {"application_id":options["application_id"], "service":"spark-sahara"})
