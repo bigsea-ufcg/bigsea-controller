@@ -28,6 +28,7 @@ Sets the amount of resources to instances.
 Request body:
 ```javascript
 {
+	"plugin":<actuation plugin>,
 	"vm_id0":cap0,
 	"vm_id1":cap1
 }
