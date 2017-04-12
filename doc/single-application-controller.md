@@ -45,3 +45,21 @@ Amount of resources added or removed when scaling up or down. Must be in range [
 The amount of decimal digits considered when taking scaling decisions.
 e.g.: If the scaler gets a metric value 0.567 from the metric source and metric_rounding = 2 then the value the scaler will use is 0.57.
 
+Request example:
+
+{
+	"plugin":"single",
+	"actuator":"basic",
+	"metric_source":"monasca",
+	
+	"instances":["6f9fe95f-9072-4545-a62a-fc5fd7cae9a4", "45034c39-c280-4047-8b92-a8efb61bc589"],
+	
+	"check_interval":10,
+	"trigger_down":10,
+	"trigger_up":10,
+	"min_cap":10,
+	"max_cap":100,
+	"actuation_size":20,
+	"metric_rounding":2
+}
+
