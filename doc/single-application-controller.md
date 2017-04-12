@@ -47,6 +47,7 @@ e.g.: If the scaler gets a metric value 0.567 from the metric source and metric_
 
 Request example:
 
+```javascript
 {
 	"plugin":"single",
 	"actuator":"basic",
@@ -62,4 +63,4 @@ Request example:
 	"actuation_size":20,
 	"metric_rounding":2
 }
-
+```
