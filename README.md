@@ -53,6 +53,9 @@ Request body:
 }
 ```
 
+Scaling plugins available:
+[Single application controller](doc/single-application-controller.md)
+
 #### Stop scaling
 
 Type: post
