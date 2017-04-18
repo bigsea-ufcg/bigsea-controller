@@ -1,5 +1,3 @@
 flask
 python-monascaclient
-pytz
 requests
-tzlocal
