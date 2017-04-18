@@ -7,6 +7,7 @@ from service.api.actuator.remote_kvm import Remote_KVM
 from service.api.controller.plugins.basic_alarm import Basic_Alarm
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from utils.ssh_utils import SSH_Utils
+import datetime
 
 
 class Test_Basic_Alarm(unittest.TestCase):
@@ -17,6 +18,11 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.application_id_2 = "app-02"
         self.application_id_3 = "app-03"
         self.application_id_4 = "app-04"
+
+        self.timestamp_1 = datetime.datetime.strptime("2000-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp_2 = datetime.datetime.strptime("2000-01-01T00:05:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp_3 = datetime.datetime.strptime("2000-01-01T00:10:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp_4 = datetime.datetime.strptime("2000-01-01T00:15:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
 
         self.instance_name_1 = "instance1"
         self.instance_name_2 = "instance2"
@@ -38,6 +44,8 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.alarm = Basic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_round)
 
+        self.timestamps = [self.timestamp_1, self.timestamp_2, self.timestamp_3, self.timestamp_4]
+
     def metrics(self, metric_name, options):
         application_id = options["application_id"]
 
@@ -56,9 +64,25 @@ class Test_Basic_Alarm(unittest.TestCase):
                          self.application_id_3:60.000, self.application_id_4:50.003}
 
         if metric_name == Basic_Alarm.PROGRESS_METRIC_NAME:
-            return job_progress[application_id]
+            return self.timestamp_1, job_progress[application_id]
         elif metric_name == Basic_Alarm.ELAPSED_TIME_METRIC_NAME:
-            return time_progress[application_id]
+            return self.timestamp_1, time_progress[application_id]
+
+    def metrics_different_timestamps(self, metric_name, options):
+        application_id = options["application_id"]
+        
+        job_progress = {self.application_id_0:30.0, self.application_id_1:50.0, self.application_id_2:80.0, 
+                        self.application_id_3:50.004, self.application_id_4:80.000}
+        time_progress = {self.application_id_0:80.0, self.application_id_1:50.0, self.application_id_2:30.0, 
+                         self.application_id_3:60.000, self.application_id_4:50.003}
+
+        timestamp = self.timestamps.pop(0)
+
+        if metric_name == Basic_Alarm.PROGRESS_METRIC_NAME:
+            return timestamp, job_progress[application_id]
+        elif metric_name == Basic_Alarm.ELAPSED_TIME_METRIC_NAME:
+            return timestamp, time_progress[application_id]
+    
 
     def test_alarm_gets_metrics_and_scales_down(self):
         # Set up mocks
@@ -151,6 +175,9 @@ class Test_Basic_Alarm(unittest.TestCase):
 
         # Scale down
         # Set up mocks
+        self.alarm = Basic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
+                                 self.min_cap, self.max_cap, self.actuation_size, 2)
+        
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
         
@@ -197,6 +224,9 @@ class Test_Basic_Alarm(unittest.TestCase):
         
         # Scale down
         # Start up mocks
+        self.alarm = Basic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
+                                 self.min_cap, self.max_cap, self.actuation_size, 3)
+        
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
         
@@ -214,7 +244,95 @@ class Test_Basic_Alarm(unittest.TestCase):
         # The method doesn't try to adjust the amount of resources
         self.actuator.adjust_resources.assert_not_called()
 
+    def test_alarm_does_not_reuse_metrics_with_same_timestamp(self):
+        self.alarm = Basic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
+                                 self.min_cap, self.max_cap, self.actuation_size, 2)
+        
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+        
+        self.alarm.check_application_state(self.application_id_0, self.instances)
+        
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.ELAPSED_TIME_METRIC_NAME, {"application_id":self.application_id_0})
+        
+        # The method tries to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
+        # Add resources
+        new_cap = self.allocated_resources + self.actuation_size
+        # The method tries to adjust the amount of resources
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        
+        #
+        # 2nd call. The method checks if the metric is new and does not acts
+        #
 
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+        
+        self.alarm.check_application_state(self.application_id_0, self.instances)
+        
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.ELAPSED_TIME_METRIC_NAME, {"application_id":self.application_id_0})
+        
+        # The method doesn't try to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_not_called()
+        # The method doesn't try to adjust the amount of resources
+        self.actuator.adjust_resources.assert_not_called()
+        
+    def test_alarm_metrics_with_different_timestamps(self):
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics_different_timestamps
+
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+
+        self.alarm.check_application_state(self.application_id_2, self.instances)
+
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.ELAPSED_TIME_METRIC_NAME, {"application_id":self.application_id_2})
+
+        # The method tries to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
+        # Remove resources
+        new_cap = self.allocated_resources - self.actuation_size
+        # The method tries to adjust the amount of resources
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        
+        #
+        # 2nd call. The method checks if the metric is new and acts
+        #
+        
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics_different_timestamps
+
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+
+        self.alarm.check_application_state(self.application_id_2, self.instances)
+
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.PROGRESS_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.assert_any_call(Basic_Alarm.ELAPSED_TIME_METRIC_NAME, {"application_id":self.application_id_2})
+
+        # The method tries to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
+        # Remove resources
+        new_cap = self.allocated_resources - self.actuation_size
+        # The method tries to adjust the amount of resources
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

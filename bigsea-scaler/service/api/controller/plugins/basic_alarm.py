@@ -1,4 +1,5 @@
 from utils.logger import configure_logging, Log
+import datetime
 
 # TODO: documentation
 
@@ -22,32 +23,71 @@ class Basic_Alarm:
 
         self.logger = Log("basic.alarm.log", "controller.log")
         configure_logging()
+        
+        self.last_time_progress_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.last_job_progress_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        
+    def get_job_progress(self, application_id):
+        job_progress_measurement = self.metric_source.get_most_recent_value(Basic_Alarm.PROGRESS_METRIC_NAME,
+                                                                {"application_id":application_id})
+        job_progress_timestamp = job_progress_measurement[0]
+        job_progress = job_progress_measurement[1]
+        job_progress = round(job_progress, self.metric_rounding)
+        return job_progress_timestamp, job_progress
+    
+    def get_time_progress(self, application_id):
+        time_progress_measurement = self.metric_source.get_most_recent_value(Basic_Alarm.ELAPSED_TIME_METRIC_NAME,
+                                                                     {"application_id":application_id})
+        time_progress_timestamp = time_progress_measurement[0]
+        time_progress = time_progress_measurement[1]
+        time_progress = round(time_progress, self.metric_rounding)
+        return time_progress_timestamp, time_progress
+
+    def check_measurements_are_new(self, job_progress_timestamp, time_progress_timestamp):
+        return self.last_job_progress_timestamp < job_progress_timestamp and \
+                self.last_time_progress_timestamp < time_progress_timestamp
 
     def check_application_state(self, application_id, instances):
         # TODO: Check parameters
-        self.logger.log("Getting progress")
-        job_progress = float(self.metric_source.get_most_recent_value(Basic_Alarm.PROGRESS_METRIC_NAME,
-                                                                {"application_id":application_id}))
-        job_progress = round(job_progress, self.metric_rounding)
-        self.logger.log("Getting time progress")
-        time_progress = float(self.metric_source.get_most_recent_value(Basic_Alarm.ELAPSED_TIME_METRIC_NAME,
-                                                                 {"application_id":application_id}))
-        time_progress = round(time_progress, self.metric_rounding)
-        self.logger.log("Progress:%f|Time progress:%f" % (job_progress, time_progress))
+        try:
+            self.logger.log("Getting progress")
+            job_progress_timestamp, job_progress = self.get_job_progress(application_id)
+            
+            self.logger.log("Getting time progress")
+            time_progress_timestamp, time_progress = self.get_time_progress(application_id)
+            
+            self.logger.log("Progress-[%s]-%f|Time progress-[%s]-%f" % (str(job_progress_timestamp), 
+                                        job_progress, str(time_progress_timestamp), time_progress))
 
-        diff = job_progress - time_progress
+            if self.check_measurements_are_new(job_progress_timestamp, time_progress_timestamp):
+                diff = job_progress - time_progress
+                
+                self.scale_down(diff, instances)
+                self.scale_up(diff, instances)
+                    
+                self.last_job_progress_timestamp = job_progress_timestamp
+                self.last_time_progress_timestamp = time_progress_timestamp
+            else:
+                self.logger.log("Could not acquire more recent metrics")
+        except Exception:
+            # TODO: Check exception type
+            self.logger.log("Could not get metrics")
+            return
 
+    def scale_down(self, diff, instances):
         if diff > 0 and diff >= self.trigger_down:
             self.logger.log("Scaling down")
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = max(cap - self.actuation_size, self.min_cap)
             cap_instances = {instance:new_cap for instance in instances}
-
+            
             self.actuator.adjust_resources(cap_instances)
-        elif diff < 0 and abs(diff) >= self.trigger_up:
+            
+    def scale_up(self, diff, instances):
+        if diff < 0 and abs(diff) >= self.trigger_up:
             self.logger.log("Scaling up")
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = min(cap + self.actuation_size, self.max_cap)
             cap_instances = {instance:new_cap for instance in instances}
-
+    
             self.actuator.adjust_resources(cap_instances)
