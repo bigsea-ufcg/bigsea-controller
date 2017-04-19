@@ -1,6 +1,6 @@
 from subprocess import check_output
 
-hosts_ports = {"c4-compute11":9000, "c4-compute12":9001, "c4-compute22":9002}
+hosts_ports = {"c4-compute11":10011, "c4-compute12":10012, "c4-compute22":10022}
 
 class SSH_Utils(object):
 
