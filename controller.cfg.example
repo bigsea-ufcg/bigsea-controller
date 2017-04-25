@@ -1,0 +1,5 @@
+[flask]
+# The ip used by the flask server
+host = 0.0.0.0 
+# The port used by the flask server
+port = 5112
