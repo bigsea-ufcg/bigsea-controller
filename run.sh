@@ -1,0 +1,1 @@
+python bigsea-scaler/cli/main.py
