@@ -1,11 +1,14 @@
-from service.api.controller.plugins.basic_alarm import Basic_Alarm
-from service.api.actuator.actuator_builder import Actuator_Builder
-from service.api.controller.metric_source_builder import Metric_Source_Builder
-import time
-from utils.logger import Log, configure_logging
 import threading
+import time
 
-class Single_Application_Controller(object):
+from service.api.actuator.actuator_builder import Actuator_Builder
+from service.api.controller.controller import Controller
+from service.api.controller.metric_source_builder import Metric_Source_Builder
+from service.api.controller.plugins.basic_alarm import Basic_Alarm
+from utils.logger import Log, configure_logging
+
+
+class Single_Application_Controller(Controller):
 
     def __init__(self, application_id, parameters):
         self.logger = Log("single.controller.log", "controller.log")
@@ -31,7 +34,8 @@ class Single_Application_Controller(object):
         self.alarm = Basic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
     
-    def start(self):
+    def start_application_scaling(self):
+    #def start(self):
         run = True
         
         while run:
@@ -44,7 +48,8 @@ class Single_Application_Controller(object):
             with self.running_lock:
                 run = self.running
             
-    def stop(self):
+    def stop_application_scaling(self):
+    #def stop(self):
         with self.running_lock:
             self.running = False
         

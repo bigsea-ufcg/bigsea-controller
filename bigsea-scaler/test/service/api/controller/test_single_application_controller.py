@@ -42,14 +42,14 @@ class Test_Single_Application_Controller(unittest.TestCase):
     def test_start_and_stop_scaling(self):
         self.controller.alarm.check_application_state = MagicMock(return_value=None)
         
-        controller_thread = threading.Thread(target=self.controller.start)
+        controller_thread = threading.Thread(target=self.controller.start_application_scaling)
         controller_thread.start()
 
         time.sleep(float(2*self.check_interval))
 
         self.controller.alarm.check_application_state.assert_any_call(self.app_id_0, self.instances)
         
-        self.controller.stop()
+        self.controller.stop_application_scaling()
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ class Main_Controller:
         self.logger.log("Adding application id: %s" %  (application_id))
         plugin_name = parameters["plugin"]
         controller = self.controller_builder.get_controller(plugin_name, application_id, parameters)
-        controller_thread = threading.Thread(target=controller.start)
+        controller_thread = threading.Thread(target=controller.start_application_scaling)
         controller_thread.start()
         
         self.controller_thread_pool[application_id] = controller
@@ -24,7 +24,7 @@ class Main_Controller:
         if self.controller_thread_pool.has_key(app_id):
             self.logger.log("Removing application id: %s" % (app_id))
             app_controller = self.controller_thread_pool[app_id]
-            app_controller.stop()
+            app_controller.stop_application_scaling()
             self.controller_thread_pool.pop(app_id)
         else:
             self.logger.log("Application %s not found" % (app_id))
