@@ -1,9 +1,9 @@
 import unittest
+import time
 
 from mock.mock import MagicMock
 from service.api.controller.main_controller import Main_Controller
 from service.api.controller.plugins.single_application_controller import Single_Application_Controller
-import time
 
 
 class Test_Main_Controller(unittest.TestCase):
@@ -62,6 +62,8 @@ class Test_Main_Controller(unittest.TestCase):
         
         # Start scaling for application 0
         self.main_controller.start_application_scaling(self.application_id_0, self.parameters)
+        
+        time.sleep(5)
         
         # The builder was called to get a new controller
         self.main_controller.controller_builder.get_controller.assert_called_once_with("single", self.application_id_0, self.parameters)

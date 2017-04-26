@@ -4,14 +4,14 @@ import time
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.controller import Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.controller.plugins.basic_alarm import Basic_Alarm
+from service.api.controller.plugins.generic_alarm import Generic_Alarm
 from utils.logger import Log, configure_logging
 
 
-class Single_Application_Controller(Controller):
+class Generic_Controller(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = Log("single.controller.log", "controller.log")
+        self.logger = Log("diff.controller.log", "controller.log")
         configure_logging()
         
         self.application_id = application_id
@@ -31,9 +31,9 @@ class Single_Application_Controller(Controller):
         
         metric_source = Metric_Source_Builder().get_metric_source(self.metric_source_type)
         actuator = Actuator_Builder().get_actuator(self.actuator_type)
-        self.alarm = Basic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
+        self.alarm = Generic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
-    
+        
     def start_application_scaling(self):
         run = True
         

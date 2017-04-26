@@ -4,6 +4,7 @@ from service.api.controller.plugins.basic_controller import Basic_Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.plugins.single_application_controller import Single_Application_Controller
+from service.api.controller.plugins.generic_controller import Generic_Controller
 
 class Controller_Builder:
 
@@ -38,6 +39,8 @@ class Controller_Builder:
             return Basic_Controller(metric_source, actuator, parameters)
         elif name == "single":
             return Single_Application_Controller(application_id, parameters)
+        elif name == "progress-error":
+            return Generic_Controller(application_id, parameters)
         else:
             # FIXME: exception type
             raise Exception("Unknown controller type")
