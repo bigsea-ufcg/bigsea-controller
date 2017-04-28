@@ -22,8 +22,6 @@ class Monasca_Monitor:
         measurements = []
         try:
             monasca_client = self._get_monasca_client()
-            dimensions = {'application_id': dimensions['application_id'],
-                          'service': dimensions['service']}
             measurements = monasca_client.metrics.list_measurements(
                 name=metric_name, dimensions=dimensions,
                 start_time=start_time, debug=False)

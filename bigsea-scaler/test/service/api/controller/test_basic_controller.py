@@ -26,7 +26,7 @@ class Test_Basic_Controller(unittest.TestCase):
         config.get = MagicMock()
         config.get.side_effect = self.config_values
 
-        metric_source = Metric_Source_Builder().get_metric_source("nop")
+        metric_source = Metric_Source_Builder().get_metric_source("nop", {})
         actuator = Actuator_Builder().get_actuator("basic")
 
         parameters = {"check_interval":self.CHECK_INTERVAL, "trigger_down":10, "trigger_up":10,

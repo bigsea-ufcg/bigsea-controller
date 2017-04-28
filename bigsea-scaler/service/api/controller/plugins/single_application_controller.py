@@ -29,7 +29,7 @@ class Single_Application_Controller(Controller):
         self.running = True
         self.running_lock = threading.RLock()
         
-        metric_source = Metric_Source_Builder().get_metric_source(self.metric_source_type)
+        metric_source = Metric_Source_Builder().get_metric_source(self.metric_source_type, parameters)
         actuator = Actuator_Builder().get_actuator(self.actuator_type)
         self.alarm = Basic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
