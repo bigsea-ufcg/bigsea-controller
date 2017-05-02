@@ -6,7 +6,8 @@ from service.api.controller.controller import Controller
 from utils.logger import Log, configure_logging
 
 
-# TODO: documentation
+# FIXME: This class does not work with the current scaler format.
+# It should be removed in the future. 
 class Basic_Controller(Controller):
 
     def __init__(self, metric_source, actuator, parameters):
