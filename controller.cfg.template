@@ -1,5 +1,7 @@
+# Flask configuration
 [flask]
-# The ip used by the flask server
-host = 
-# The port used by the flask server
-port = 
+# The host where the scaler service will be deployed
+host = <host_ip>
+# The port where the scaler service will be deployed
+port = <port_number>
+
