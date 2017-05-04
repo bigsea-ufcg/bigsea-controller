@@ -7,7 +7,8 @@ from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.controller.plugins.generic_alarm import Generic_Alarm
 from utils.logger import Log, configure_logging
 
-
+# This class dictates the pace of the scaling process. It controls when Generic_Alarm
+# is called to check application state and when is necessary to wait.
 class Generic_Controller(Controller):
 
     def __init__(self, application_id, parameters):

@@ -1,6 +1,7 @@
 from utils.logger import Log, configure_logging
 import datetime
 
+# This class contains the logic used to adjust the amount of resources allocated to applications
 class Generic_Alarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
