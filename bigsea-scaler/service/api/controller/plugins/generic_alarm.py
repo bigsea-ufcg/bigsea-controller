@@ -23,6 +23,12 @@ class Generic_Alarm:
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
 
     def check_application_state(self, application_id, instances):
+        """
+            Checks the application progress by getting progress metrics from a 
+            metric source, checks if the metrics are new and tries to modify the
+            amount of allocated resources if necessary.
+        """
+        
         # TODO: Check parameters
         try:
             self.logger.log("Getting progress error")
@@ -45,6 +51,12 @@ class Generic_Alarm:
             return
 
     def _scale_down(self, progress_error, instances):
+        """
+            Checks if it is necessary to scale down, according to
+            the progress_error. If it is, calculates the new CPU cap
+            value and tries to modify the cap of the vms.
+        """
+        
         # If the error is positive and its absolute value is too high, scale down
         if progress_error > 0 and progress_error >= self.trigger_down:
             self.logger.log("Scaling down")
@@ -60,6 +72,12 @@ class Generic_Alarm:
             self.actuator.adjust_resources(cap_instances)
             
     def _scale_up(self, progress_error, instances):
+        """
+            Checks if it is necessary to scale up, according to
+            the progress_error. If it is, calculates the new CPU cap
+            value and tries to modify the cap of the vms.
+        """
+        
         # If the error is negative and its absolute value is too high, scale up
         if progress_error < 0 and abs(progress_error) >= self.trigger_up:
             self.logger.log("Scaling up")
