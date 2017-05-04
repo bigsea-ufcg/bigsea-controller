@@ -15,6 +15,7 @@ class Generic_Controller(Controller):
         configure_logging()
         
         self.application_id = application_id
+        # read scaling parameters
         self.instances = parameters["instances"]
         self.check_interval = parameters["check_interval"]
         self.trigger_down = parameters["trigger_down"]
@@ -23,14 +24,20 @@ class Generic_Controller(Controller):
         self.max_cap = parameters["max_cap"]
         self.actuation_size = parameters["actuation_size"]
         self.metric_rounding = parameters["metric_rounding"]
+        # The actuator plugin name
         self.actuator_type = parameters["actuator"]
+        # The metric source plugin name
         self.metric_source_type = parameters["metric_source"]
         
+        # We use a lock here to prevent race conditions when stopping the controller
         self.running = True
         self.running_lock = threading.RLock()
         
+        # Gets a new metric source plugin using the given name
         metric_source = Metric_Source_Builder().get_metric_source(self.metric_source_type, parameters)
+        # Gets a new actuator plugin using the given name
         actuator = Actuator_Builder().get_actuator(self.actuator_type)
+        # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
         self.alarm = Generic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
         
@@ -40,10 +47,12 @@ class Generic_Controller(Controller):
         while run:
             self.logger.log("Monitoring application: %s" % (self.application_id))
 
+            # Call the alarm to check the application
             self.alarm.check_application_state(self.application_id, self.instances)
 
+            # Wait some time
             time.sleep(float(self.check_interval))
-                
+            
             with self.running_lock:
                 run = self.running
             

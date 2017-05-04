@@ -25,10 +25,12 @@ class Generic_Alarm:
         # TODO: Check parameters
         try:
             self.logger.log("Getting progress error")
+            # Get the progress error value and timestamp
             progress_error_timestamp, progress_error = self._get_progress_error(application_id)
             
             self.logger.log("Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
 
+            # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
             if self._check_measurements_are_new(progress_error_timestamp):
                 self._scale_down(progress_error, instances)
                 self._scale_up(progress_error, instances)
@@ -42,21 +44,33 @@ class Generic_Alarm:
             return
 
     def _scale_down(self, progress_error, instances):
+        # If the error is positive and its absolute value is too high, scale down
         if progress_error > 0 and progress_error >= self.trigger_down:
             self.logger.log("Scaling down")
+            
+            # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = max(cap - self.actuation_size, self.min_cap)
+            
+            # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
             
+            # Set the new cap
             self.actuator.adjust_resources(cap_instances)
             
     def _scale_up(self, progress_error, instances):
+        # If the error is negative and its absolute value is too high, scale up
         if progress_error < 0 and abs(progress_error) >= self.trigger_up:
             self.logger.log("Scaling up")
+            
+            # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = min(cap + self.actuation_size, self.max_cap)
+            
+            # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
     
+            # Set the new cap
             self.actuator.adjust_resources(cap_instances)
     
     def _get_progress_error(self, application_id):

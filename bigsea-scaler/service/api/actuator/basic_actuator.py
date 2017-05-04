@@ -14,19 +14,22 @@ class Basic_Actuator(Actuator):
         self.adjust_resources(vm_data)
 
     # TODO: validation
+    # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
         instances_locations = {}
 
-        # discover vm_id - compute nodes map
+        # Discover vm_id - compute nodes map
         for instance in vm_data.keys():
+            # Access compute nodes to discover vms location
             instances_locations[instance] = self.instance_locator.locate(instance)
 
-        # access compute nodes
-        # change cap
         for instance in vm_data.keys():
+            # Access a compute node and change cap
             self.remote_kvm.change_vcpu_quota(instances_locations[instance], instance, int(vm_data[instance]))
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
+        # Access compute nodes to discover vm location
         host = self.instance_locator.locate(vm_id)
+        # Access a compute node and get amount of allocated resources
         return self.remote_kvm.get_allocated_resources(host, vm_id)
