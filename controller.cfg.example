@@ -3,3 +3,7 @@
 host = 0.0.0.0 
 # The port used by the flask server
 port = 5112
+
+[actuator]
+# The ips or names of the compute nodes, separated by comma
+compute_nodes = 

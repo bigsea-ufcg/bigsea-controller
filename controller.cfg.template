@@ -5,3 +5,6 @@ host = <host_ip>
 # The port where the scaler service will be deployed
 port = <port_number>
 
+[actuator]
+# The ips or names of the compute nodes, separated by comma
+compute_nodes = 

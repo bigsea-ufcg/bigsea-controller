@@ -35,9 +35,10 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.allocated_resources = 50
         self.metric_round = 2
 
+        compute_nodes = []
         self.instances = [self.instance_name_1, self.instance_name_2]
         self.metric_source = Metric_Source_Builder().get_metric_source("nop", {})
-        self.instance_locator = Instance_Locator(SSH_Utils())
+        self.instance_locator = Instance_Locator(SSH_Utils(), compute_nodes)
         self.remote_kvm = Remote_KVM(SSH_Utils())
         self.actuator = Basic_Actuator(self.instance_locator, self.remote_kvm)
 

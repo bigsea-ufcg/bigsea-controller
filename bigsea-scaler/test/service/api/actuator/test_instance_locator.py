@@ -7,13 +7,14 @@ from mock.mock import MagicMock
 class Test_Instance_Locator(unittest.TestCase):
 
     def setUp(self):
-        self.ssh_utils = SSH_Utils()
-        self.instance_locator = Instance_Locator(self.ssh_utils)
         self.compute_1 = "compute1"
         self.compute_2 = "compute2"
         self.user = "root"
         self.vm_id = "vm-id"
-        self.instance_locator.COMPUTE_NODES = [self.compute_1, self.compute_2]
+        
+        self.ssh_utils = SSH_Utils()
+        self.compute_nodes = [self.compute_1, self.compute_2]
+        self.instance_locator = Instance_Locator(self.ssh_utils, self.compute_nodes)
 
     def tearDown(self):
         pass
