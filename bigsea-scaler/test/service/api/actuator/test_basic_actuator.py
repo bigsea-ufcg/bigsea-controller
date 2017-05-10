@@ -20,9 +20,9 @@ class Test_Basic_Actuator(unittest.TestCase):
         self.cap2 = 78
 
         compute_nodes = []
-
-        self.instance_locator = Instance_Locator(SSH_Utils(), compute_nodes)
-        self.remote_kvm = Remote_KVM(SSH_Utils())
+        compute_nodes_key = "key"
+        self.instance_locator = Instance_Locator(SSH_Utils(), compute_nodes, compute_nodes_key)
+        self.remote_kvm = Remote_KVM(SSH_Utils(), compute_nodes_key)
         self.actuator = Basic_Actuator(self.instance_locator, self.remote_kvm)
 
     def locator(self, vm_id):

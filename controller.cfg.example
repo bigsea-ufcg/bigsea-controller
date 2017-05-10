@@ -7,3 +7,5 @@ port = 5112
 [actuator]
 # The ips or names of the compute nodes, separated by comma
 compute_nodes = 
+# The keypair used to access the compute nodes
+keypair_compute_nodes =
