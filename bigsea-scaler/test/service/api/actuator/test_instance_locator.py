@@ -20,10 +20,10 @@ class Test_Instance_Locator(unittest.TestCase):
         pass
 
     def located(self, command, user, host):
-        return {self.compute_1:"1\n", self.compute_2:"0\n"}[host]
+        return {self.compute_1:"0\n", self.compute_2:"1\n"}[host]
 
     def impossible_to_locate(self, command, user, host):
-        return {self.compute_1:"0\n", self.compute_2:"0\n"}[host]
+        return {self.compute_1:"1\n", self.compute_2:"1\n"}[host]
 
     def test_locate(self):
         self.ssh_utils.run_and_get_result = MagicMock()
@@ -31,7 +31,7 @@ class Test_Instance_Locator(unittest.TestCase):
         
         result = self.instance_locator.locate(self.vm_id)
         
-        self.ssh_utils.run_and_get_result.assert_any_call("test -e \"/var/lib/nova/instances/%s\" && echo \"1\" || echo \"0\"" % (self.vm_id), self.user, self.compute_1)
+        self.ssh_utils.run_and_get_result.assert_any_call("virsh schedinfo %s > /dev/null 2> /dev/null ; echo $?" % (self.vm_id), self.user, self.compute_1)
         self.assertEquals(result, self.compute_1)
         
     def test_locate_impossible_to_find_instance(self):
@@ -40,8 +40,8 @@ class Test_Instance_Locator(unittest.TestCase):
         
         self.assertRaises(Exception, self.instance_locator.locate, self.vm_id)
         
-        self.ssh_utils.run_and_get_result.assert_any_call("test -e \"/var/lib/nova/instances/%s\" && echo \"1\" || echo \"0\"" % (self.vm_id), self.user, self.compute_1)
-        self.ssh_utils.run_and_get_result.assert_any_call("test -e \"/var/lib/nova/instances/%s\" && echo \"1\" || echo \"0\"" % (self.vm_id), self.user, self.compute_2)
+        self.ssh_utils.run_and_get_result.assert_any_call("virsh schedinfo %s > /dev/null 2> /dev/null ; echo $?" % (self.vm_id), self.user, self.compute_1)
+        self.ssh_utils.run_and_get_result.assert_any_call("virsh schedinfo %s > /dev/null 2> /dev/null ; echo $?" % (self.vm_id), self.user, self.compute_2)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

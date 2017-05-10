@@ -14,7 +14,7 @@ class Actuator_Builder:
             config = ConfigParser.RawConfigParser()
             config.read("controller.cfg")
             compute_nodes_str = config.get("actuator", "compute_nodes")
-            compute_nodes = compute_nodes_str.split(",")
+            compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
             
             instance_locator = Instance_Locator(SSH_Utils(), compute_nodes)
             remote_kvm = Remote_KVM(SSH_Utils())
