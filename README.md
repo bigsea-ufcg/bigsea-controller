@@ -57,11 +57,18 @@ Request body:
 ```
 
 Scaling plugins available:
+
 [Single application controller](doc/single-application-controller.md)
+
 [Progress error controller](doc/progress-error.md)
 
 Actuation plugins available:
+
 [KVM actuator](doc/kvm-actuator.md)
+
+Metric source plugins available:
+
+[Monasca metric source](doc/monasca-metric-source.md)
 
 #### Stop scaling
 
