@@ -6,7 +6,10 @@ host = <host_ip>
 port = <port_number>
 
 [actuator]
-# The ips or names of the compute nodes, separated by comma
+# The ips or names of the compute nodes, separated by comma.
 compute_nodes = 
-# The keypair used to access the compute nodes
+# The keypair used to access the compute nodes.
 keypair_compute_nodes =
+# A list of ports. Required when using SSH through tunnels.
+# The i-th port will be used to access the i-th compute node.
+tunnel_ports = 

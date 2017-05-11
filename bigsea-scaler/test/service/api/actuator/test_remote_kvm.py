@@ -6,7 +6,7 @@ from mock.mock import MagicMock
 class Test_Remote_KVM(unittest.TestCase):
 
     def setUp(self):
-        self.ssh_utils = SSH_Utils()
+        self.ssh_utils = SSH_Utils({})
         self.compute_nodes_key = "key"
         self.remote_kvm = Remote_KVM(self.ssh_utils, self.compute_nodes_key)
         self.cap = 56

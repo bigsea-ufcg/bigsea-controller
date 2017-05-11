@@ -12,7 +12,7 @@ class Test_Instance_Locator(unittest.TestCase):
         self.user = "root"
         self.vm_id = "vm-id"
         
-        self.ssh_utils = SSH_Utils()
+        self.ssh_utils = SSH_Utils({})
         self.compute_nodes = [self.compute_1, self.compute_2]
         self.compute_nodes_key = "key"
         self.instance_locator = Instance_Locator(self.ssh_utils, self.compute_nodes, self.compute_nodes_key)
