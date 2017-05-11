@@ -1,9 +1,9 @@
-from actuator import Actuator
+from service.api.actuator.actuator import Actuator
 
 # TODO: documentation
 
 
-class Basic_Actuator(Actuator):
+class KVM_Actuator(Actuator):
 
     def __init__(self, instance_locator, remote_kvm):
         self.instance_locator = instance_locator

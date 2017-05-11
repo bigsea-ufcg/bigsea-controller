@@ -1,5 +1,5 @@
 import unittest
-from service.api.actuator.instance_locator import Instance_Locator
+from service.api.actuator.plugins.instance_locator import Instance_Locator
 from utils.ssh_utils import SSH_Utils
 from mock.mock import MagicMock
 

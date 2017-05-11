@@ -1,5 +1,5 @@
 import unittest
-from service.api.actuator.remote_kvm import Remote_KVM
+from service.api.actuator.plugins.remote_kvm import Remote_KVM
 from utils.ssh_utils import SSH_Utils
 from mock.mock import MagicMock
 

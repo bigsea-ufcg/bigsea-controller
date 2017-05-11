@@ -2,12 +2,12 @@ import datetime
 import unittest
 
 from mock.mock import MagicMock
-from service.api.actuator.basic_actuator import Basic_Actuator
-from service.api.actuator.instance_locator import Instance_Locator
-from service.api.actuator.remote_kvm import Remote_KVM
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.controller.plugins.generic_alarm import Generic_Alarm
 from utils.ssh_utils import SSH_Utils
+from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
+from service.api.actuator.plugins.instance_locator import Instance_Locator
+from service.api.actuator.plugins.remote_kvm import Remote_KVM
 
 
 class Test_Generic_Alarm(unittest.TestCase):
@@ -41,7 +41,7 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.metric_source = Metric_Source_Builder().get_metric_source("nop", {})
         self.instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_key)
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
-        self.actuator = Basic_Actuator(self.instance_locator, self.remote_kvm)
+        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm)
 
         self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_round)

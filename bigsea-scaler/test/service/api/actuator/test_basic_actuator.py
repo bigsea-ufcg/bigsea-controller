@@ -1,10 +1,10 @@
 from mock import MagicMock
 import unittest
 
-from service.api.actuator.basic_actuator import Basic_Actuator
-from service.api.actuator.instance_locator import Instance_Locator
-from service.api.actuator.remote_kvm import Remote_KVM
 from utils.ssh_utils import SSH_Utils
+from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
+from service.api.actuator.plugins.instance_locator import Instance_Locator
+from service.api.actuator.plugins.remote_kvm import Remote_KVM
 
 
 class Test_Basic_Actuator(unittest.TestCase):
@@ -23,7 +23,7 @@ class Test_Basic_Actuator(unittest.TestCase):
         compute_nodes_key = "key"
         self.instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_key)
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
-        self.actuator = Basic_Actuator(self.instance_locator, self.remote_kvm)
+        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm)
 
     def locator(self, vm_id):
         return {self.vm_id1:self.host_ip1, self.vm_id2:self.host_ip2}[vm_id]
