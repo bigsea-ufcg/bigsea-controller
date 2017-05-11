@@ -5,3 +5,4 @@
 *.pyc
 /controller.cfg
 /monitor.cfg
+/scaler.cfg

@@ -14,9 +14,10 @@ from service.api.actuator.plugins.remote_kvm import Remote_KVM
 class Actuator_Builder:
 
     def get_actuator(self, name):
+        config = ConfigParser.RawConfigParser()
+        config.read("scaler.cfg")
+        
         if name == "kvm":
-            config = ConfigParser.RawConfigParser()
-            config.read("controller.cfg")
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
@@ -25,8 +26,6 @@ class Actuator_Builder:
             remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair)
             return KVM_Actuator(instance_locator, remote_kvm)
         elif name == "kvm-tunnel":
-            config = ConfigParser.RawConfigParser()
-            config.read("controller.cfg")
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]

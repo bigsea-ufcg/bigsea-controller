@@ -4,7 +4,7 @@ import ConfigParser
 
 def main():
     config = ConfigParser.RawConfigParser()
-    config.read("controller.cfg")
+    config.read("scaler.cfg")
 
     host = config.get("flask", "host")
     port = config.getint("flask", "port")

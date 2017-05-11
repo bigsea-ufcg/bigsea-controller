@@ -26,7 +26,7 @@ class Test_Main_Controller(unittest.TestCase):
         self.max_cap = 100
         self.actuation_size = 20
         self.metric_rounding = 2
-        self.actuator = "basic"
+        self.actuator = "kvm"
         self.metric_source = "nop"
         
         self.parameters = {}
