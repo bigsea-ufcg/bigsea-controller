@@ -10,7 +10,9 @@ host = <host ip>
 # The port used by the flask server
 port = <host port>
 ```
-* Run the main python file to start the service
+* Some scaler plugins may require additional parameters. Please, check the plugins documentation.
+* Run the main python file to start the service.
+
 ```
 $ python bigsea-scaler/cli/main.py
 ```
@@ -56,6 +58,10 @@ Request body:
 
 Scaling plugins available:
 [Single application controller](doc/single-application-controller.md)
+[Progress error controller](doc/progress-error.md)
+
+Actuation plugins available:
+[KVM actuator](doc/kvm-actuator.md)
 
 #### Stop scaling
 

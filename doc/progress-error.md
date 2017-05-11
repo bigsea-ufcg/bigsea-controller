@@ -1,4 +1,4 @@
-# Controller Plugin - "single"
+# Controller Plugin - "progress-error"
 
 ## Start Scaling
 
@@ -49,7 +49,7 @@ Request example:
 
 ```javascript
 {
-	"plugin":"single",
+	"plugin":"progress-error",
 	"actuator":"kvm",
 	"metric_source":"monasca",
 	
