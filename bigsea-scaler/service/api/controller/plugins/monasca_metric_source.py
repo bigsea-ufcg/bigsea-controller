@@ -9,13 +9,7 @@ class Monasca_Metric_Source(Metric_Source):
         self.parameters = parameters
 
     def get_most_recent_value(self, metric_name, options):
-        
-        application_type = self.parameters["application_type"]
         dimensions = {"application_id":options["application_id"]}
-        
-        if application_type == "spark":
-            dimensions["service"] = "spark-sahara"
-        
         measurement = self.monasca.last_measurement(metric_name, dimensions)
         timestamp = datetime.datetime.strptime(measurement[0], '%Y-%m-%dT%H:%M:%S.%fZ')
         value = measurement[1]
