@@ -11,7 +11,7 @@ from utils.logger import Log, configure_logging
 class Single_Application_Controller(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = Log("single.controller.log", "controller.log")
+        self.logger = Log("single.controller.log", "scaler.log")
         configure_logging()
         
         self.application_id = application_id

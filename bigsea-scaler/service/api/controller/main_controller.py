@@ -5,7 +5,7 @@ from utils.logger import Log, configure_logging
 class Main_Controller:
 
     def __init__(self):
-        self.logger = Log("main.controller.log", "controller.log")
+        self.logger = Log("main.controller.log", "scaler.log")
         configure_logging()
         
         self.controller_thread_pool = {}
