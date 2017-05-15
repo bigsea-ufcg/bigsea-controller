@@ -2,4 +2,5 @@ flask
 python-monascaclient
 requests
 wrapt
+cffi
 paramiko
