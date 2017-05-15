@@ -2,3 +2,4 @@ flask
 python-monascaclient
 requests
 wrapt
+paramiko
