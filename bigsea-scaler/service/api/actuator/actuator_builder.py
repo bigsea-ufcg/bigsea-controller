@@ -8,6 +8,7 @@ from utils.ssh_utils import SSH_Utils
 from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
 from service.api.actuator.plugins.instance_locator import Instance_Locator
 from service.api.actuator.plugins.remote_kvm import Remote_KVM
+from service.api.actuator.plugins.nop_actuator import Nop_Actuator
 
 
 # TODO: documentation
@@ -38,6 +39,8 @@ class Actuator_Builder:
             instance_locator = Instance_Locator_Tunnel(SSH_Utils(hosts_ports), compute_nodes, compute_nodes_keypair)
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair)
             return KVM_Actuator(instance_locator, remote_kvm)
+        elif name == "nop":
+            return Nop_Actuator()
         else:
             # FIXME: review this exception type
             raise Exception("Unknown actuator type")

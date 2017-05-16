@@ -23,7 +23,7 @@ class Test_Single_Application_Controller(unittest.TestCase):
         self.max_cap = 100
         self.actuation_size = 20
         self.metric_rounding = 2
-        self.actuator = "kvm"
+        self.actuator = "nop"
         self.metric_source = "nop"
         
         self.parameters["instances"] = self.instances

@@ -27,7 +27,7 @@ class Test_Basic_Controller(unittest.TestCase):
         config.get.side_effect = self.config_values
 
         metric_source = Metric_Source_Builder().get_metric_source("nop", {})
-        actuator = Actuator_Builder().get_actuator("kvm")
+        actuator = Actuator_Builder().get_actuator("nop")
 
         parameters = {"check_interval":self.CHECK_INTERVAL, "trigger_down":10, "trigger_up":10,
                   "min_cap":10, "max_cap":100, "actuation_size":20, "metric_rounding":2}
