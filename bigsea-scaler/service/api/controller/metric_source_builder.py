@@ -1,5 +1,5 @@
-from service.api.controller.plugins.monasca_metric_source import Monasca_Metric_Source
-from service.api.controller.plugins.nop_metric_source import Nop_Metric_Source
+from service.api.controller.plugins.monasca.monasca_metric_source import Monasca_Metric_Source
+from service.api.controller.plugins.nop.nop_metric_source import Nop_Metric_Source
 
 class Metric_Source_Builder:
 

@@ -4,7 +4,7 @@ import time
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.controller import Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.controller.plugins.generic_alarm import Generic_Alarm
+from service.api.controller.plugins.generic.generic_alarm import Generic_Alarm
 from utils.logger import Log, configure_logging
 
 # This class dictates the pace of the scaling process. It controls when Generic_Alarm

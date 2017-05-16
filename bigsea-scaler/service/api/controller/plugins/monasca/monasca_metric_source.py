@@ -1,5 +1,5 @@
 from service.api.controller.metric_source import Metric_Source
-from service.api.controller.plugins.monasca_monitor import Monasca_Monitor
+from service.api.controller.plugins.monasca.monasca_monitor import Monasca_Monitor
 import datetime
 
 
