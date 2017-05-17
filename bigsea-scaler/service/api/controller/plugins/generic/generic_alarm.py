@@ -45,9 +45,9 @@ class Generic_Alarm:
                 self.last_progress_error_timestamp = progress_error_timestamp
             else:
                 self.logger.log("Could not acquire more recent metrics")
-        except Exception:
+        except Exception as e:
             # TODO: Check exception type
-            self.logger.log("Could not get metrics")
+            self.logger.log(str(e))
             return
 
     def _scale_down(self, progress_error, instances):

@@ -34,4 +34,5 @@ class SSH_Utils(object):
         keypair = paramiko.RSAKey.from_private_key_file(keypair_path)
         conn = paramiko.SSHClient()
         conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        conn.connect(hostname="127.0.0.1", port=self.hosts_ports[ip], username=username, pkey=keypair)
+        conn.connect(hostname="127.0.0.1", port=int(self.hosts_ports[ip]), username=username, pkey=keypair)
+        return conn
