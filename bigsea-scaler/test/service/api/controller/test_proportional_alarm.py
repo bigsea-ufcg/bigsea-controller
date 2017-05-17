@@ -6,7 +6,7 @@ from service.api.actuator.plugins.instance_locator import Instance_Locator
 from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
 from service.api.actuator.plugins.remote_kvm import Remote_KVM
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.controller.plugins.proportional_alarm import Proportional_Alarm
+from service.api.controller.plugins.tendency.tendency_aware_proportional_alarm import Tendency_Aware_Proportional_Alarm
 from utils.ssh_utils import SSH_Utils
 
 class Test_Proportional_Alarm(unittest.TestCase):
@@ -42,7 +42,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
         self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm)
 
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
+        self.alarm = Tendency_Aware_Proportional_Alarm(self.actuator, self.metric_source, 
                                         self.trigger_down, self.trigger_up, 
                                         self.min_cap, self.max_cap, 
                                         self.metric_round)
