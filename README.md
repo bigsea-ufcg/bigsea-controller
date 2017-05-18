@@ -62,6 +62,8 @@ Scaling plugins available:
 
 [Progress error controller](doc/progress-error.md)
 
+[Proportional controller](doc/proportional-controller.md)
+
 Actuation plugins available:
 
 [KVM actuator](doc/kvm-actuator.md)
