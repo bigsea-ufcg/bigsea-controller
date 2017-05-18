@@ -7,6 +7,7 @@ from service.api.controller.plugins.single_application_controller import Single_
 from service.api.controller.plugins.generic.generic_controller import Generic_Controller
 from service.api.controller.plugins.tendency.tendency_aware_proportional_alarm import Tendency_Aware_Proportional_Alarm
 from service.api.controller.plugins.tendency.tendency_aware_proportional_controller import Tendency_Aware_Proportional_Controller
+from service.api.controller.plugins.proportional.proportional_controller import Proportional_Controller
 
 class Controller_Builder:
 
@@ -43,6 +44,8 @@ class Controller_Builder:
             return Single_Application_Controller(application_id, parameters)
         elif name == "progress-error":
             return Generic_Controller(application_id, parameters)
+        elif name == "proportional":
+            return Proportional_Controller(application_id, parameters)
         elif name == "progress-tendency":
             return Tendency_Aware_Proportional_Controller(application_id, parameters)
         else:
