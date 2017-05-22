@@ -5,6 +5,7 @@ import time
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.plugins.proportional.proportional_alarm import Proportional_Alarm
+from exceptions.monasca_exceptions import No_Metrics_Exception
 
 class Proportional_Controller(Controller):
     
@@ -47,7 +48,12 @@ class Proportional_Controller(Controller):
             self.logger.log("Monitoring application: %s" % (self.application_id))
 
             # Call the alarm to check the application
-            self.alarm.check_application_state(self.application_id, self.instances)
+            try:
+                self.alarm.check_application_state(self.application_id, self.instances)
+            except No_Metrics_Exception: 
+                self.logger.log("No metrics available")
+            except Exception as e:
+                self.logger.log(str(e))
 
             # Wait some time
             time.sleep(float(self.check_interval))

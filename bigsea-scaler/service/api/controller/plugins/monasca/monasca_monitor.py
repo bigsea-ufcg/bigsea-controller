@@ -2,6 +2,7 @@ import monascaclient.exc as exc
 import ConfigParser
 
 from monascaclient import client as monclient, ksclient
+from exceptions.monasca_exceptions import No_Metrics_Exception
 
 
 class Monasca_Monitor:
@@ -42,7 +43,7 @@ class Monasca_Monitor:
         measurements = self.get_measurements(name, dimensions) 
 
         if measurements is None:
-            raise Exception("No metrics")
+            raise No_Metrics_Exception()
         else:
             return measurements[-1]
 

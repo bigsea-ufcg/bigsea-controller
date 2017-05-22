@@ -29,25 +29,24 @@ class Proportional_Alarm:
         """
         
         # TODO: Check parameters
-        try:
-            self.logger.log("Getting progress error")
-            # Get the progress error value and timestamp
-            progress_error_timestamp, progress_error = self._get_progress_error(application_id)
+        self.logger.log("Getting progress error")
+        # Get the progress error value and timestamp
+        progress_error_timestamp, progress_error = self._get_progress_error(application_id)
             
-            self.logger.log("Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
+        self.logger.log("Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
 
-            # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
-            if self._check_measurements_are_new(progress_error_timestamp):
-                self._scale_down(progress_error, instances)
-                self._scale_up(progress_error, instances)
+        # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
+        if self._check_measurements_are_new(progress_error_timestamp):
+            self._scale_down(progress_error, instances)
+            self._scale_up(progress_error, instances)
                     
-                self.last_progress_error_timestamp = progress_error_timestamp
-            else:
-                self.logger.log("Could not acquire more recent metrics")
-        except Exception as e:
-            # TODO: Check exception type
-            self.logger.log(str(e))
-            return
+            self.last_progress_error_timestamp = progress_error_timestamp
+        else:
+            self.logger.log("Could not acquire more recent metrics")
+#         except Exception as e:
+#             # TODO: Check exception type
+#             self.logger.log(str(e))
+#             return
 
     def _scale_down(self, progress_error, instances):
         """
