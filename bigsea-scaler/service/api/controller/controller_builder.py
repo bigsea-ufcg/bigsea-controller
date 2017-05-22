@@ -5,7 +5,6 @@ from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.plugins.single_application_controller import Single_Application_Controller
 from service.api.controller.plugins.generic.generic_controller import Generic_Controller
-from service.api.controller.plugins.tendency.tendency_aware_proportional_alarm import Tendency_Aware_Proportional_Alarm
 from service.api.controller.plugins.tendency.tendency_aware_proportional_controller import Tendency_Aware_Proportional_Controller
 from service.api.controller.plugins.proportional.proportional_controller import Proportional_Controller
 
@@ -15,6 +14,8 @@ class Controller_Builder:
         pass
 
     def get_controller(self, name, application_id, parameters):
+        scaling_parameters = parameters["scaling_parameters"]
+        
         if name == "basic":
             config = ConfigParser.RawConfigParser()
             config.read("controller.cfg")
@@ -43,11 +44,11 @@ class Controller_Builder:
         elif name == "single":
             return Single_Application_Controller(application_id, parameters)
         elif name == "progress-error":
-            return Generic_Controller(application_id, parameters)
+            return Generic_Controller(application_id, scaling_parameters)
         elif name == "proportional":
-            return Proportional_Controller(application_id, parameters)
+            return Proportional_Controller(application_id, scaling_parameters)
         elif name == "progress-tendency":
-            return Tendency_Aware_Proportional_Controller(application_id, parameters)
+            return Tendency_Aware_Proportional_Controller(application_id, scaling_parameters)
         else:
             # FIXME: exception type
             raise Exception("Unknown controller type")

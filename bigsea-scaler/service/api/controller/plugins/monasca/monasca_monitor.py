@@ -2,7 +2,7 @@ import monascaclient.exc as exc
 import ConfigParser
 
 from monascaclient import client as monclient, ksclient
-from exceptions.monasca_exceptions import No_Metrics_Exception
+from service.exceptions.monasca_exceptions import No_Metrics_Exception
 
 
 class Monasca_Monitor:

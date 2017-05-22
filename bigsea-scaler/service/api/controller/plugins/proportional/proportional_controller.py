@@ -5,7 +5,7 @@ import time
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.plugins.proportional.proportional_alarm import Proportional_Alarm
-from exceptions.monasca_exceptions import No_Metrics_Exception
+from service.exceptions.monasca_exceptions import No_Metrics_Exception
 
 class Proportional_Controller(Controller):
     
@@ -21,7 +21,6 @@ class Proportional_Controller(Controller):
         self.trigger_up = parameters["trigger_up"]
         self.min_cap = parameters["min_cap"]
         self.max_cap = parameters["max_cap"]
-        self.actuation_size = parameters["actuation_size"]
         self.metric_rounding = parameters["metric_rounding"]
         # The actuator plugin name
         self.actuator_type = parameters["actuator"]
