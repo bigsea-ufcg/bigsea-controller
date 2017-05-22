@@ -63,7 +63,7 @@ class Proportional_Alarm:
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
-            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+            self.logger.log("Scaling from %f to %f" % (cap, new_cap))
             
             # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
@@ -86,7 +86,7 @@ class Proportional_Alarm:
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
-            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+            self.logger.log("Scaling from %f to %f" % (cap, new_cap))
             
             # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
