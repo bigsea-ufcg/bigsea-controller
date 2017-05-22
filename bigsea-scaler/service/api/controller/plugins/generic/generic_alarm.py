@@ -65,6 +65,8 @@ class Generic_Alarm:
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = max(cap - self.actuation_size, self.min_cap)
             
+            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+            
             # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
             
@@ -85,6 +87,8 @@ class Generic_Alarm:
             # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = min(cap + self.actuation_size, self.max_cap)
+            
+            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
             
             # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
