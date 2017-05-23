@@ -29,3 +29,12 @@ class Main_Controller:
         else:
             self.logger.log("Application %s not found" % (app_id))
     
+    def status(self):
+        status_string = "Status: OK\n"
+        status_string += "Monitoring applications:\n"
+        for application_id in self.controller_thread_pool.keys():
+            status_string += application_id + "\n"
+            status_string += "Last action:" + self.controller_thread_pool[application_id].status()
+            status_string += "\n"
+        
+        return status_string

@@ -12,6 +12,7 @@ from utils.logger import configure_logging
 SETUP_ROUTE="/scaler/setup_env"
 START_SCALING_ROUTE = '/scaler/start_scaling/<app_id>'
 STOP_SCALING_ROUTE = '/scaler/stop_scaling/<app_id>'
+STATUS = '/scaler/status'
 
 app = Flask(__name__)
 
@@ -55,3 +56,7 @@ def stop_application_scaling(app_id):
     main_controller.stop_application_scaling(app_id)
 
     return "stopped-scaling"
+
+@app.route(STATUS, methods = ['GET'])
+def status():
+    return main_controller.status()

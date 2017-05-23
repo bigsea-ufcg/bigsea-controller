@@ -20,6 +20,7 @@ class Proportional_Alarm:
         configure_logging()
         
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.last_action = ""
     
     def check_application_state(self, application_id, instances):
         """
@@ -30,10 +31,12 @@ class Proportional_Alarm:
         
         # TODO: Check parameters
         self.logger.log("Getting progress error")
+        self.last_action = "getting progress error"
         # Get the progress error value and timestamp
         progress_error_timestamp, progress_error = self._get_progress_error(application_id)
             
         self.logger.log("Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
+        self.last_action = "Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error)
 
         # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
         if self._check_measurements_are_new(progress_error_timestamp):
@@ -42,6 +45,7 @@ class Proportional_Alarm:
                     
             self.last_progress_error_timestamp = progress_error_timestamp
         else:
+            self.last_action += " Could not acquire more recent metrics"
             self.logger.log("Could not acquire more recent metrics")
 #         except Exception as e:
 #             # TODO: Check exception type
@@ -58,12 +62,14 @@ class Proportional_Alarm:
         # If the error is positive and its absolute value is too high, scale down
         if progress_error > 0 and progress_error >= self.trigger_down:
             self.logger.log("Scaling down")
+            self.last_action = "Getting allocated resources"
             
             # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
             self.logger.log("Scaling from %f to %f" % (cap, new_cap))
+            self.last_action = "Scaling from %d to %d" % (cap, new_cap)
             
             # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
@@ -81,12 +87,14 @@ class Proportional_Alarm:
         # If the error is negative and its absolute value is too high, scale up
         if progress_error < 0 and abs(progress_error) >= self.trigger_up:
             self.logger.log("Scaling up")
+            self.last_action = "Getting allocated resources"
             
             # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
             self.logger.log("Scaling from %f to %f" % (cap, new_cap))
+            self.last_action = "Scaling from %d to %d" % (cap, new_cap)
             
             # Currently, we use the same cap for all the vms
             cap_instances = {instance:new_cap for instance in instances}
@@ -119,3 +127,7 @@ class Proportional_Alarm:
                 return max(current_cap - actuation_size, self.min_cap) 
         else:
             raise Exception("Unknown heuristic")
+        
+    def status(self):
+        return self.last_action
+        

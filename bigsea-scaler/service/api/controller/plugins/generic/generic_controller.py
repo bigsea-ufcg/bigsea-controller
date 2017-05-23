@@ -60,3 +60,6 @@ class Generic_Controller(Controller):
     def stop_application_scaling(self):
         with self.running_lock:
             self.running = False
+            
+    def status(self):
+        return self.alarm.status()

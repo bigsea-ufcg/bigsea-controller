@@ -33,3 +33,7 @@ class Controller:
     @abstractmethod
     def stop_application_scaling(self):
         pass
+    
+    @abstractmethod
+    def status(self):
+        pass
