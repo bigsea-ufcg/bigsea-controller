@@ -68,7 +68,7 @@ class Proportional_Alarm:
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
-            self.logger.log("Scaling from %f to %f" % (cap, new_cap))
+            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
             
             # Currently, we use the same cap for all the vms
@@ -114,10 +114,10 @@ class Proportional_Alarm:
         return self.last_progress_error_timestamp < progress_error_timestamp
     
     def _decide_next_cap(self, current_cap, progress_error, heuristic_options):
-        heuristic = heuristic_options["heuristic-name"]
+        heuristic = heuristic_options["heuristic_name"]
         
-        if heuristic == "error-proportional":
-            conservative_factor = heuristic_options["conservative-factor"]
+        if heuristic == "error_proportional":
+            conservative_factor = heuristic_options["conservative_factor"]
             
             actuation_size = abs(progress_error*conservative_factor)
             
