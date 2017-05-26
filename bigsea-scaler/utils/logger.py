@@ -5,11 +5,12 @@ import logging
 class Log:
     def __init__(self, name, output_file_path):
         self.logger = logging.getLogger(name)
-        handler = logging.StreamHandler()
-        handler.setLevel(logging.DEBUG)
-        self.logger.addHandler(handler)
-        handler = logging.FileHandler(output_file_path)
-        self.logger.addHandler(handler)
+        if not len(self.logger.handlers):
+            handler = logging.StreamHandler()
+            handler.setLevel(logging.DEBUG)
+            self.logger.addHandler(handler)
+            handler = logging.FileHandler(output_file_path)
+            self.logger.addHandler(handler)
 
     def log(self, text):
         self.logger.info(text)

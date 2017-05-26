@@ -27,10 +27,14 @@ class Remote_KVM(object):
         
         try:
             cap = int(ssh_result)
+        
+            if cap == 0:
+                raise Exception("Could not get allocated resources")
             
             if cap == -1:
                 return 100
             return cap/1000
+        
         except:
             # FIXME: review this exception type
             raise Exception("Could not get allocated resources")

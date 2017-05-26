@@ -1,5 +1,6 @@
 from utils.logger import Log, configure_logging
 import datetime
+import time
 
 class Tendency_Aware_Proportional_Alarm:
 
@@ -20,6 +21,7 @@ class Tendency_Aware_Proportional_Alarm:
         
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
         self.last_progress_error = None
+        self.cap = -1
 
     def check_application_state(self, application_id, instances):
         """
@@ -39,6 +41,9 @@ class Tendency_Aware_Proportional_Alarm:
             # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
             if self._check_measurements_are_new(progress_error_timestamp):
                 self._scale(progress_error, instances)
+                
+                if self.cap != -1:
+                    self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(application_id), str(self.cap)))
                 
                 self.last_progress_error = progress_error
                 self.last_progress_error_timestamp = progress_error_timestamp
@@ -73,6 +78,8 @@ class Tendency_Aware_Proportional_Alarm:
             
         # Set the new cap
         self.actuator.adjust_resources(cap_instances)
+        
+        self.cap = new_cap
 
     def _scale_up(self, instances):
         self.logger.log("Scaling up")
@@ -88,6 +95,8 @@ class Tendency_Aware_Proportional_Alarm:
     
         # Set the new cap
         self.actuator.adjust_resources(cap_instances)
+        
+        self.cap = new_cap
     
     def _tendency_scale(self, progress_error, instances):
         if self.last_progress_error != None:
@@ -101,12 +110,15 @@ class Tendency_Aware_Proportional_Alarm:
                 
             cap_instances = {instance:new_cap for instance in instances}
             self.actuator.adjust_resources(cap_instances)
+            
+            self.cap = new_cap
         elif difference > 0.0:
             cap = self.actuator.get_allocated_resources(instances[0])
             new_cap = max(cap - abs(difference), self.min_cap)
                 
             cap_instances = {instance:new_cap for instance in instances}
-            self.actuator.adjust_resources(cap_instances)    
+            self.actuator.adjust_resources(cap_instances)
+            self.cap = new_cap
 
     def _get_progress_error(self, application_id):
         progress_error_measurement = self.metric_source.get_most_recent_value(Tendency_Aware_Proportional_Alarm.ERROR_METRIC_NAME,

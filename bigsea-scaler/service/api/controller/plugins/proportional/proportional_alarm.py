@@ -1,5 +1,6 @@
 from utils.logger import Log, configure_logging
 import datetime
+import time
 
 class Proportional_Alarm:
     
@@ -21,6 +22,7 @@ class Proportional_Alarm:
         
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
         self.last_action = ""
+        self.cap = -1
     
     def check_application_state(self, application_id, instances):
         """
@@ -42,6 +44,9 @@ class Proportional_Alarm:
         if self._check_measurements_are_new(progress_error_timestamp):
             self._scale_down(progress_error, instances)
             self._scale_up(progress_error, instances)
+                    
+            if self.cap != -1:
+                self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(application_id), str(self.cap)))
                     
             self.last_progress_error_timestamp = progress_error_timestamp
         else:
@@ -77,6 +82,8 @@ class Proportional_Alarm:
             # Set the new cap
             self.actuator.adjust_resources(cap_instances)
             
+            self.cap = new_cap
+            
     def _scale_up(self, progress_error, instances):
         """
             Checks if it is necessary to scale up, according to
@@ -101,6 +108,8 @@ class Proportional_Alarm:
     
             # Set the new cap
             self.actuator.adjust_resources(cap_instances)
+            
+            self.cap = new_cap
     
     def _get_progress_error(self, application_id):
         progress_error_measurement = self.metric_source.get_most_recent_value(Proportional_Alarm.ERROR_METRIC_NAME,

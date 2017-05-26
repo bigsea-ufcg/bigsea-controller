@@ -25,6 +25,9 @@ class Remote_KVM_Tunnel:
         
         try:
             cap = int(ssh_result)
+        
+            if cap == 0:
+                raise Exception("Could not get allocated resources")
             
             if cap == -1:
                 return 100
