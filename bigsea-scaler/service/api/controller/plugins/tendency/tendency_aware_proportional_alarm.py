@@ -17,6 +17,8 @@ class Tendency_Aware_Proportional_Alarm:
         self.metric_rounding = metric_rounding
 
         self.logger = Log("proportional.alarm.log", "scaler.log")
+        self.cap_logger = Log("cap.log", "cap.log")
+        
         configure_logging()
         
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')

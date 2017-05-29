@@ -18,6 +18,8 @@ class Proportional_Alarm:
         self.heuristic_options = heuristic_options
 
         self.logger = Log("proportional.alarm.log", "scaler.log")
+        self.cap_logger = Log("cap.log", "cap.log")
+
         configure_logging()
         
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
