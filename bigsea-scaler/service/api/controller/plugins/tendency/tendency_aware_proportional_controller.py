@@ -22,6 +22,7 @@ class Tendency_Aware_Proportional_Controller(Controller):
         self.min_cap = parameters["min_cap"]
         self.max_cap = parameters["max_cap"]
         self.metric_rounding = parameters["metric_rounding"]
+        self.actuation_size = parameters["actuation_size"]
         # The actuator plugin name
         self.actuator_type = parameters["actuator"]
         # The metric source plugin name
@@ -37,7 +38,7 @@ class Tendency_Aware_Proportional_Controller(Controller):
         actuator = Actuator_Builder().get_actuator(self.actuator_type)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
         self.alarm = Tendency_Aware_Proportional_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
-                                 self.min_cap, self.max_cap, self.metric_rounding)
+                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
         
     def start_application_scaling(self):
         run = True
@@ -62,3 +63,6 @@ class Tendency_Aware_Proportional_Controller(Controller):
     def stop_application_scaling(self):
         with self.running_lock:
             self.running = False
+            
+    def status(self):
+        return self.alarm.status()

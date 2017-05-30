@@ -6,7 +6,7 @@ class Tendency_Aware_Proportional_Alarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
 
-    def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, metric_rounding):
+    def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, actuation_size, metric_rounding):
         # TODO: Check parameters
         self.metric_source = metric_source
         self.actuator = actuator
@@ -15,6 +15,7 @@ class Tendency_Aware_Proportional_Alarm:
         self.min_cap = min_cap
         self.max_cap = max_cap
         self.metric_rounding = metric_rounding
+        self.actuation_size = actuation_size
 
         self.logger = Log("proportional.alarm.log", "scaler.log")
         self.cap_logger = Log("cap.log", "cap.log")
@@ -24,6 +25,7 @@ class Tendency_Aware_Proportional_Alarm:
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
         self.last_progress_error = None
         self.cap = -1
+        self.last_action = ""
 
     def check_application_state(self, application_id, instances):
         """
@@ -33,28 +35,25 @@ class Tendency_Aware_Proportional_Alarm:
         """
         
         # TODO: Check parameters
-        try:
-            self.logger.log("Getting progress error")
-            # Get the progress error value and timestamp
+        self.logger.log("Getting progress error")
+        self.last_action = "getting progress error"
+        # Get the progress error value and timestamp
 
-            progress_error_timestamp, progress_error = self._get_progress_error(application_id)
-            self.logger.log("Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
+        progress_error_timestamp, progress_error = self._get_progress_error(application_id)
+        self.logger.log("Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
+        self.last_action = "Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error)
 
-            # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
-            if self._check_measurements_are_new(progress_error_timestamp):
-                self._scale(progress_error, instances)
+        # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
+        if self._check_measurements_are_new(progress_error_timestamp):
+            self._scale(progress_error, instances)
                 
-                if self.cap != -1:
-                    self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(application_id), str(self.cap)))
+            if self.cap != -1:
+                self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(application_id), str(self.cap)))
                 
-                self.last_progress_error = progress_error
-                self.last_progress_error_timestamp = progress_error_timestamp
-            else:
-                self.logger.log("Could not acquire more recent metrics")
-        except Exception:
-            # TODO: Check exception type
-            self.logger.log("Could not get metrics")
-            return
+            self.last_progress_error = progress_error
+            self.last_progress_error_timestamp = progress_error_timestamp
+        else:
+            self.logger.log("Could not acquire more recent metrics")
 
     def _scale(self, progress_error, instances):
         # If the error is positive and its absolute value is too high, scale down
@@ -68,12 +67,14 @@ class Tendency_Aware_Proportional_Alarm:
     
     def _scale_down(self, instances):
         self.logger.log("Scaling down")
-            
+        self.last_action = "Getting allocated resources"
+        
         # Get current CPU cap
         cap = self.actuator.get_allocated_resources(instances[0])
         new_cap = max(cap - self.actuation_size, self.min_cap)
             
         self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+        self.last_action = "Scaling from %d to %d" % (cap, new_cap)
             
         # Currently, we use the same cap for all the vms
         cap_instances = {instance:new_cap for instance in instances}
@@ -85,12 +86,14 @@ class Tendency_Aware_Proportional_Alarm:
 
     def _scale_up(self, instances):
         self.logger.log("Scaling up")
-            
+        self.last_action = "Getting allocated resources"
+        
         # Get current CPU cap
         cap = self.actuator.get_allocated_resources(instances[0])
         new_cap = min(cap + self.actuation_size, self.max_cap)
         
         self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+        self.last_action = "Scaling from %d to %d" % (cap, new_cap)
         
         # Currently, we use the same cap for all the vms
         cap_instances = {instance:new_cap for instance in instances}
@@ -108,16 +111,22 @@ class Tendency_Aware_Proportional_Alarm:
             
         if difference < 0.0:
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = min(cap + abs(difference), self.max_cap)
-                
+            new_cap = min(cap + self.actuation_size, self.max_cap)
+            
+            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+            self.last_action = "Scaling from %d to %d" % (cap, new_cap)
+            
             cap_instances = {instance:new_cap for instance in instances}
             self.actuator.adjust_resources(cap_instances)
             
             self.cap = new_cap
         elif difference > 0.0:
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = max(cap - abs(difference), self.min_cap)
-                
+            new_cap = max(cap - self.actuation_size, self.min_cap)
+            
+            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+            self.last_action = "Scaling from %d to %d" % (cap, new_cap)
+            
             cap_instances = {instance:new_cap for instance in instances}
             self.actuator.adjust_resources(cap_instances)
             self.cap = new_cap

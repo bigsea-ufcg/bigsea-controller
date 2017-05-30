@@ -33,6 +33,7 @@ class Test_Tendency_Aware_Proportional_Alarm(unittest.TestCase):
         self.max_cap = 100.0
         self.allocated_resources = 50
         self.metric_round = 2
+        self.actuation_size = 25
 
         compute_nodes = []
         compute_nodes_key = "key"
@@ -44,7 +45,7 @@ class Test_Tendency_Aware_Proportional_Alarm(unittest.TestCase):
 
         self.alarm = Tendency_Aware_Proportional_Alarm(self.actuator, self.metric_source, 
                                         self.trigger_down, self.trigger_up, 
-                                        self.min_cap, self.max_cap, 
+                                        self.min_cap, self.max_cap, self.actuation_size,
                                         self.metric_round)
         
         self.timestamps = [self.timestamp_1, self.timestamp_2, self.timestamp_3, self.timestamp_4]
@@ -121,7 +122,7 @@ class Test_Tendency_Aware_Proportional_Alarm(unittest.TestCase):
         
         self.actuator.get_allocated_resources.assert_any_call(self.instance_name_1)
         
-        new_cap = self.allocated_resources + 15
+        new_cap = self.allocated_resources + self.actuation_size
         self.actuator.adjust_resources.assert_any_call({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
         
     def test_case2(self):
@@ -153,7 +154,7 @@ class Test_Tendency_Aware_Proportional_Alarm(unittest.TestCase):
         
         self.actuator.get_allocated_resources.assert_any_call(self.instance_name_1)
         
-        new_cap = self.allocated_resources - 15
+        new_cap = self.allocated_resources - self.actuation_size
         self.actuator.adjust_resources.assert_any_call({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
         
 
