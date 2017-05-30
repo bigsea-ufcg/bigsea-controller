@@ -5,6 +5,7 @@ from service.api.actuator.actuator_builder import Actuator_Builder
 import threading
 import time
 from service.api.controller.plugins.tendency.tendency_aware_proportional_alarm import Tendency_Aware_Proportional_Alarm
+from service.exceptions.monasca_exceptions import No_Metrics_Exception
 
 class Tendency_Aware_Proportional_Controller(Controller):
 
@@ -40,12 +41,17 @@ class Tendency_Aware_Proportional_Controller(Controller):
         
     def start_application_scaling(self):
         run = True
-        
+        #FIXME: add exception handling
         while run:
             self.logger.log("Monitoring application: %s" % (self.application_id))
 
             # Call the alarm to check the application
-            self.alarm.check_application_state(self.application_id, self.instances)
+            try:
+                self.alarm.check_application_state(self.application_id, self.instances)
+            except No_Metrics_Exception: 
+                self.logger.log("No metrics available")
+            except Exception as e:
+                self.logger.log(str(e))
 
             # Wait some time
             time.sleep(float(self.check_interval))

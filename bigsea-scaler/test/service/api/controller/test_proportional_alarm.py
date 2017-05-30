@@ -40,8 +40,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm)
 
         self.conservative_factor = 1
-        self.heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":self.conservative_factor}
+        self.heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":self.conservative_factor}
 
         self.progress_error = {self.application_id_0:-20.0, self.application_id_1:0.00, self.application_id_2:30.0}
         
@@ -71,8 +71,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Case 1: normal scale down
         #
         conservative_factor = 1
-        heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":conservative_factor}
+        heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":conservative_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.metric_round, heuristic_options)
@@ -102,8 +102,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Case 2: calculated cap is too low. Use min cap instead
         #
         conservative_factor = 3
-        heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":conservative_factor}
+        heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":conservative_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.metric_round, heuristic_options)
@@ -134,8 +134,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Case 1: normal scale up
         #
         conservative_factor = 1
-        heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":conservative_factor}
+        heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":conservative_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.metric_round, heuristic_options)
@@ -164,8 +164,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Case 2: calculated cap is too high. Use max cap instead
         #
         conservative_factor = 3
-        heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":conservative_factor}
+        heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":conservative_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.metric_round, heuristic_options)
@@ -191,8 +191,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
 
     def test_alarm_does_nothing(self):
         conservative_factor = 1
-        heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":conservative_factor}
+        heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":conservative_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.metric_round, heuristic_options)
@@ -216,8 +216,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
 
     def test_alarm_does_not_reuse_metrics_with_same_timestamp(self):
         conservative_factor = 1
-        heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":conservative_factor}
+        heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":conservative_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.metric_round, heuristic_options)
@@ -263,8 +263,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
     def test_alarm_metrics_with_different_timestamps(self):
         conservative_factor = 1
-        heuristic_options = {"heuristic-name":"error-proportional",
-                                  "conservative-factor":conservative_factor}
+        heuristic_options = {"heuristic_name":"error_proportional",
+                                  "conservative_factor":conservative_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.metric_round, heuristic_options)

@@ -51,6 +51,9 @@ class Basic_Controller(Controller):
 
     def stop_controller(self):
         self.controller.running = False
+        
+    def status(self):
+        return ""
 
 
 class _Basic_Controller_Thread():
