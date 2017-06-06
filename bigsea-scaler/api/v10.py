@@ -34,7 +34,11 @@ def prepare_environment():
     logger.log("%s-Preparing environment for instances %s" % (time.strftime("%H:%M:%S"), str(data)))
 
     data.pop("plugin")
-    actuator.prepare_environment(data)
+    
+    try:
+        actuator.prepare_environment(data)
+    except Exception as e:
+        logger.log(e.getMessage())
 
     return "prepared_environment"
 
