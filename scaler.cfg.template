@@ -13,8 +13,6 @@ keypair_compute_nodes =
 # A list of ports. Required when using SSH through tunnels.
 # The i-th port will be used to access the i-th compute node.
 tunnel_ports = 
-# The actuator service's IP
-actuator_ip = 0.0.0.0
 # The actuator service's port
 actuator_port = 5047
 

@@ -10,6 +10,7 @@ from service.api.actuator.plugins.instance_locator import Instance_Locator
 from service.api.actuator.plugins.remote_kvm import Remote_KVM
 from service.api.actuator.plugins.nop_actuator import Nop_Actuator
 from service.api.actuator.plugins.service_actuator import Service_Actuator
+from service.api.actuator.plugins.service_instance_locator import Service_Instance_Locator
 
 
 # TODO: documentation
@@ -43,9 +44,13 @@ class Actuator_Builder:
         elif name == "nop":
             return Nop_Actuator()
         elif name == "service":
-            actuator_ip = config.get("actuator", "actuator_ip")
             actuator_port = config.get("actuator", "actuator_port")
-            return Service_Actuator(actuator_ip, actuator_port)
+            
+            compute_nodes_str = config.get("actuator", "compute_nodes")
+            compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
+            
+            instance_locator = Service_Instance_Locator(compute_nodes, actuator_port)
+            return Service_Actuator(actuator_port, instance_locator)
         else:
             # FIXME: review this exception type
             raise Exception("Unknown actuator type")
