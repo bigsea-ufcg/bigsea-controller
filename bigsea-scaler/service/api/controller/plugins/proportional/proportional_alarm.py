@@ -15,7 +15,7 @@ class Proportional_Alarm:
         self.min_cap = min_cap
         self.max_cap = max_cap
         self.metric_rounding = metric_rounding
-        self.heuristic_options = heuristic_options
+        self.heuristic_options_1 = heuristic_options
 
         self.logger = Log("proportional.alarm.log", "scaler.log")
         self.cap_logger = Log("cap.log", "cap.log")
@@ -73,7 +73,7 @@ class Proportional_Alarm:
             
             # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
+            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options_1)
             
             self.logger.log("Scaling from %d to %d" % (cap, new_cap))
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
@@ -100,7 +100,7 @@ class Proportional_Alarm:
             
             # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
+            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options_1)
             
             self.logger.log("Scaling from %f to %f" % (cap, new_cap))
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
@@ -128,17 +128,32 @@ class Proportional_Alarm:
         heuristic = heuristic_options["heuristic_name"]
         
         if heuristic == "error_proportional":
-            conservative_factor = heuristic_options["conservative_factor"]
-            
-            actuation_size = abs(progress_error*conservative_factor)
-            
-            if progress_error < 0:
-                return min(current_cap + actuation_size, self.max_cap)
-            else:
-                return max(current_cap - actuation_size, self.min_cap) 
+            return self._error_proportional(current_cap, progress_error, heuristic_options)
+        elif heuristic == "error_proportional_up_down":
+            return self._error_proportional_up_down(current_cap, progress_error, heuristic_options)
         else:
             raise Exception("Unknown heuristic")
-        
+    
+    def _error_proportional(self, current_cap, progress_error, heuristic_options):
+        conservative_factor = heuristic_options["conservative_factor"]
+            
+        actuation_size = abs(progress_error*conservative_factor)
+            
+        if progress_error < 0:
+            return min(current_cap + actuation_size, self.max_cap)
+        else:
+            return max(current_cap - actuation_size, self.min_cap)
+    
+    def _error_proportional_up_down(self, current_cap, progress_error, heuristic_options):
+        if progress_error < 0:
+            factor = heuristic_options["factor_up"]
+            actuation_size = abs(progress_error*factor)
+            return min(current_cap + actuation_size, self.max_cap)
+        else:
+            factor = heuristic_options["factor_down"]
+            actuation_size = abs(progress_error*factor)
+            return max(current_cap - actuation_size, self.min_cap)
+    
     def status(self):
         return self.last_action
         
