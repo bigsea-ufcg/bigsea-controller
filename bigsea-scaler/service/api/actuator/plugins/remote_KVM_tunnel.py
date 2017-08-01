@@ -1,7 +1,10 @@
+# TODO: Documentation
 class Remote_KVM_Tunnel:
     def __init__(self, ssh_utils, compute_nodes_key):
         self.ssh_utils = ssh_utils
         self.compute_nodes_key = compute_nodes_key
+        # TODO: Add parameters max io throughput, io quota to vm and block device name
+
 
     # Warning: This code requires that the vcpu_quota parameter is between 0 and 100000
     def change_vcpu_quota(self, host_ip, vm_id, cap):
@@ -15,7 +18,10 @@ class Remote_KVM_Tunnel:
         # TODO: check errors
         self.ssh_utils.run_command_tunnel(command, "root", host_ip, self.compute_nodes_key)
         
+    # TODO: Add a method change_io_quota
+        
     # Warning: This code requires that the vcpu_quota parameter is between 0 and 100000 
+    # TODO: Change this method name to get_vcpu_quota
     def get_allocated_resources(self, host_ip, vm_id):
         # TODO: check ip value
         # TODO: check id value
@@ -35,4 +41,5 @@ class Remote_KVM_Tunnel:
         except:
             # FIXME: review this exception type
             raise Exception("Could not get allocated resources")
-        
+    
+    # TODO: Add a method get_io_quota

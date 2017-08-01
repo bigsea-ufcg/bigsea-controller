@@ -26,6 +26,7 @@ class KVM_Actuator(Actuator):
         for instance in vm_data.keys():
             # Access a compute node and change cap
             self.remote_kvm.change_vcpu_quota(instances_locations[instance], instance, int(vm_data[instance]))
+            # Add a call to change_io_quota
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
