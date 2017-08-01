@@ -15,7 +15,7 @@ class Proportional_Alarm:
         self.min_cap = min_cap
         self.max_cap = max_cap
         self.metric_rounding = metric_rounding
-        self.heuristic_options_1 = heuristic_options
+        self.heuristic_options = heuristic_options
 
         self.logger = Log("proportional.alarm.log", "scaler.log")
         self.cap_logger = Log("cap.log", "cap.log")
@@ -73,7 +73,7 @@ class Proportional_Alarm:
             
             # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options_1)
+            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
             self.logger.log("Scaling from %d to %d" % (cap, new_cap))
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
@@ -100,7 +100,7 @@ class Proportional_Alarm:
             
             # Get current CPU cap
             cap = self.actuator.get_allocated_resources(instances[0])
-            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options_1)
+            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
             self.logger.log("Scaling from %f to %f" % (cap, new_cap))
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
