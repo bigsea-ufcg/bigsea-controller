@@ -15,10 +15,14 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.application_id_1 = "app-01"
         self.application_id_2 = "app-02"
 
-        self.timestamp_1 = datetime.datetime.strptime("2000-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
-        self.timestamp_2 = datetime.datetime.strptime("2000-01-01T00:05:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
-        self.timestamp_3 = datetime.datetime.strptime("2000-01-01T00:10:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
-        self.timestamp_4 = datetime.datetime.strptime("2000-01-01T00:15:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp_1 = datetime.datetime.strptime("2000-01-01T00:00:00.0Z", 
+                                                      '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp_2 = datetime.datetime.strptime("2000-01-01T00:05:00.0Z", 
+                                                      '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp_3 = datetime.datetime.strptime("2000-01-01T00:10:00.0Z", 
+                                                      '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.timestamp_4 = datetime.datetime.strptime("2000-01-01T00:15:00.0Z", 
+                                                      '%Y-%m-%dT%H:%M:%S.%fZ')
 
         self.instance_name_1 = "instance1"
         self.instance_name_2 = "instance2"
@@ -40,12 +44,20 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm)
 
         self.conservative_factor = 1
-        self.heuristic_options = {"heuristic_name":"error_proportional",
+        self.factor_up = 1
+        self.factor_down = 0.5
+        self.heuristic_options_error_proportional = {"heuristic_name":"error_proportional",
                                   "conservative_factor":self.conservative_factor}
+        self.heuristic_options_error_proportional_up_down = \
+                                {"heuristic_name":"error_proportional_up_down",
+                                  "factor_up":self.factor_up, 
+                                  "factor_down":self.factor_down}
 
-        self.progress_error = {self.application_id_0:-20.0, self.application_id_1:0.00, self.application_id_2:30.0}
+        self.progress_error = {self.application_id_0:-20.0, 
+                               self.application_id_1:0.00, self.application_id_2:30.0}
         
-        self.timestamps = [self.timestamp_1, self.timestamp_2, self.timestamp_3, self.timestamp_4]
+        self.timestamps = [self.timestamp_1, self.timestamp_2, 
+                           self.timestamp_3, self.timestamp_4]
 
     # normal cases
     # application 0 -> job progress < time progress -> scale up
@@ -74,8 +86,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         heuristic_options = {"heuristic_name":"error_proportional",
                                   "conservative_factor":conservative_factor}
         
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.metric_round, heuristic_options)
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                        self.trigger_up, self.min_cap, self.max_cap, 
+                                        self.metric_round, heuristic_options)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -87,16 +100,20 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_2, self.instances)
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_2})
         
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
         
         # Remove resources
-        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})[1]
+        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
+                             {"application_id":self.application_id_2})[1]
         new_cap = self.allocated_resources - self.conservative_factor*error
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
         
         #
         # Case 2: calculated cap is too low. Use min cap instead
@@ -105,8 +122,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         heuristic_options = {"heuristic_name":"error_proportional",
                                   "conservative_factor":conservative_factor}
         
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.metric_round, heuristic_options)
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
+                                    self.trigger_down, self.trigger_up, self.min_cap, 
+                                    self.max_cap, self.metric_round, heuristic_options)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -118,7 +136,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_2, self.instances)
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_2})
         
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
@@ -126,7 +146,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Remove resources
         new_cap = self.min_cap
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
         
 
     def test_alarm_gets_metrics_and_scales_up_error_proportional(self):
@@ -137,8 +158,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         heuristic_options = {"heuristic_name":"error_proportional",
                                   "conservative_factor":conservative_factor}
         
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.metric_round, heuristic_options)
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
+                                self.trigger_down, self.trigger_up, self.min_cap, 
+                                self.max_cap, self.metric_round, heuristic_options)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -150,15 +172,19 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_0, self.instances)
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_0})
 
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
         # Add resources
-        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})[1]
+        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
+                            {"application_id":self.application_id_0})[1]
         new_cap = self.allocated_resources + conservative_factor*abs(error)
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
         
         #
         # Case 2: calculated cap is too high. Use max cap instead
@@ -167,8 +193,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         heuristic_options = {"heuristic_name":"error_proportional",
                                   "conservative_factor":conservative_factor}
         
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.metric_round, heuristic_options)
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
+                                self.trigger_down, self.trigger_up, self.min_cap, 
+                                self.max_cap, self.metric_round, heuristic_options)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -180,22 +207,26 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_0, self.instances)
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_0})
 
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
         # Add resources
         new_cap = self.max_cap
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
 
     def test_alarm_does_nothing(self):
         conservative_factor = 1
         heuristic_options = {"heuristic_name":"error_proportional",
                                   "conservative_factor":conservative_factor}
         
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.metric_round, heuristic_options)
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                self.trigger_up, self.min_cap, self.max_cap, self.metric_round, 
+                                heuristic_options)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -207,7 +238,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_1, self.instances)
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_1})
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_1})
 
         # The method doesn't try to get the amount of allocated resources 
         self.actuator.get_allocated_resources.assert_not_called()
@@ -219,8 +252,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         heuristic_options = {"heuristic_name":"error_proportional",
                                   "conservative_factor":conservative_factor}
         
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.metric_round, heuristic_options)
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                        self.trigger_up, self.min_cap, self.max_cap, 
+                                        self.metric_round, heuristic_options)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -231,15 +265,19 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_0, self.instances)
         
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_0})
         
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
         # Add resources
-        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})[1]
+        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
+                        {"application_id":self.application_id_0})[1]
         new_cap = self.allocated_resources + conservative_factor*abs(error)
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
         
         #
         # 2nd call. The method checks if the metric is new and does not act
@@ -254,7 +292,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_0, self.instances)
         
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.\
+                assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                {"application_id":self.application_id_0})
 
         # The method doesn't try to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_not_called()
@@ -266,8 +306,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         heuristic_options = {"heuristic_name":"error_proportional",
                                   "conservative_factor":conservative_factor}
         
-        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.metric_round, heuristic_options)
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
+                                self.trigger_down, self.trigger_up, self.min_cap, 
+                                self.max_cap, self.metric_round, heuristic_options)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -279,15 +320,19 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_2, self.instances)
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_2})
 
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
         # Remove resources
-        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})[1]
+        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
+                        {"application_id":self.application_id_2})[1]
         new_cap = self.allocated_resources - self.conservative_factor*error
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
         
         #
         # 2nd call. The method checks if the metric is new and acts
@@ -303,17 +348,165 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm.check_application_state(self.application_id_2, self.instances)
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.\
+                        assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                        {"application_id":self.application_id_2})
 
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
         # Remove resources
         
-        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})[1]
+        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
+                        {"application_id":self.application_id_2})[1]
         new_cap = self.allocated_resources - self.conservative_factor*error
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
         
+    def test_alarm_gets_metrics_and_scales_down_error_proportional_up_down(self):
+        #
+        # Case 1: normal scale down
+        #
+        heuristic_options = {"heuristic_name":"error_proportional_up_down",
+                                  "factor_up":self.factor_up, 
+                                  "factor_down":self.factor_down}
+        
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
+                                    self.trigger_down, self.trigger_up,
+                                    self.min_cap, self.max_cap, self.metric_round, 
+                                    heuristic_options)
+        
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics
+
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+
+        self.alarm.check_application_state(self.application_id_2, self.instances)
+
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_2})
+        
+        # The method tries to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
+        
+        # Remove resources
+        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
+                            {"application_id":self.application_id_2})[1]
+        new_cap = self.allocated_resources - self.factor_down*error
+        # The method tries to adjust the amount of resources
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                            self.instance_name_2:new_cap})
+        
+        #
+        # Case 2: calculated cap is too low. Use min cap instead
+        #
+        factor_down = 5
+        heuristic_options = {"heuristic_name":"error_proportional_up_down",
+                                  "factor_up":self.factor_up, 
+                                  "factor_down":factor_down}
+        
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                        self.trigger_up, self.min_cap, self.max_cap, 
+                                        self.metric_round, heuristic_options)
+        
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics
+
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+
+        self.alarm.check_application_state(self.application_id_2, self.instances)
+
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.\
+                        assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                        {"application_id":self.application_id_2})
+        
+        # The method tries to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
+        
+        # Remove resources
+        new_cap = self.min_cap
+        # The method tries to adjust the amount of resources
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                        self.instance_name_2:new_cap})
+        
+    def test_alarm_gets_metrics_and_scales_up_error_proportional_up_down(self):
+        #
+        # Case 1: normal scale up
+        #
+        heuristic_options = {"heuristic_name":"error_proportional_up_down",
+                                  "factor_up":self.factor_up, 
+                                  "factor_down":self.factor_down}
+        
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down,
+                                    self.trigger_up, self.min_cap, self.max_cap, 
+                                    self.metric_round, heuristic_options)
+        
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics
+
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+
+        self.alarm.check_application_state(self.application_id_0, self.instances)
+
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.\
+                            assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                            {"application_id":self.application_id_0})
+
+        # The method tries to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
+        # Add resources
+        error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
+                             {"application_id":self.application_id_0})[1]
+        new_cap = self.allocated_resources + self.factor_up*abs(error)
+        # The method tries to adjust the amount of resources
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
+        
+        #
+        # Case 2: calculated cap is too high. Use max cap instead
+        #
+        factor_up = 5
+        heuristic_options = {"heuristic_name":"error_proportional_up_down",
+                                  "factor_up":factor_up, 
+                                  "factor_down":self.factor_down}
+        
+        self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
+                                    self.trigger_down, self.trigger_up, self.min_cap, 
+                                    self.max_cap, self.metric_round, heuristic_options)
+        
+        # Set up mocks
+        self.metric_source.get_most_recent_value = MagicMock()
+        self.metric_source.get_most_recent_value.side_effect = self.metrics
+
+        self.actuator.adjust_resources = MagicMock(return_value=None)
+        self.actuator.get_allocated_resources = MagicMock(return_value=self.allocated_resources)
+
+        self.alarm.check_application_state(self.application_id_0, self.instances)
+
+        # The method tries to get the metrics correctly
+        self.metric_source.get_most_recent_value.\
+                    assert_any_call(Proportional_Alarm.ERROR_METRIC_NAME, 
+                    {"application_id":self.application_id_0})
+
+        # The method tries to get the amount of allocated resources
+        self.actuator.get_allocated_resources.assert_called_once_with(self.instance_name_1)
+        # Add resources
+        new_cap = self.max_cap
+        # The method tries to adjust the amount of resources
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap,
+                                                            self.instance_name_2:new_cap})
+    
+    
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
