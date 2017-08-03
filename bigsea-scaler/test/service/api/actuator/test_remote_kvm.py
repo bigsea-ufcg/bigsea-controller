@@ -42,14 +42,14 @@ class Test_Remote_KVM(unittest.TestCase):
     def test_change_io_quota(self):
         command_get_block_device = "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (self.vm_id)
         command_set_io_quota = "virsh blkdeviotune %s %s --current --total_bytes_sec %s" % \
-                                        (self.vm_id, self.block_device, self.cap*self.io_quota_to_vm)
+                                        (self.vm_id, self.block_device, (self.cap*self.io_quota_to_vm)/100)
         
-        self.ssh_utils.run_command_and_get_result = MagicMock(return_value=self.block_device)
+        self.ssh_utils.run_and_get_result = MagicMock(return_value=self.block_device)
         self.ssh_utils.run_command = MagicMock(return_value=None)
         
         self.remote_kvm.change_io_quota(self.host_ip, self.vm_id, self.cap)
         
-        self.ssh_utils.run_command_and_get_result.assert_called_once_with(command_get_block_device, "root", 
+        self.ssh_utils.run_and_get_result.assert_called_once_with(command_get_block_device, "root", 
                                                         self.host_ip, self.compute_nodes_key)
         self.ssh_utils.run_command.assert_called_once_with(command_set_io_quota, "root", 
                                                         self.host_ip, self.compute_nodes_key)

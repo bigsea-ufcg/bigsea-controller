@@ -1,5 +1,5 @@
 # TODO: documentation
-class Remote_KVM(object):
+class Remote_KVM:
 
     def __init__(self, ssh_utils, compute_nodes_key, io_quota_to_vm = 1000, max_io = 1000000):
         self.ssh_utils = ssh_utils
@@ -25,14 +25,14 @@ class Remote_KVM(object):
             raise Exception("Invalid cap value")
         
         command_get_block_device = "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (vm_id)
-        block_device = self.ssh_utils.run_command_and_get_result(command_get_block_device, "root", host_ip, self.compute_nodes_key)
+        block_device = self.ssh_utils.run_and_get_result(command_get_block_device, "root", host_ip, self.compute_nodes_key)
+        block_device = block_device.strip()
         
-        #virsh blkdeviotune lubuntu_1604 vda --current --total_bytes_sec 1000000
-        command_set_io_quota = "virsh blkdeviotune %s %s --current --total_bytes_sec %d" % \
-                        (vm_id, block_device, cap*self.io_quota_to_vm)
-        
+        command_set_io_quota = "virsh blkdeviotune %s %s --current --total_bytes_sec %s" % \
+                        (vm_id, block_device, (cap*self.io_quota_to_vm)/100)
+                        
         self.ssh_utils.run_command(command_set_io_quota, "root", host_ip, self.compute_nodes_key)
-    
+
     # Warning: This code requires that the vcpu_quota parameter is between 0 and 100000
     # TODO: Change this method name to get_vcpu_quota
     def get_allocated_resources(self, host_ip, vm_id):
