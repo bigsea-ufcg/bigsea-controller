@@ -37,7 +37,8 @@ class Actuator_Builder:
             
             hosts_ports = {compute_nodes[i]:ports[i] for i in xrange(len(ports))}
             
-            instance_locator = Instance_Locator_Tunnel(SSH_Utils(hosts_ports), compute_nodes, compute_nodes_keypair)
+            instance_locator = Instance_Locator_Tunnel(SSH_Utils(hosts_ports), compute_nodes, 
+                                                                            compute_nodes_keypair)
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair)
             return KVM_Actuator(instance_locator, remote_kvm)
         elif name == "kvm-io":
@@ -49,6 +50,18 @@ class Actuator_Builder:
 
             instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_keypair)
             remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair, io_quota_to_vm, max_io)
+            return KVM_IO_Actuator(instance_locator, remote_kvm)
+        elif name == "kvm-io-tunnel":
+            compute_nodes_str = config.get("actuator", "compute_nodes")
+            compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
+            io_quota_to_vm = config.getint("actuator", "quota_vm") 
+            max_io = config.getint("actuator", "max_io")
+            compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
+
+            instance_locator = Instance_Locator_Tunnel(SSH_Utils({}), compute_nodes, 
+                                                                compute_nodes_keypair)
+            remote_kvm = Remote_KVM_Tunnel(SSH_Utils({}), compute_nodes_keypair, 
+                                                                io_quota_to_vm, max_io)
             return KVM_IO_Actuator(instance_locator, remote_kvm)
         elif name == "nop":
             return Nop_Actuator()

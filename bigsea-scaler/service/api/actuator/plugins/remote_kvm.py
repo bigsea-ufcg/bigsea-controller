@@ -24,13 +24,11 @@ class Remote_KVM:
             # FIXME review this exception type
             raise Exception("Invalid cap value")
         
-        command_get_block_device = "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (vm_id)
-        block_device = self.ssh_utils.run_and_get_result(command_get_block_device, "root", host_ip, self.compute_nodes_key)
-        block_device = block_device.strip()
+        command_quota = (cap*self.io_quota_to_vm)/100
+        command_set_io_quota = "virsh blkdeviotune %s" % (vm_id)
+        command_set_io_quota += " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" % (vm_id)
+        command_set_io_quota += " --current --total_bytes_sec %s" % (command_quota)
         
-        command_set_io_quota = "virsh blkdeviotune %s %s --current --total_bytes_sec %s" % \
-                        (vm_id, block_device, (cap*self.io_quota_to_vm)/100)
-                        
         self.ssh_utils.run_command(command_set_io_quota, "root", host_ip, self.compute_nodes_key)
 
     # Warning: This code requires that the vcpu_quota parameter is between 0 and 100000
@@ -40,7 +38,8 @@ class Remote_KVM:
         # TODO: check id value
         command = "virsh schedinfo %s | grep vcpu_quota | awk '{print $3}'" % (vm_id)
         # TODO: check errors
-        ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip, self.compute_nodes_key)
+        ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip, 
+                                                       self.compute_nodes_key)
         
         try:
             cap = int(ssh_result)
@@ -51,17 +50,17 @@ class Remote_KVM:
             if cap == -1:
                 return 100
             return cap/1000
-        
         except:
             # FIXME: review this exception type
             raise Exception("Could not get allocated resources")
 
     def get_io_quota(self, host_ip, vm_id):
-        command_get_block_device = "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (vm_id)
-        block_device = self.ssh_utils.run_and_get_result(command_get_block_device, "root", host_ip, self.compute_nodes_key)
+        command = "virsh blkdeviotune %s" % (vm_id)
+        command += " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" % (vm_id)
+        command += " | grep total_bytes_sec: | awk '{print $2}'"
         
-        command = "virsh blkdeviotune %s %s | grep total_bytes_sec: | awk {'print $2'}" % (vm_id, block_device)
-        ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip, self.compute_nodes_key)
+        ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip, 
+                                                                self.compute_nodes_key)
         
         try:
             quota = int(ssh_result)
