@@ -1,10 +1,7 @@
 from service.api.actuator.actuator import Actuator
 
-# TODO: documentation
-
-
-class KVM_Actuator(Actuator):
-
+class KVM_IO_Actuator(Actuator):
+    
     def __init__(self, instance_locator, remote_kvm):
         self.instance_locator = instance_locator
         self.remote_kvm = remote_kvm
@@ -14,7 +11,7 @@ class KVM_Actuator(Actuator):
         self.adjust_resources(vm_data)
 
     # TODO: validation
-    # This method receives as argument a map {vm-id:CPU cap}
+    # This method receives as argument a map {vm-id:cap}
     def adjust_resources(self, vm_data):
         instances_locations = {}
 
@@ -26,7 +23,7 @@ class KVM_Actuator(Actuator):
         for instance in vm_data.keys():
             # Access a compute node and change cap
             self.remote_kvm.change_vcpu_quota(instances_locations[instance], instance, int(vm_data[instance]))
-            # Add a call to change_io_quota
+            self.remote_kvm.change_io_quota(instances_locations[instance], instance, int(vm_data[instance]))
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):

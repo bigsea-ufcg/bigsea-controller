@@ -2,7 +2,7 @@ import paramiko
 
 class SSH_Utils(object):
 
-    def __init__(self, hosts_ports):
+    def __init__(self, hosts_ports={}):
         self.hosts_ports = hosts_ports
 
     def run_command(self, command, user, host, key):
