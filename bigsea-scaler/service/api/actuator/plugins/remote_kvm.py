@@ -25,9 +25,9 @@ class Remote_KVM:
             raise Exception("Invalid cap value")
         
         command_quota = (cap*self.io_quota_to_vm)/100
-        command_set_io_quota = "virsh blkdeviotune %s" % (vm_id)
-        command_set_io_quota += " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" % (vm_id)
-        command_set_io_quota += " --current --total_bytes_sec %s" % (command_quota)
+        command_set_io_quota = "virsh blkdeviotune %s" \
+            " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
+            " --current --total_bytes_sec %s" % (vm_id, vm_id, command_quota)
         
         self.ssh_utils.run_command(command_set_io_quota, "root", host_ip, self.compute_nodes_key)
 
@@ -55,9 +55,9 @@ class Remote_KVM:
             raise Exception("Could not get allocated resources")
 
     def get_io_quota(self, host_ip, vm_id):
-        command = "virsh blkdeviotune %s" % (vm_id)
-        command += " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" % (vm_id)
-        command += " | grep total_bytes_sec: | awk '{print $2}'"
+        command = "virsh blkdeviotune %s" \
+            " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
+            " | grep total_bytes_sec: | awk '{print $2}'" % (vm_id, vm_id)
         
         ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip, 
                                                                 self.compute_nodes_key)

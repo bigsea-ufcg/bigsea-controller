@@ -44,9 +44,9 @@ class Test_Remote_KVM(unittest.TestCase):
 
     def test_change_io_quota(self):
         command_quota = (self.cap*self.io_quota_to_vm)/100
-        command_set_io_quota = "virsh blkdeviotune %s" % (self.vm_id)
-        command_set_io_quota += " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" % (self.vm_id)
-        command_set_io_quota += " --current --total_bytes_sec %s" % (command_quota)
+        command_set_io_quota = "virsh blkdeviotune %s" \
+            " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
+            " --current --total_bytes_sec %s" % (self.vm_id, self.vm_id, command_quota)
         
         self.ssh_utils.run_command = MagicMock(return_value=None)
         
@@ -106,9 +106,9 @@ class Test_Remote_KVM(unittest.TestCase):
             return self.block_device
 
     def test_get_io_quota(self):                                            
-        command_get_io_quota = "virsh blkdeviotune %s" % (self.vm_id)
-        command_get_io_quota += " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" % (self.vm_id)
-        command_get_io_quota += " | grep total_bytes_sec: | awk '{print $2}'"
+        command_get_io_quota = "virsh blkdeviotune %s" \
+            " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
+            " | grep total_bytes_sec: | awk '{print $2}'" % (self.vm_id, self.vm_id)
         
         self.ssh_utils.run_and_get_result = MagicMock()
         self.ssh_utils.run_and_get_result.side_effect = self.get_io_quota_ssh_values
