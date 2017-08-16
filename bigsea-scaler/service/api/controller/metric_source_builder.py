@@ -16,6 +16,7 @@
 from service.api.controller.plugins.monasca.monasca_metric_source import Monasca_Metric_Source
 from service.api.controller.plugins.nop.nop_metric_source import Nop_Metric_Source
 from service.api.controller.plugins.spark.spark_metric_source import Spark_Metric_Source
+from service.api.controller.plugins.os_generic.os_generic_metric_source import OS_Generic_Metric_Source
 
 class Metric_Source_Builder:
 
@@ -26,6 +27,8 @@ class Metric_Source_Builder:
             return Nop_Metric_Source()
         elif name == "spark":
             return Spark_Metric_Source(parameters)
+        elif name == "os-generic":
+            return OS_Generic_Metric_Source(parameters)
         else:
             # FIXME: exception type
             raise Exception("Unknown metric source type")
