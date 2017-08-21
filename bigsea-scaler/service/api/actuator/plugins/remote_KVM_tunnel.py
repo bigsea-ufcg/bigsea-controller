@@ -42,7 +42,7 @@ class Remote_KVM_Tunnel:
         command_quota = (cap*self.io_quota_to_vm)/100
         command_set_io_quota = "virsh blkdeviotune %s" \
             " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
-            " --current --total_bytes_sec %s" % (vm_id, vm_id, command_quota)
+            " --current --total_iops_sec %s" % (vm_id, vm_id, command_quota)
         
         self.ssh_utils.run_command_tunnel(command_set_io_quota, "root", host_ip, 
                                           self.compute_nodes_key)
@@ -73,7 +73,7 @@ class Remote_KVM_Tunnel:
     def get_io_quota(self, host_ip, vm_id):
         command = "virsh blkdeviotune %s" \
             " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
-            " | grep total_bytes_sec: | awk '{print $2}'" % (vm_id, vm_id)
+            " | grep total_iops_sec: | awk '{print $2}'" % (vm_id, vm_id)
         
         ssh_result = self.ssh_utils.run_and_get_result_tunnel(command, "root", host_ip, 
                                                               self.compute_nodes_key)

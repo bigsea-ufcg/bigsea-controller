@@ -15,9 +15,9 @@ keypair_compute_nodes =
 tunnel_ports = 
 # The actuator service's port
 actuator_port = 5047
-# The disk I/O throughput (in bytes per second) reserved to each virtual machine
+# The disk I/O throughput (in operations per second) reserved to each virtual machine
 quota_vm =  
-# The max possible disk I/O throughput (in bytes per second) (not in use currently)
+# The max possible disk I/O throughput (in operations per second) (not in use currently)
 max_io = 
 
 [monasca]
