@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from service.api.actuator.actuator import Actuator
+from service.exceptions.kvm_exceptions import Instance_Not_Found_Exception
 
 # TODO: documentation
 
@@ -31,17 +32,15 @@ class KVM_Actuator(Actuator):
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
-        instances_locations = {}
-
         # Discover vm_id - compute nodes map
         for instance in vm_data.keys():
-            # Access compute nodes to discover vms location
-            instances_locations[instance] = self.instance_locator.locate(instance)
-
-        for instance in vm_data.keys():
-            # Access a compute node and change cap
-            self.remote_kvm.change_vcpu_quota(instances_locations[instance], instance, int(vm_data[instance]))
-            # Add a call to change_io_quota
+            try:
+                # Access compute nodes to discover vms location
+                instance_location = self.instance_locator.locate(instance)
+                # Access a compute node and change cap
+                self.remote_kvm.change_vcpu_quota(instance_location, instance, int(vm_data[instance]))
+            except Instance_Not_Found_Exception:
+                print "instance not found:%s" % (instance)
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
@@ -49,3 +48,13 @@ class KVM_Actuator(Actuator):
         host = self.instance_locator.locate(vm_id)
         # Access a compute node and get amount of allocated resources
         return self.remote_kvm.get_allocated_resources(host, vm_id)
+    
+    # TODO: validation
+    def get_allocated_resources_to_cluster(self, vms_ids):
+        for vm_id in vms_ids:
+            try:
+                return self.get_allocated_resources(vm_id)
+            except Instance_Not_Found_Exception:
+                print "instance not found:%s" % (vm_id)
+                
+        raise Exception("Could not get allocated resources")

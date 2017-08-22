@@ -87,7 +87,7 @@ class Proportional_Alarm:
             self.last_action = "Getting allocated resources"
             
             # Get current CPU cap
-            cap = self.actuator.get_allocated_resources(instances[0])
+            cap = self.actuator.get_allocated_resources_to_cluster(instances)
             new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
             self.logger.log("Scaling from %d to %d" % (cap, new_cap))
@@ -114,7 +114,7 @@ class Proportional_Alarm:
             self.last_action = "Getting allocated resources"
             
             # Get current CPU cap
-            cap = self.actuator.get_allocated_resources(instances[0])
+            cap = self.actuator.get_allocated_resources_to_cluster(instances)
             new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
             self.logger.log("Scaling from %f to %f" % (cap, new_cap))

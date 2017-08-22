@@ -20,6 +20,7 @@ from utils.ssh_utils import SSH_Utils
 from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
 from service.api.actuator.plugins.instance_locator import Instance_Locator
 from service.api.actuator.plugins.remote_kvm import Remote_KVM
+from service.exceptions.kvm_exceptions import Instance_Not_Found_Exception
 
 
 class Test_Basic_Actuator(unittest.TestCase):
@@ -42,6 +43,12 @@ class Test_Basic_Actuator(unittest.TestCase):
 
     def locator(self, vm_id):
         return {self.vm_id1:self.host_ip1, self.vm_id2:self.host_ip2}[vm_id]
+
+    def locator_instance_does_not_exist(self, vm_id):
+        if vm_id == self.vm_id1:
+            return self.host_ip1
+        else:
+            raise Instance_Not_Found_Exception(vm_id)
 
     # TODO: more cases
     def test_prepare_environment_locates_and_acts_correctly_1_instance(self):
@@ -118,6 +125,23 @@ class Test_Basic_Actuator(unittest.TestCase):
         # Actuator tries to change the cap of only the given instances
         self.assertEqual(self.remote_kvm.change_vcpu_quota.call_count, 2)
 
+    def test_adjust_resources_one_instance_does_not_exist(self):
+        vm_data = {self.vm_id1:self.cap1, self.vm_id2:self.cap2}
+
+        self.instance_locator.locate = MagicMock()
+        self.instance_locator.locate.side_effect = self.locator_instance_does_not_exist
+        
+        self.remote_kvm.change_vcpu_quota = MagicMock(return_value=None)
+
+        self.actuator.adjust_resources(vm_data)
+
+        # Actuator tries to locate the instances
+        self.instance_locator.locate.assert_any_call(self.vm_id1)
+        self.instance_locator.locate.assert_any_call(self.vm_id2)
+
+        # Actuator tries to change the cap
+        self.remote_kvm.change_vcpu_quota.assert_called_once_with(self.host_ip1, self.vm_id1, self.cap1)
+
     def test_get_allocated_resources(self):
         self.instance_locator.locate = MagicMock()
         self.instance_locator.locate.side_effect = self.locator
@@ -130,6 +154,37 @@ class Test_Basic_Actuator(unittest.TestCase):
 
         # Actuator tries to locate the instance
         self.instance_locator.locate.assert_called_once_with(self.vm_id1)
+
+        # Actuator tries to get the resources allocated to the given instance
+        self.remote_kvm.get_allocated_resources.assert_called_once_with(self.host_ip1, self.vm_id1)
+        
+    def test_get_allocated_resources_to_cluster(self):
+        vms_ids = [self.vm_id1, self.vm_id2]
+        
+        self.instance_locator.locate = MagicMock()
+        self.instance_locator.locate.side_effect = self.locator
+        self.remote_kvm.get_allocated_resources = MagicMock(return_value=50)
+
+        self.actuator.get_allocated_resources_to_cluster(vms_ids)
+        
+        # Actuator tries to locate the first instance
+        self.instance_locator.locate.assert_called_once_with(self.vm_id1)
+
+        # Actuator tries to get the resources allocated to the given instance
+        self.remote_kvm.get_allocated_resources.assert_called_once_with(self.host_ip1, self.vm_id1)
+        
+    def test_get_allocated_resources_to_cluster_instance_does_not_exist(self):
+        vms_ids = [self.vm_id2, self.vm_id1]
+        
+        self.instance_locator.locate = MagicMock()
+        self.instance_locator.locate.side_effect = self.locator_instance_does_not_exist
+        self.remote_kvm.get_allocated_resources = MagicMock(return_value=50)
+
+        self.actuator.get_allocated_resources_to_cluster(vms_ids)
+        
+        # Actuator tries to locate the first instance
+        self.instance_locator.locate.assert_any_call(self.vm_id1)
+        self.instance_locator.locate.assert_any_call(self.vm_id2)
 
         # Actuator tries to get the resources allocated to the given instance
         self.remote_kvm.get_allocated_resources.assert_called_once_with(self.host_ip1, self.vm_id1)
