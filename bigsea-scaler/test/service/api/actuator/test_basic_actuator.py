@@ -20,7 +20,7 @@ from utils.ssh_utils import SSH_Utils
 from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
 from service.api.actuator.plugins.instance_locator import Instance_Locator
 from service.api.actuator.plugins.remote_kvm import Remote_KVM
-from service.exceptions.kvm_exceptions import Instance_Not_Found_Exception
+from service.exceptions.kvm_exceptions import InstanceNotFoundException
 
 
 class Test_Basic_Actuator(unittest.TestCase):
@@ -48,7 +48,7 @@ class Test_Basic_Actuator(unittest.TestCase):
         if vm_id == self.vm_id1:
             return self.host_ip1
         else:
-            raise Instance_Not_Found_Exception(vm_id)
+            raise InstanceNotFoundException(vm_id)
 
     # TODO: more cases
     def test_prepare_environment_locates_and_acts_correctly_1_instance(self):

@@ -17,7 +17,7 @@ import unittest
 from service.api.actuator.plugins.instance_locator import Instance_Locator
 from utils.ssh_utils import SSH_Utils
 from mock.mock import MagicMock
-from service.exceptions.kvm_exceptions import Instance_Not_Found_Exception
+from service.exceptions.kvm_exceptions import InstanceNotFoundException
 
 
 class Test_Instance_Locator(unittest.TestCase):
@@ -56,7 +56,7 @@ class Test_Instance_Locator(unittest.TestCase):
         self.ssh_utils.run_and_get_result = MagicMock()
         self.ssh_utils.run_and_get_result.side_effect = self.impossible_to_locate
         
-        self.assertRaises(Instance_Not_Found_Exception, self.instance_locator.locate, self.vm_id)
+        self.assertRaises(InstanceNotFoundException, self.instance_locator.locate, self.vm_id)
         
         self.ssh_utils.run_and_get_result.assert_any_call("virsh schedinfo %s > /dev/null 2> /dev/null ; echo $?" % (self.vm_id), self.user, 
                                                           self.compute_1, self.compute_nodes_key)

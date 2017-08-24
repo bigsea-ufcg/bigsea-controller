@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from service.exceptions.kvm_exceptions import Instance_Not_Found_Exception
+from service.exceptions.kvm_exceptions import InstanceNotFoundException
 
 # TODO: documentation
 class Instance_Locator(object):
@@ -31,4 +31,4 @@ class Instance_Locator(object):
             if in_node == "0\n":
                 return compute_node
 
-        raise Instance_Not_Found_Exception(vm_id, "It was not possible to find the instance: command %s, ssh return value %s" % (check_command, in_node)) 
+        raise InstanceNotFoundException(vm_id, "It was not possible to find the instance: command %s, ssh return value %s" % (check_command, in_node)) 

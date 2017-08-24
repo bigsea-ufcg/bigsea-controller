@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from service.api.actuator.actuator import Actuator
-from service.exceptions.kvm_exceptions import Instance_Not_Found_Exception
+from service.exceptions.kvm_exceptions import InstanceNotFoundException
 
 class KVM_IO_Actuator(Actuator):
     
@@ -36,7 +36,7 @@ class KVM_IO_Actuator(Actuator):
                 # Access a compute node and change cap
                 self.remote_kvm.change_vcpu_quota(instance_location, instance, int(vm_data[instance]))
                 self.remote_kvm.change_io_quota(instance_location, instance, int(vm_data[instance]))
-            except Instance_Not_Found_Exception:
+            except InstanceNotFoundException:
                 print "instance not found:%s" % (instance)
 
     # TODO: validation
@@ -51,7 +51,7 @@ class KVM_IO_Actuator(Actuator):
         for vm_id in vms_ids:
             try:
                 return self.get_allocated_resources(vm_id)
-            except Instance_Not_Found_Exception:
+            except InstanceNotFoundException:
                 print "instance not found:%s" % (vm_id)
                 
         raise Exception("Could not get allocated resources")
