@@ -85,7 +85,7 @@ class Tendency_Aware_Proportional_Alarm:
         self.last_action = "Getting allocated resources"
         
         # Get current CPU cap
-        cap = self.actuator.get_allocated_resources(instances[0])
+        cap = self.actuator.get_allocated_resources_to_cluster(instances)
         new_cap = max(cap - self.actuation_size, self.min_cap)
             
         self.logger.log("Scaling from %d to %d" % (cap, new_cap))
@@ -104,7 +104,7 @@ class Tendency_Aware_Proportional_Alarm:
         self.last_action = "Getting allocated resources"
         
         # Get current CPU cap
-        cap = self.actuator.get_allocated_resources(instances[0])
+        cap = self.actuator.get_allocated_resources_to_cluster(instances)
         new_cap = min(cap + self.actuation_size, self.max_cap)
         
         self.logger.log("Scaling from %d to %d" % (cap, new_cap))
@@ -125,7 +125,7 @@ class Tendency_Aware_Proportional_Alarm:
             difference = 0.0
             
         if difference < 0.0:
-            cap = self.actuator.get_allocated_resources(instances[0])
+            cap = self.actuator.get_allocated_resources_to_cluster(instances)
             new_cap = min(cap + self.actuation_size, self.max_cap)
             
             self.logger.log("Scaling from %d to %d" % (cap, new_cap))
@@ -136,7 +136,7 @@ class Tendency_Aware_Proportional_Alarm:
             
             self.cap = new_cap
         elif difference > 0.0:
-            cap = self.actuator.get_allocated_resources(instances[0])
+            cap = self.actuator.get_allocated_resources_to_cluster(instances)
             new_cap = max(cap - self.actuation_size, self.min_cap)
             
             self.logger.log("Scaling from %d to %d" % (cap, new_cap))

@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from service.exceptions.kvm_exceptions import InstanceNotFoundException
+
 class Instance_Locator_Tunnel:
     def __init__(self, ssh_utils, compute_nodes, compute_nodes_key):
         self.compute_nodes = compute_nodes
@@ -26,5 +28,5 @@ class Instance_Locator_Tunnel:
             in_node = self.ssh_utils.run_and_get_result_tunnel(check_command, "root", compute_node, self.compute_nodes_key)
             if in_node == "0\n":
                 return compute_node
-        #FIXME: exception type
-        raise Exception("It was not possible to find the instance: command %s, ssh return value %s" % (check_command, in_node)) 
+
+        raise InstanceNotFoundException(vm_id, "It was not possible to find the instance: command %s, ssh return value %s" % (check_command, in_node)) 
