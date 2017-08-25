@@ -15,10 +15,10 @@ keypair_compute_nodes =
 tunnel_ports = 
 # The actuator service's port
 actuator_port = 5047
-# The disk I/O throughput (in operations per second) reserved to each virtual machine
-quota_vm =  
-# The max possible disk I/O throughput (in operations per second) (not in use currently)
-max_io = 
+# The max possible disk throughput (iops) that can be allocated to a virtual machine.
+iops_reference = 
+# The max possible disk throughput, in bytes/sec, that can be allocated to a virtual machine.
+bs_reference =  
 
 [monasca]
 # The endpoint for the Monasca's service.

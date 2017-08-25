@@ -23,10 +23,10 @@ class Test_Remote_KVM(unittest.TestCase):
     def setUp(self):
         self.ssh_utils = SSH_Utils({})
         self.compute_nodes_key = "key"
-        self.io_quota_to_vm = 100000
-        self.max_io = 10000000 
+        self.iops_reference = 50
+        self.bs_reference = 10000000
         self.remote_kvm = Remote_KVM(self.ssh_utils, self.compute_nodes_key, 
-                                     self.io_quota_to_vm, self.max_io)
+                                     self.iops_reference, self.bs_reference)
         self.cap = 56
         self.host_ip = "vm-ip"
         self.vm_id = "vm-id"
@@ -58,10 +58,12 @@ class Test_Remote_KVM(unittest.TestCase):
     #
 
     def test_change_io_quota(self):
-        command_quota = (self.cap*self.io_quota_to_vm)/100
+        command_iops_quota = (self.cap*self.iops_reference)/100
+        command_bs_quota = (self.cap*self.bs_reference)/100
         command_set_io_quota = "virsh blkdeviotune %s" \
             " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
-            " --current --total_iops_sec %s" % (self.vm_id, self.vm_id, command_quota)
+            " --current --total_iops_sec %s --total_bytes_sec %s" % (self.vm_id, self.vm_id, 
+                                                        command_iops_quota, command_bs_quota)
         
         self.ssh_utils.run_command = MagicMock(return_value=None)
         
@@ -130,7 +132,7 @@ class Test_Remote_KVM(unittest.TestCase):
         
         quota = self.remote_kvm.get_io_quota(self.host_ip, self.vm_id)
         
-        self.assertEqual(quota, 100*float(self.io_quota)/self.io_quota_to_vm)
+        self.assertEqual(quota, 100*float(self.io_quota)/self.iops_reference)
         self.ssh_utils.run_and_get_result.assert_any_call(command_get_io_quota, "root", 
                                                 self.host_ip, self.compute_nodes_key)
         

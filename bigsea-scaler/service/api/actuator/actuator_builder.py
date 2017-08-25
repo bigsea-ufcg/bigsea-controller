@@ -59,24 +59,26 @@ class Actuator_Builder:
         elif name == "kvm-io":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
-            io_quota_to_vm = config.getint("actuator", "quota_vm") 
-            max_io = config.getint("actuator", "max_io")
+            iops_reference = config.getint("actuator", "iops_reference")
+            bs_reference = config.getint("actuator", "bs_reference")
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
 
             instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_keypair)
-            remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair, io_quota_to_vm, max_io)
+            remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair, iops_reference, 
+                                                                        bs_reference)
             return KVM_IO_Actuator(instance_locator, remote_kvm)
         elif name == "kvm-io-tunnel":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
-            io_quota_to_vm = config.getint("actuator", "quota_vm") 
-            max_io = config.getint("actuator", "max_io")
+            iops_reference = config.getint("actuator", "iops_reference")
+            bs_reference = config.getint("actuator", "bs_reference")
+
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
 
             instance_locator = Instance_Locator_Tunnel(SSH_Utils({}), compute_nodes, 
                                                                 compute_nodes_keypair)
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils({}), compute_nodes_keypair, 
-                                                                io_quota_to_vm, max_io)
+                                                                iops_reference, bs_reference)
             return KVM_IO_Actuator(instance_locator, remote_kvm)
         elif name == "nop":
             return Nop_Actuator()

@@ -16,11 +16,11 @@
 # TODO: Documentation
 class Remote_KVM_Tunnel:
     
-    def __init__(self, ssh_utils, compute_nodes_key, io_quota_to_vm = 1000, max_io = 1000000):
+    def __init__(self, ssh_utils, compute_nodes_key, iops_reference = 1000, bs_reference = 1000000):
         self.ssh_utils = ssh_utils
         self.compute_nodes_key = compute_nodes_key
-        self.io_quota_to_vm = io_quota_to_vm
-        self.max_io = max_io
+        self.iops_reference = iops_reference
+        self.bs_reference = bs_reference
 
     # Warning: This code requires that the vcpu_quota parameter is between 0 and 100000
     def change_vcpu_quota(self, host_ip, vm_id, cap):
@@ -39,10 +39,13 @@ class Remote_KVM_Tunnel:
             # FIXME review this exception type
             raise Exception("Invalid cap value")
         
-        command_quota = (cap*self.io_quota_to_vm)/100
+        command_iops_quota = (cap*self.iops_reference)/100
+        command_bs_quota = (cap*self.bs_reference)/100
+        
         command_set_io_quota = "virsh blkdeviotune %s" \
             " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
-            " --current --total_iops_sec %s" % (vm_id, vm_id, command_quota)
+            " --current --total_iops_sec %s --total_bytes_sec %s" % (vm_id, vm_id, 
+                                                command_iops_quota, command_bs_quota)
         
         self.ssh_utils.run_command_tunnel(command_set_io_quota, "root", host_ip, 
                                           self.compute_nodes_key)
@@ -80,7 +83,7 @@ class Remote_KVM_Tunnel:
         
         try:
             quota = int(ssh_result)
-            return 100*quota/float(self.io_quota_to_vm)
+            return 100*quota/float(self.iops_reference)
         except:
             # FIXME: review this exception type
             raise Exception("Could not get allocated resources")
