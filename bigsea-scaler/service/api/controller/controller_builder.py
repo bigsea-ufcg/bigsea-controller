@@ -22,6 +22,7 @@ from service.api.controller.plugins.single_application_controller import Single_
 from service.api.controller.plugins.generic.generic_controller import Generic_Controller
 from service.api.controller.plugins.tendency.tendency_aware_proportional_controller import Tendency_Aware_Proportional_Controller
 from service.api.controller.plugins.proportional.proportional_controller import Proportional_Controller
+from service.api.controller.plugins.proportional_derivative.proportional_derivative_controller import ProportionalDerivativeController
 
 class Controller_Builder:
 
@@ -62,6 +63,8 @@ class Controller_Builder:
             return Generic_Controller(application_id, scaling_parameters)
         elif name == "proportional":
             return Proportional_Controller(application_id, scaling_parameters)
+        elif name == "proportional_derivative":
+            return ProportionalDerivativeController(application_id, scaling_parameters)
         elif name == "progress-tendency":
             return Tendency_Aware_Proportional_Controller(application_id, scaling_parameters)
         else:
