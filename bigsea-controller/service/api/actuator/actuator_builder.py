@@ -32,7 +32,7 @@ class Actuator_Builder:
 
     def get_actuator(self, name):
         config = ConfigParser.RawConfigParser()
-        config.read("scaler.cfg")
+        config.read("controller.cfg")
         
         if name == "kvm":
             compute_nodes_str = config.get("actuator", "compute_nodes")

@@ -25,7 +25,7 @@ from service.exceptions.monasca_exceptions import No_Metrics_Exception
 class Proportional_Controller(Controller):
     
     def __init__(self, application_id, parameters):
-        self.logger = Log("proportional.controller.log", "scaler.log")
+        self.logger = Log("proportional.controller.log", "controller.log")
         configure_logging()
         
         self.application_id = application_id

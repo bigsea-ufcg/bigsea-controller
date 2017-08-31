@@ -32,7 +32,7 @@ class ProportionalDerivativeAlarm:
         self.metric_rounding = metric_rounding
         self.heuristic_options = heuristic_options
 
-        self.logger = Log("proportional_derivative.alarm.log", "scaler.log")
+        self.logger = Log("proportional_derivative.alarm.log", "controller.log")
         self.cap_logger = Log("cap.log", "cap.log")
 
         #self.last_absolute_error = -1

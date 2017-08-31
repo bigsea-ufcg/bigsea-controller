@@ -19,7 +19,7 @@ import ConfigParser
 
 def main():
     config = ConfigParser.RawConfigParser()
-    config.read("scaler.cfg")
+    config.read("controller.cfg")
 
     host = config.get("flask", "host")
     port = config.getint("flask", "port")

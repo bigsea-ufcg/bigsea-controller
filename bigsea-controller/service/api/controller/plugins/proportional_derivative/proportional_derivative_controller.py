@@ -25,7 +25,7 @@ import time
 class ProportionalDerivativeController(Controller):
     
     def __init__(self, application_id, parameters):
-        self.logger = Log("proportional_derivative.controller.log", "scaler.log")
+        self.logger = Log("proportional_derivative.controller.log", "controller.log")
         configure_logging()
         
         self.application_id = application_id

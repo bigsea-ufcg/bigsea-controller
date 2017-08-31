@@ -32,7 +32,7 @@ STATUS = '/scaler/status'
 app = Flask(__name__)
 
 # Set up logging
-logger = Log("scaler.api.logger", "scaler.api.log")
+logger = Log("controller.api.logger", "controller.api.log")
 configure_logging()
 
 main_controller = Main_Controller()

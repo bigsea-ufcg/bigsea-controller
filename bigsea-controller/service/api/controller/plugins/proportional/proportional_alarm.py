@@ -32,7 +32,7 @@ class Proportional_Alarm:
         self.metric_rounding = metric_rounding
         self.heuristic_options = heuristic_options
 
-        self.logger = Log("proportional.alarm.log", "scaler.log")
+        self.logger = Log("proportional.alarm.log", "controller.log")
         self.cap_logger = Log("cap.log", "cap.log")
 
         configure_logging()

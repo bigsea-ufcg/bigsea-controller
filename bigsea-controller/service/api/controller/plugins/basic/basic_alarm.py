@@ -36,7 +36,7 @@ class Basic_Alarm:
         self.actuation_size = actuation_size
         self.metric_rounding = metric_rounding
 
-        self.logger = Log("basic.alarm.log", "scaler.log")
+        self.logger = Log("basic.alarm.log", "controller.log")
         configure_logging()
         
         self.last_time_progress_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
