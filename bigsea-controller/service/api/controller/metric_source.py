@@ -20,6 +20,10 @@ from abc import ABCMeta
 class Metric_Source:
     __metaclass__ = ABCMeta
 
+    '''
+        Returns the most recent measured value of the metric "metric_name", using the given options
+        as filter parameters
+    '''
     @abstractmethod
     def get_most_recent_value(self, metric_name, options):
         pass

@@ -16,20 +16,47 @@
 from abc import abstractmethod
 from abc import ABCMeta
 
-# TODO: documentation
-
-
+'''
+The Actuator is the component responsible for connecting to the underlying infrastructure and 
+triggering the commands or API calls that allocate or deallocate resources, based on other 
+component's (normally the Controller) requests.
+'''
 class Actuator:
     __metaclass__ = ABCMeta
 
+    '''
+        Sets the amount of allocated resources to the given instances, using the given values 
+        of caps. This method expects a dictionary of format:
+        
+        {
+            "instance_id_1":cap_value_1,
+            "instance_id_2":cap_value_2
+        }
+        
+        Normally used before starting executing.
+    '''
     @abstractmethod
     def prepare_environment(self, vm_data):
         pass
 
+    '''
+        Sets the amount of allocated resources to the given instances, using the given values 
+        of caps. This method expects a dictionary of format:
+        
+        {
+            "instance_id_1":cap_value_1,
+            "instance_id_2":cap_value_2
+        }
+    
+        Normally used when executing an application.
+    '''
     @abstractmethod
     def adjust_resources(self, vm_data):
         pass
 
+    '''
+        Returns a number which represents the amount of allocated resources to the given instance
+    '''
     @abstractmethod
     def get_allocated_resources(self, vm_id):
         pass

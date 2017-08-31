@@ -34,12 +34,9 @@ class ProportionalDerivativeAlarm:
 
         self.logger = Log("proportional_derivative.alarm.log", "controller.log")
         self.cap_logger = Log("cap.log", "cap.log")
-
-        #self.last_absolute_error = -1
-        self.last_error = ""
-
         configure_logging()
-        
+
+        self.last_error = ""        
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
         self.last_action = ""
         self.cap = -1
@@ -68,9 +65,7 @@ class ProportionalDerivativeAlarm:
             if self.cap != -1:
                 self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(application_id), str(self.cap)))
             
-            #self.last_absolute_error = abs(progress_error)
             self.last_error = progress_error
-            #self.last_absolute_error = progress_error
             self.last_progress_error_timestamp = progress_error_timestamp
         else:
             self.last_action += " Could not acquire more recent metrics"
@@ -150,11 +145,19 @@ class ProportionalDerivativeAlarm:
             raise Exception("Unknown heuristic")
     
     def _error_proportional_derivative(self, current_cap, progress_error, heuristic_options):
+        """
+            Calculates the new cap value using a proportional derivative algorithm.
+            
+            The new cap expression is:
+            new cap = old cap - proportional_factor*error - derivative_factor*(error difference)
+        """
+        
         proportional_factor = heuristic_options["proportional_factor"]
         derivative_factor = heuristic_options["derivative_factor"]
         
         proportional_component = -1*progress_error*proportional_factor
         
+        # If it is the first call, there is no last_error and the derivative component value is null
         if self.last_error == "":
             derivative_component = 0
         else:

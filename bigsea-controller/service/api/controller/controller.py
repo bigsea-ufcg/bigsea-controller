@@ -15,6 +15,11 @@
 from abc import ABCMeta
 from abc import abstractmethod
 
+'''
+The Controller is the component responsible for, based on metrics of infrastructure and application 
+health such as application progress and CPU usage, taking actions to ensure compliance with 
+quality of service levels.
+'''
 class Controller:
     __metaclass__ = ABCMeta
 
@@ -42,12 +47,16 @@ class Controller:
     '''
         Stops scaling for the application associated 
         with the controller instance. This method's expected
-        side effect is to make start_application_scaling to return
+        side effect is to make start_application_scaling to return.
     '''
     @abstractmethod
     def stop_application_scaling(self):
         pass
     
+    '''
+        Returns information on the status of the scaling of applications, 
+        normally as a string.
+    '''
     @abstractmethod
     def status(self):
         pass
