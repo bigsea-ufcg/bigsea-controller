@@ -24,7 +24,7 @@ class Monasca_Monitor:
 
     def __init__(self):
         config = ConfigParser.RawConfigParser()
-        config.read('scaler.cfg')
+        config.read('controller.cfg')
 
         self.monasca_username = config.get('monasca', 'username')
         self.monasca_password = config.get('monasca', 'password')

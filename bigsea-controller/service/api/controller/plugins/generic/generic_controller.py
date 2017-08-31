@@ -27,7 +27,7 @@ from utils.logger import Log, configure_logging
 class Generic_Controller(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = Log("diff.controller.log", "scaler.log")
+        self.logger = Log("diff.controller.log", "controller.log")
         configure_logging()
         
         self.application_id = application_id

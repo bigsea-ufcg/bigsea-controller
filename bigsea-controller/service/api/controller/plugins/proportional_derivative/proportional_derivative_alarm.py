@@ -17,8 +17,8 @@ from utils.logger import Log, configure_logging
 import datetime
 import time
 
-class Proportional_Alarm:
-    
+class ProportionalDerivativeAlarm:
+
     ERROR_METRIC_NAME = "application-progress.error"
     
     def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, metric_rounding, heuristic_options):
@@ -32,8 +32,11 @@ class Proportional_Alarm:
         self.metric_rounding = metric_rounding
         self.heuristic_options = heuristic_options
 
-        self.logger = Log("proportional.alarm.log", "scaler.log")
+        self.logger = Log("proportional_derivative.alarm.log", "controller.log")
         self.cap_logger = Log("cap.log", "cap.log")
+
+        #self.last_absolute_error = -1
+        self.last_error = ""
 
         configure_logging()
         
@@ -64,15 +67,14 @@ class Proportional_Alarm:
                     
             if self.cap != -1:
                 self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(application_id), str(self.cap)))
-                    
+            
+            #self.last_absolute_error = abs(progress_error)
+            self.last_error = progress_error
+            #self.last_absolute_error = progress_error
             self.last_progress_error_timestamp = progress_error_timestamp
         else:
             self.last_action += " Could not acquire more recent metrics"
             self.logger.log("Could not acquire more recent metrics")
-#         except Exception as e:
-#             # TODO: Check exception type
-#             self.logger.log(str(e))
-#             return
 
     def _scale_down(self, progress_error, instances):
         """
@@ -129,7 +131,7 @@ class Proportional_Alarm:
             self.cap = new_cap
     
     def _get_progress_error(self, application_id):
-        progress_error_measurement = self.metric_source.get_most_recent_value(Proportional_Alarm.ERROR_METRIC_NAME,
+        progress_error_measurement = self.metric_source.get_most_recent_value(ProportionalDerivativeAlarm.ERROR_METRIC_NAME,
                                                                 {"application_id":application_id})
         progress_error_timestamp = progress_error_measurement[0]
         progress_error = progress_error_measurement[1]
@@ -142,33 +144,23 @@ class Proportional_Alarm:
     def _decide_next_cap(self, current_cap, progress_error, heuristic_options):
         heuristic = heuristic_options["heuristic_name"]
         
-        if heuristic == "error_proportional":
-            return self._error_proportional(current_cap, progress_error, heuristic_options)
-        elif heuristic == "error_proportional_up_down":
-            return self._error_proportional_up_down(current_cap, progress_error, heuristic_options)
+        if heuristic == "error_proportional_derivative":
+            return self._error_proportional_derivative(current_cap, progress_error, heuristic_options)
         else:
             raise Exception("Unknown heuristic")
     
-    def _error_proportional(self, current_cap, progress_error, heuristic_options):
-        conservative_factor = heuristic_options["conservative_factor"]
-            
-        actuation_size = abs(progress_error*conservative_factor)
-            
-        if progress_error < 0:
-            return min(current_cap + actuation_size, self.max_cap)
-        else:
-            return max(current_cap - actuation_size, self.min_cap)
-    
-    def _error_proportional_up_down(self, current_cap, progress_error, heuristic_options):
-        if progress_error < 0:
-            factor = heuristic_options["factor_up"]
-            actuation_size = abs(progress_error*factor)
-            return min(current_cap + actuation_size, self.max_cap)
-        else:
-            factor = heuristic_options["factor_down"]
-            actuation_size = abs(progress_error*factor)
-            return max(current_cap - actuation_size, self.min_cap)
-    
-    def status(self):
-        return self.last_action
+    def _error_proportional_derivative(self, current_cap, progress_error, heuristic_options):
+        proportional_factor = heuristic_options["proportional_factor"]
+        derivative_factor = heuristic_options["derivative_factor"]
         
+        proportional_component = -1*progress_error*proportional_factor
+        
+        if self.last_error == "":
+            derivative_component = 0
+        else:
+            derivative_component = -1*derivative_factor*(progress_error - self.last_error)
+    
+        new_cap = current_cap + proportional_component + derivative_component
+        new_cap = max(min(new_cap, self.max_cap), self.min_cap)
+    
+        return new_cap

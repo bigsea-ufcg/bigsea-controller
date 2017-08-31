@@ -27,7 +27,7 @@ class Basic_Controller(Controller):
 
     def __init__(self, metric_source, actuator, parameters):
         # Set up logging
-        self.logger = Log("basic.controller.log", "scaler.log")
+        self.logger = Log("basic.controller.log", "controller.log")
         configure_logging()
         
         check_interval = parameters["check_interval"]
@@ -74,7 +74,7 @@ class Basic_Controller(Controller):
 class _Basic_Controller_Thread():
 
     def __init__(self, applications, applications_lock, alarm, check_interval):
-        self.logger = Log("basic.controller_thread.log", "scaler.log")
+        self.logger = Log("basic.controller_thread.log", "controller.log")
         configure_logging()
 
         self.applications = applications

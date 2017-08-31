@@ -15,17 +15,17 @@
 
 from service.api.controller.controller import Controller
 from utils.logger import Log, configure_logging
+import threading
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
-import threading
-import time
-from service.api.controller.plugins.tendency.tendency_aware_proportional_alarm import Tendency_Aware_Proportional_Alarm
+from service.api.controller.plugins.proportional_derivative.proportional_derivative_alarm import ProportionalDerivativeAlarm
 from service.exceptions.monasca_exceptions import No_Metrics_Exception
+import time
 
-class Tendency_Aware_Proportional_Controller(Controller):
-
+class ProportionalDerivativeController(Controller):
+    
     def __init__(self, application_id, parameters):
-        self.logger = Log("tendency.proportional.controller.log", "scaler.log")
+        self.logger = Log("proportional_derivative.controller.log", "controller.log")
         configure_logging()
         
         self.application_id = application_id
@@ -37,11 +37,11 @@ class Tendency_Aware_Proportional_Controller(Controller):
         self.min_cap = parameters["min_cap"]
         self.max_cap = parameters["max_cap"]
         self.metric_rounding = parameters["metric_rounding"]
-        self.actuation_size = parameters["actuation_size"]
         # The actuator plugin name
         self.actuator_type = parameters["actuator"]
         # The metric source plugin name
         self.metric_source_type = parameters["metric_source"]
+        self.heuristic_options = parameters["heuristic_options"]
         
         # We use a lock here to prevent race conditions when stopping the controller
         self.running = True
@@ -52,12 +52,12 @@ class Tendency_Aware_Proportional_Controller(Controller):
         # Gets a new actuator plugin using the given name
         actuator = Actuator_Builder().get_actuator(self.actuator_type)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
-        self.alarm = Tendency_Aware_Proportional_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
-                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
+        self.alarm = ProportionalDerivativeAlarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
+                                 self.min_cap, self.max_cap, self.metric_rounding, self.heuristic_options)
         
     def start_application_scaling(self):
         run = True
-        #FIXME: add exception handling
+        
         while run:
             self.logger.log("Monitoring application: %s" % (self.application_id))
 

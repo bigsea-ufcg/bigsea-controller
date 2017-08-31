@@ -32,7 +32,7 @@ class Tendency_Aware_Proportional_Alarm:
         self.metric_rounding = metric_rounding
         self.actuation_size = actuation_size
 
-        self.logger = Log("proportional.alarm.log", "scaler.log")
+        self.logger = Log("proportional.alarm.log", "controller.log")
         self.cap_logger = Log("cap.log", "cap.log")
         
         configure_logging()

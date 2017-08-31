@@ -33,7 +33,7 @@ class Generic_Alarm:
         self.actuation_size = actuation_size
         self.metric_rounding = metric_rounding
 
-        self.logger = Log("generic.alarm.log", "scaler.log")
+        self.logger = Log("generic.alarm.log", "controller.log")
         self.cap_logger = Log("cap.log", "cap.log")
         configure_logging()
         
