@@ -13,7 +13,7 @@ To install, configure and run the Controller component you will need a virtual m
 OS: Ubuntu 14.04
 CPU: 1 core
 Memory: 2GB of RAM
-Disk: there is no disk requirements.
+Disk: 20GB
 ```
 
 In the virtual machine that you want to install the Controller follow the steps below:
