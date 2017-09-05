@@ -150,6 +150,14 @@ class Proportional_Alarm:
             raise Exception("Unknown heuristic")
     
     def _error_proportional(self, current_cap, progress_error, heuristic_options):
+        """
+            Calculates the new cap value using a proportional algorithm, with 
+            single control parameter.
+        
+            The new cap expression is:
+            new cap = old cap + conservative_factor*progress_error
+        """
+        
         conservative_factor = heuristic_options["conservative_factor"]
             
         actuation_size = abs(progress_error*conservative_factor)
@@ -160,6 +168,14 @@ class Proportional_Alarm:
             return max(current_cap - actuation_size, self.min_cap)
     
     def _error_proportional_up_down(self, current_cap, progress_error, heuristic_options):
+        """
+            Calculates the new cap value using a proportional algorithm, with 
+            adjust parameters for scaling down and up.
+            
+            The new cap expression is:
+            new cap = old cap + factor*progress_error
+        """
+        
         if progress_error < 0:
             factor = heuristic_options["factor_up"]
             actuation_size = abs(progress_error*factor)

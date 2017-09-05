@@ -30,7 +30,7 @@ The keystone authentication endpoint.
 
 Monasca API version.
 
-### Example
+## Example
 ```
 [monasca]
 monasca_endpoint = http://1.1.1.1:8070
