@@ -108,11 +108,6 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
             self.application_id_7:{self.timestamp_1:-5.0, self.timestamp_2:-1.0,
                                    self.timestamp_3:2.0}}
         
-        self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
-                                        self.trigger_down, self.trigger_up, self.min_cap, 
-                                        self.max_cap, self.metric_round, self.heuristic_options)
-        
-        
     def metrics(self, metric_name, options):
         application_id = options["application_id"]
 
@@ -130,6 +125,11 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
          
     '''
     def test_alarm_gets_metrics_and_scales_up_decreasing_error(self):
+        self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
+                                        self.trigger_down, self.trigger_up, self.min_cap, 
+                                        self.max_cap, self.metric_round, self.heuristic_options, 
+                                        self.application_id_0, self.instances)
+        
         #
         # First call - there is no derivative effect - timestamp_1
         # Proportional effect = 45
@@ -144,7 +144,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                         MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -173,7 +173,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -202,7 +202,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -233,6 +233,11 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         # Derivative effect = 0
         #
         
+        self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
+                                        self.trigger_down, self.trigger_up, self.min_cap, 
+                                        self.max_cap, self.metric_round, self.heuristic_options, 
+                                        self.application_id_1, self.instances)
+        
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -241,7 +246,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_1, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -270,7 +275,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                         MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_1, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -299,7 +304,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_1, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -331,6 +336,11 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         # Derivative effect = 0
         #
         
+        self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
+                                        self.trigger_down, self.trigger_up, self.min_cap, 
+                                        self.max_cap, self.metric_round, self.heuristic_options, 
+                                        self.application_id_2, self.instances)
+        
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -339,7 +349,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -368,7 +378,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -397,7 +407,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -428,6 +438,11 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         # Derivative effect = 0
         #
         
+        self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
+                                        self.trigger_down, self.trigger_up, self.min_cap, 
+                                        self.max_cap, self.metric_round, self.heuristic_options, 
+                                        self.application_id_3, self.instances)
+        
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -436,7 +451,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_3, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -465,7 +480,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                     MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_3, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -494,7 +509,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_3, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -522,6 +537,11 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         # First call - there is no derivative effect - timestamp_1
         #
         
+        self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
+                                        self.trigger_down, self.trigger_up, self.min_cap, 
+                                        self.max_cap, self.metric_round, self.heuristic_options, 
+                                        self.application_id_4, self.instances)
+        
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
 
@@ -529,7 +549,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                     MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_4, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -556,7 +576,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_4, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -584,6 +604,11 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         # First call - there is no derivative effect - timestamp_1
         #
         
+        self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
+                                        self.trigger_down, self.trigger_up, self.min_cap, 
+                                        self.max_cap, self.metric_round, self.heuristic_options, 
+                                        self.application_id_5, self.instances)
+        
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
 
@@ -591,7 +616,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_5, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -618,7 +643,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                     MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_5, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -650,7 +675,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         
         self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
                             0, 0, self.min_cap, self.max_cap, self.metric_round, 
-                            self.heuristic_options)
+                            self.heuristic_options, self.application_id_6, self.instances)
         
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -659,7 +684,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_6, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -688,7 +713,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_6, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -716,7 +741,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_6, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -748,7 +773,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         
         self.alarm = ProportionalDerivativeAlarm(self.actuator, self.metric_source, 
                             0, 0, self.min_cap, self.max_cap, self.metric_round, 
-                            self.heuristic_options)
+                            self.heuristic_options, self.application_id_7, self.instances)
         
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -757,7 +782,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                                 MagicMock(return_value=self.allocated_resources_scale_up)
         
-        self.alarm.check_application_state(self.application_id_7, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -786,7 +811,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_7, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 
@@ -814,7 +839,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.actuator.get_allocated_resources_to_cluster = \
                             MagicMock(return_value=self.allocated_resources_scale_down)
         
-        self.alarm.check_application_state(self.application_id_7, self.instances)
+        self.alarm.check_application_state()
         
         self.metric_source.get_most_recent_value.\
                     assert_any_call(ProportionalDerivativeAlarm.ERROR_METRIC_NAME, 

@@ -1,3 +1,12 @@
+# Logging configuration
+[logging]
+# Enable logging?
+# Accepted values - True / False
+enable = True
+# Logging level
+# Accepted values - "CRITICAL", "DEBUG", "ERROR", "FATAL", "INFO", "NOTSET", "WARN", "WARNING"
+level = INFO
+
 # Flask configuration
 [flask]
 # The host where the scaler service will be deployed

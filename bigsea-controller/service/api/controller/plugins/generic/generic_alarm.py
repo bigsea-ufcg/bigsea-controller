@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from utils.logger import Log, configure_logging
+from utils.logger import ScalingLog
 import datetime
 import time
 
@@ -22,7 +22,8 @@ class Generic_Alarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
 
-    def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, actuation_size, metric_rounding):
+    def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, 
+                 actuation_size, metric_rounding, application_id, instances):
         # TODO: Check parameters
         self.metric_source = metric_source
         self.actuator = actuator
@@ -32,16 +33,19 @@ class Generic_Alarm:
         self.max_cap = max_cap
         self.actuation_size = actuation_size
         self.metric_rounding = metric_rounding
+        self.application_id = application_id
+        self.instances = instances
 
-        self.logger = Log("generic.alarm.log", "controller.log")
-        self.cap_logger = Log("cap.log", "cap.log")
-        configure_logging()
+        self.logger = ScalingLog("%s.generic.alarm.log" % (application_id), "controller.log", 
+                                                                          application_id)
+        self.cap_logger = ScalingLog("%s.cap.log" % (application_id), "cap.log", application_id)
         
-        self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+        self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z", 
+                                                                        '%Y-%m-%dT%H:%M:%S.%fZ')
         self.last_action = ""
         self.cap = -1
 
-    def check_application_state(self, application_id, instances):
+    def check_application_state(self):
         """
             Checks the application progress by getting progress metrics from a 
             metric source, checks if the metrics are new and tries to modify the
@@ -53,18 +57,19 @@ class Generic_Alarm:
             self.logger.log("Getting progress error")
             self.last_action = "getting progress error"
             # Get the progress error value and timestamp
-            progress_error_timestamp, progress_error = self._get_progress_error(application_id)
+            progress_error_timestamp, progress_error = self._get_progress_error(self.application_id)
             
             self.logger.log("Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
             self.last_action = "Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error)
 
             # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
             if self._check_measurements_are_new(progress_error_timestamp):
-                self._scale_down(progress_error, instances)
-                self._scale_up(progress_error, instances)
+                self._scale_down(progress_error, self.instances)
+                self._scale_up(progress_error, self.instances)
                 
                 if self.cap != -1:
-                    self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(application_id), str(self.cap)))
+                    self.cap_logger.log("%.0f|%s|%s" % (time.time(), 
+                                                        str(self.application_id), str(self.cap)))
                     
                 self.last_progress_error_timestamp = progress_error_timestamp
             else:

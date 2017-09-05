@@ -20,15 +20,14 @@ from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.controller import Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.controller.plugins.generic.generic_alarm import Generic_Alarm
-from utils.logger import Log, configure_logging
+from utils.logger import ScalingLog
 
 # This class dictates the pace of the scaling process. It controls when Generic_Alarm
 # is called to check application state and when is necessary to wait.
 class Generic_Controller(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = Log("diff.controller.log", "controller.log")
-        configure_logging()
+        self.logger = ScalingLog("diff.controller.log", "controller.log", application_id)
         
         self.application_id = application_id
         # read scaling parameters
@@ -55,7 +54,8 @@ class Generic_Controller(Controller):
         actuator = Actuator_Builder().get_actuator(self.actuator_type)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
         self.alarm = Generic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
-                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
+                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding, 
+                                 application_id, self.instances)
         
     def start_application_scaling(self):
         run = True
@@ -64,7 +64,7 @@ class Generic_Controller(Controller):
             self.logger.log("Monitoring application: %s" % (self.application_id))
 
             # Call the alarm to check the application
-            self.alarm.check_application_state(self.application_id, self.instances)
+            self.alarm.check_application_state()
 
             # Wait some time
             time.sleep(float(self.check_interval))

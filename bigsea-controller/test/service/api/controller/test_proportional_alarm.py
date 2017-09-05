@@ -104,7 +104,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
                                         self.trigger_up, self.min_cap, self.max_cap, 
-                                        self.metric_round, heuristic_options)
+                                        self.metric_round, heuristic_options, self.application_id_2, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -113,7 +113,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -140,7 +140,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                     self.trigger_down, self.trigger_up, self.min_cap, 
-                                    self.max_cap, self.metric_round, heuristic_options)
+                                    self.max_cap, self.metric_round, heuristic_options, 
+                                    self.application_id_2, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -149,7 +150,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -176,7 +177,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                 self.trigger_down, self.trigger_up, self.min_cap, 
-                                self.max_cap, self.metric_round, heuristic_options)
+                                self.max_cap, self.metric_round, heuristic_options, 
+                                self.application_id_0, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -185,7 +187,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -211,7 +213,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                 self.trigger_down, self.trigger_up, self.min_cap, 
-                                self.max_cap, self.metric_round, heuristic_options)
+                                self.max_cap, self.metric_round, heuristic_options,
+                                self.application_id_0, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -220,7 +223,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -242,7 +245,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
                                 self.trigger_up, self.min_cap, self.max_cap, self.metric_round, 
-                                heuristic_options)
+                                heuristic_options, self.application_id_1, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -251,7 +254,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_1, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -270,7 +273,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
                                         self.trigger_up, self.min_cap, self.max_cap, 
-                                        self.metric_round, heuristic_options)
+                                        self.metric_round, heuristic_options, self.application_id_0, 
+                                        self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -278,7 +282,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
         
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -305,7 +309,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
         
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -324,7 +328,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                 self.trigger_down, self.trigger_up, self.min_cap, 
-                                self.max_cap, self.metric_round, heuristic_options)
+                                self.max_cap, self.metric_round, heuristic_options, 
+                                self.application_id_2, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -333,7 +338,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -361,7 +366,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -390,7 +395,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                     self.trigger_down, self.trigger_up,
                                     self.min_cap, self.max_cap, self.metric_round, 
-                                    heuristic_options)
+                                    heuristic_options, self.application_id_2, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -399,7 +404,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -427,7 +432,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
                                         self.trigger_up, self.min_cap, self.max_cap, 
-                                        self.metric_round, heuristic_options)
+                                        self.metric_round, heuristic_options, 
+                                        self.application_id_2, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -436,7 +442,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -462,7 +468,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down,
                                     self.trigger_up, self.min_cap, self.max_cap, 
-                                    self.metric_round, heuristic_options)
+                                    self.metric_round, heuristic_options, 
+                                    self.application_id_0, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -471,7 +478,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
@@ -498,7 +505,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                     self.trigger_down, self.trigger_up, self.min_cap, 
-                                    self.max_cap, self.metric_round, heuristic_options)
+                                    self.max_cap, self.metric_round, heuristic_options, 
+                                    self.application_id_0, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -507,7 +515,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
         self.metric_source.get_most_recent_value.\
