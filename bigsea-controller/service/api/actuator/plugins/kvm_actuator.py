@@ -15,15 +15,19 @@
 
 from service.api.actuator.actuator import Actuator
 from service.exceptions.kvm_exceptions import InstanceNotFoundException
+from utils.authorizer import Authorizer
+from service.exceptions.infra_exceptions import AuthorizationFailedException
 
 # TODO: documentation
 
 
 class KVM_Actuator(Actuator):
 
-    def __init__(self, instance_locator, remote_kvm):
+    def __init__(self, instance_locator, remote_kvm, authorization_data):
         self.instance_locator = instance_locator
         self.remote_kvm = remote_kvm
+        self.authorizer = Authorizer()
+        self.authorization_data = authorization_data
 
     # TODO: validation
     def prepare_environment(self, vm_data):
@@ -32,6 +36,13 @@ class KVM_Actuator(Actuator):
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
+        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
+                                                 self.authorization_data['bigsea_username'],
+                                                 self.authorization_data['bigsea_password'])
+        
+        if not authorization['success']:
+            raise AuthorizationFailedException()
+        
         # Discover vm_id - compute nodes map
         for instance in vm_data.keys():
             try:
@@ -44,6 +55,13 @@ class KVM_Actuator(Actuator):
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
+        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
+                                                self.authorization_data['bigsea_username'],
+                                                self.authorization_data['bigsea_password'])
+        
+        if not authorization['success']:
+            raise AuthorizationFailedException()
+        
         # Access compute nodes to discover vm location
         host = self.instance_locator.locate(vm_id)
         # Access a compute node and get amount of allocated resources

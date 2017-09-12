@@ -51,13 +51,20 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.allocated_resources = 50
         self.metric_round = 2
 
+        self.bigsea_username = "username"
+        self.bigsea_password = "password"
+        self.authorization_url = "authorization_url"
+        self.authorization_data = dict(authorization_url=self.authorization_url,
+                                  bigsea_username=self.bigsea_username,
+                                  bigsea_password=self.bigsea_password)
+
         compute_nodes = []
         compute_nodes_key = "key"
         self.instances = [self.instance_name_1, self.instance_name_2]
         self.metric_source = Metric_Source_Builder().get_metric_source("nop", {})
         self.instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_key)
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
-        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm)
+        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data)
 
         self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_round)

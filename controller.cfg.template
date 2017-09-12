@@ -5,6 +5,14 @@ host = <host_ip>
 # The port where the scaler service will be deployed
 port = <port_number>
 
+[authorization]
+# BigSea's authentication endpoint
+authorization_url =
+# The BigSea username to use when scaling
+bigsea_username =
+# The BigSea password to use when scaling
+bigsea_password = 
+
 [actuator]
 # The ips or names of the compute nodes, separated by comma.
 compute_nodes = 
