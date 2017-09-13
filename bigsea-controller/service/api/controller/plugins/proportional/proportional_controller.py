@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from service.api.controller.controller import Controller
-from utils.logger import Log, configure_logging
+from utils.logger import ScalingLog
 import threading
 import time
 from service.api.controller.metric_source_builder import Metric_Source_Builder
@@ -25,8 +25,7 @@ from service.exceptions.monasca_exceptions import No_Metrics_Exception
 class Proportional_Controller(Controller):
     
     def __init__(self, application_id, parameters):
-        self.logger = Log("proportional.controller.log", "controller.log")
-        configure_logging()
+        self.logger = ScalingLog("proportional.controller.log", "controller.log", application_id)
         
         scaling_parameters = parameters["scaling_parameters"]
         
@@ -55,7 +54,8 @@ class Proportional_Controller(Controller):
         actuator = Actuator_Builder().get_actuator(self.actuator_type, parameters)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
         self.alarm = Proportional_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
-                                 self.min_cap, self.max_cap, self.metric_rounding, self.heuristic_options)
+                                 self.min_cap, self.max_cap, self.metric_rounding, self.heuristic_options, 
+                                 self.application_id, self.instances)
         
     def start_application_scaling(self):
         run = True
@@ -65,7 +65,7 @@ class Proportional_Controller(Controller):
 
             # Call the alarm to check the application
             try:
-                self.alarm.check_application_state(self.application_id, self.instances)
+                self.alarm.check_application_state()
             except No_Metrics_Exception: 
                 self.logger.log("No metrics available")
             except Exception as e:

@@ -101,6 +101,10 @@ class Test_Generic_Alarm(unittest.TestCase):
             return timestamp, progress_error[application_id]
 
     def test_alarm_gets_metrics_and_scales_down(self):
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
+                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_round, 
+                                 self.application_id_2, self.instances)
+        
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -108,19 +112,25 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                        {"application_id":self.application_id_2})
         
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources_to_cluster.assert_called_once_with(self.instances)
         # Remove resources
         new_cap = self.allocated_resources - self.actuation_size
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                                self.instance_name_2:new_cap})
 
     def test_alarm_gets_metrics_and_scales_up(self):
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
+                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_round, 
+                                 self.application_id_0, self.instances)
+        
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -128,19 +138,25 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                        {"application_id":self.application_id_0})
 
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources_to_cluster.assert_called_once_with(self.instances)
         # Add resources
         new_cap = self.allocated_resources + self.actuation_size
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                        self.instance_name_2:new_cap})
 
     def test_alarm_does_nothing(self):
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
+                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_round, 
+                                 self.application_id_1, self.instances)
+        
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -148,10 +164,11 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_1, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_1})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                    {"application_id":self.application_id_1})
 
         # The method doesn't try to get the amount of allocated resources 
         self.actuator.get_allocated_resources_to_cluster.assert_not_called()
@@ -163,8 +180,9 @@ class Test_Generic_Alarm(unittest.TestCase):
         # The metrics are rounded to 2 digits from the decimal point
         # There should be scale up and down in these cases
         #
-        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.actuation_size, 2)
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                   self.trigger_up, self.min_cap, self.max_cap, self.actuation_size, 
+                                   2, self.application_id_3, self.instances)
         
         # Scale up
         # Set up mocks
@@ -174,21 +192,24 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_3, self.instances)
+        self.alarm.check_application_state()
         
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_3})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                    {"application_id":self.application_id_3})
 
         # The method tries to get the amount of allocated resources 
         self.actuator.get_allocated_resources_to_cluster.assert_called_once_with(self.instances)
         new_cap = self.allocated_resources + self.actuation_size
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                        self.instance_name_2:new_cap})
 
         # Scale down
         # Set up mocks
-        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.actuation_size, 2)
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                   self.trigger_up, self.min_cap, self.max_cap, self.actuation_size,
+                                    2, self.application_id_4, self.instances)
         
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -196,23 +217,26 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_4, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_4})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                    {"application_id":self.application_id_4})
 
         # The method tries to get the amount of allocated resources 
         self.actuator.get_allocated_resources_to_cluster.assert_called_once_with(self.instances)
         new_cap = self.allocated_resources - self.actuation_size
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                        self.instance_name_2:new_cap})
         
         #
         # The metrics are rounded to 3 digits from the decimal point
         # There should not be scale up and down in these cases
         #
-        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up, 
-                                 self.min_cap, self.max_cap, self.actuation_size, 3)
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                   self.trigger_up, self.min_cap, self.max_cap, self.actuation_size, 
+                                   3, self.application_id_3, self.instances)
                 
         # Scale up
         # Start up mocks
@@ -222,10 +246,11 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_3, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_3})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                {"application_id":self.application_id_3})
         
         # The method doesn't try to get the amount of allocated resources 
         self.actuator.get_allocated_resources_to_cluster.assert_not_called()
@@ -234,8 +259,9 @@ class Test_Generic_Alarm(unittest.TestCase):
         
         # Scale down
         # Start up mocks
-        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.actuation_size, 3)
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                   self.trigger_up, self.min_cap, self.max_cap, self.actuation_size, 
+                                3, self.application_id_4, self.instances)
         
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics
@@ -243,10 +269,11 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_4, self.instances)
+        self.alarm.check_application_state()
         
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_4})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                    {"application_id":self.application_id_4})
         
         # The method doesn't try to get the amount of allocated resources
         self.actuator.get_allocated_resources_to_cluster.assert_not_called()
@@ -254,8 +281,9 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources.assert_not_called()
 
     def test_alarm_does_not_reuse_metrics_with_same_timestamp(self):
-        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.actuation_size, 2)
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                   self.trigger_up, self.min_cap, self.max_cap, self.actuation_size,
+                                    2, self.application_id_0, self.instances)
         
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
@@ -263,17 +291,19 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
         
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                    {"application_id":self.application_id_0})
         
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources_to_cluster.assert_called_once_with(self.instances)
         # Add resources
         new_cap = self.allocated_resources + self.actuation_size
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                            self.instance_name_2:new_cap})
         
         #
         # 2nd call. The method checks if the metric is new and does not act
@@ -285,10 +315,11 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
         
-        self.alarm.check_application_state(self.application_id_0, self.instances)
+        self.alarm.check_application_state()
         
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_0})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                    {"application_id":self.application_id_0})
 
         # The method doesn't try to get the amount of allocated resources
         self.actuator.get_allocated_resources_to_cluster.assert_not_called()
@@ -296,6 +327,10 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources.assert_not_called()
         
     def test_alarm_metrics_with_different_timestamps(self):
+        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, 
+                                self.trigger_up, self.min_cap, self.max_cap, self.actuation_size, 3,
+                                 self.application_id_2, self.instances)
+        
         # Set up mocks
         self.metric_source.get_most_recent_value = MagicMock()
         self.metric_source.get_most_recent_value.side_effect = self.metrics_different_timestamps
@@ -303,17 +338,19 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                {"application_id":self.application_id_2})
 
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources_to_cluster.assert_called_once_with(self.instances)
         # Remove resources
         new_cap = self.allocated_resources - self.actuation_size
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                    self.instance_name_2:new_cap})
         
         #
         # 2nd call. The method checks if the metric is new and acts
@@ -326,17 +363,19 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.actuator.adjust_resources = MagicMock(return_value=None)
         self.actuator.get_allocated_resources_to_cluster = MagicMock(return_value=self.allocated_resources)
 
-        self.alarm.check_application_state(self.application_id_2, self.instances)
+        self.alarm.check_application_state()
 
         # The method tries to get the metrics correctly
-        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, {"application_id":self.application_id_2})
+        self.metric_source.get_most_recent_value.assert_any_call(Generic_Alarm.ERROR_METRIC_NAME, 
+                                                    {"application_id":self.application_id_2})
 
         # The method tries to get the amount of allocated resources
         self.actuator.get_allocated_resources_to_cluster.assert_called_once_with(self.instances)
         # Remove resources
         new_cap = self.allocated_resources - self.actuation_size
         # The method tries to adjust the amount of resources
-        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, self.instance_name_2:new_cap})
+        self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
+                                                        self.instance_name_2:new_cap})
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

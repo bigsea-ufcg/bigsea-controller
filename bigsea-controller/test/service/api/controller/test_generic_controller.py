@@ -70,7 +70,7 @@ class Test_Generic_Controller(unittest.TestCase):
 
         time.sleep(float(2*self.check_interval))
 
-        self.controller.alarm.check_application_state.assert_any_call(self.app_id_0, self.instances)
+        self.controller.alarm.check_application_state.assert_any_call()
         
         self.controller.stop_application_scaling()
 
