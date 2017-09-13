@@ -27,20 +27,22 @@ class Proportional_Controller(Controller):
     def __init__(self, application_id, parameters):
         self.logger = ScalingLog("proportional.controller.log", "controller.log", application_id)
         
+        scaling_parameters = parameters["scaling_parameters"]
+        
         self.application_id = application_id
         # read scaling parameters
-        self.instances = parameters["instances"]
-        self.check_interval = parameters["check_interval"]
-        self.trigger_down = parameters["trigger_down"]
-        self.trigger_up = parameters["trigger_up"]
-        self.min_cap = parameters["min_cap"]
-        self.max_cap = parameters["max_cap"]
-        self.metric_rounding = parameters["metric_rounding"]
+        self.instances = scaling_parameters["instances"]
+        self.check_interval = scaling_parameters["check_interval"]
+        self.trigger_down = scaling_parameters["trigger_down"]
+        self.trigger_up = scaling_parameters["trigger_up"]
+        self.min_cap = scaling_parameters["min_cap"]
+        self.max_cap = scaling_parameters["max_cap"]
+        self.metric_rounding = scaling_parameters["metric_rounding"]
         # The actuator plugin name
-        self.actuator_type = parameters["actuator"]
+        self.actuator_type = scaling_parameters["actuator"]
         # The metric source plugin name
-        self.metric_source_type = parameters["metric_source"]
-        self.heuristic_options = parameters["heuristic_options"]
+        self.metric_source_type = scaling_parameters["metric_source"]
+        self.heuristic_options = scaling_parameters["heuristic_options"]
         
         # We use a lock here to prevent race conditions when stopping the controller
         self.running = True
@@ -49,7 +51,7 @@ class Proportional_Controller(Controller):
         # Gets a new metric source plugin using the given name
         metric_source = Metric_Source_Builder().get_metric_source(self.metric_source_type, parameters)
         # Gets a new actuator plugin using the given name
-        actuator = Actuator_Builder().get_actuator(self.actuator_type)
+        actuator = Actuator_Builder().get_actuator(self.actuator_type, parameters)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
         self.alarm = Proportional_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
                                  self.min_cap, self.max_cap, self.metric_rounding, self.heuristic_options, 

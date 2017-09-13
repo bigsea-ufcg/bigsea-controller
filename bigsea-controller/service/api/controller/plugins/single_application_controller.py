@@ -29,23 +29,25 @@ class Single_Application_Controller(Controller):
         self.logger = Log("single.controller.log", "controller.log")
         configure_logging()
         
+        scaling_parameters = parameters["scaling_parameters"]
+        
         self.application_id = application_id
-        self.instances = parameters["instances"]
-        self.check_interval = parameters["check_interval"]
-        self.trigger_down = parameters["trigger_down"]
-        self.trigger_up = parameters["trigger_up"]
-        self.min_cap = parameters["min_cap"]
-        self.max_cap = parameters["max_cap"]
-        self.actuation_size = parameters["actuation_size"]
-        self.metric_rounding = parameters["metric_rounding"]
-        self.actuator_type = parameters["actuator"]
-        self.metric_source_type = parameters["metric_source"]
+        self.instances = scaling_parameters["instances"]
+        self.check_interval = scaling_parameters["check_interval"]
+        self.trigger_down = scaling_parameters["trigger_down"]
+        self.trigger_up = scaling_parameters["trigger_up"]
+        self.min_cap = scaling_parameters["min_cap"]
+        self.max_cap = scaling_parameters["max_cap"]
+        self.actuation_size = scaling_parameters["actuation_size"]
+        self.metric_rounding = scaling_parameters["metric_rounding"]
+        self.actuator_type = scaling_parameters["actuator"]
+        self.metric_source_type = scaling_parameters["metric_source"]
         
         self.running = True
         self.running_lock = threading.RLock()
         
         metric_source = Metric_Source_Builder().get_metric_source(self.metric_source_type, parameters)
-        actuator = Actuator_Builder().get_actuator(self.actuator_type)
+        actuator = Actuator_Builder().get_actuator(self.actuator_type, parameters)
         self.alarm = Basic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up, 
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding)
     

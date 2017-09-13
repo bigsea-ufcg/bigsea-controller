@@ -45,17 +45,24 @@ class Test_Main_Controller(unittest.TestCase):
         self.metric_source = "nop"
         
         self.parameters = {}
-        self.parameters["instances"] = self.instances
-        self.parameters["check_interval"] = self.check_interval
-        self.parameters["trigger_down"] = self.trigger_down
-        self.parameters["trigger_up"] = self.trigger_up
-        self.parameters["min_cap"] = self.min_cap
-        self.parameters["max_cap"] = self.max_cap
-        self.parameters["actuation_size"] = self.actuation_size
-        self.parameters["metric_rounding"] = self.metric_rounding
-        self.parameters["actuator"] = self.actuator
-        self.parameters["metric_source"] = self.metric_source
-        self.parameters["plugin"] = self.plugin
+        self.scaling_parameters = {}
+        self.scaling_parameters["instances"] = self.instances
+        self.scaling_parameters["check_interval"] = self.check_interval
+        self.scaling_parameters["trigger_down"] = self.trigger_down
+        self.scaling_parameters["trigger_up"] = self.trigger_up
+        self.scaling_parameters["min_cap"] = self.min_cap
+        self.scaling_parameters["max_cap"] = self.max_cap
+        self.scaling_parameters["actuation_size"] = self.actuation_size
+        self.scaling_parameters["metric_rounding"] = self.metric_rounding
+        self.scaling_parameters["actuator"] = self.actuator
+        self.scaling_parameters["metric_source"] = self.metric_source
+        
+        self.bigsea_username = "username"
+        self.bigsea_password = "password"
+        self.parameters = {"scaler_plugin":self.plugin,
+                            "scaling_parameters":self.scaling_parameters,
+                            "bigsea_username":self.bigsea_username,
+                           "bigsea_password":self.bigsea_password}
         
         self.controller = Single_Application_Controller(self.application_id_0, self.parameters)
         self.controller_2 = Single_Application_Controller(self.application_id_1, self.parameters)

@@ -28,7 +28,7 @@ class Main_Controller:
         
     def start_application_scaling(self, application_id, parameters):
         self.logger.log("Adding application id: %s" %  (application_id))
-        plugin_name = parameters["plugin"]
+        plugin_name = parameters["scaler_plugin"]
         controller = self.controller_builder.get_controller(plugin_name, application_id, parameters)
         controller_thread = threading.Thread(target=controller.start_application_scaling)
         controller_thread.start()

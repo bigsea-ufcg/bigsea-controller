@@ -30,13 +30,15 @@ class Basic_Controller(Controller):
         self.logger = Log("basic.controller.log", "controller.log")
         configure_logging()
         
-        check_interval = parameters["check_interval"]
-        trigger_down = parameters["trigger_down"]
-        trigger_up = parameters["trigger_up"]
-        min_cap = parameters["min_cap"]
-        max_cap = parameters["max_cap"]
-        actuation_size = parameters["actuation_size"]
-        metric_rounding = parameters["metric_rounding"]
+        scaling_parameters = parameters["scaling_parameters"]
+        
+        check_interval = scaling_parameters["check_interval"]
+        trigger_down = scaling_parameters["trigger_down"]
+        trigger_up = scaling_parameters["trigger_up"]
+        min_cap = scaling_parameters["min_cap"]
+        max_cap = scaling_parameters["max_cap"]
+        actuation_size = scaling_parameters["actuation_size"]
+        metric_rounding = scaling_parameters["metric_rounding"]
 
         # Start alarm
         self.alarm = Basic_Alarm(actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap, actuation_size, metric_rounding)

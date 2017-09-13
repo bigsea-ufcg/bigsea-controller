@@ -30,9 +30,17 @@ from service.api.actuator.plugins.kvm_io_actuator import KVM_IO_Actuator
 # TODO: documentation
 class Actuator_Builder:
 
-    def get_actuator(self, name):
+    def get_actuator(self, name, parameters):
         config = ConfigParser.RawConfigParser()
         config.read("controller.cfg")
+        
+        authorization_url = config.get("authorization", "authorization_url")
+        bigsea_username = parameters["bigsea_username"]
+        bigsea_password = parameters["bigsea_password"]
+        
+        authorization_data = dict(authorization_url=authorization_url,
+                                  bigsea_username=bigsea_username,
+                                  bigsea_password=bigsea_password)
         
         if name == "kvm":
             compute_nodes_str = config.get("actuator", "compute_nodes")
@@ -41,7 +49,7 @@ class Actuator_Builder:
             
             instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_keypair)
             remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair)
-            return KVM_Actuator(instance_locator, remote_kvm)
+            return KVM_Actuator(instance_locator, remote_kvm, authorization_data)
         elif name == "kvm-tunnel":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
@@ -55,7 +63,7 @@ class Actuator_Builder:
             instance_locator = Instance_Locator_Tunnel(SSH_Utils(hosts_ports), compute_nodes, 
                                                                             compute_nodes_keypair)
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair)
-            return KVM_Actuator(instance_locator, remote_kvm)
+            return KVM_Actuator(instance_locator, remote_kvm, authorization_data)
         elif name == "kvm-io":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
@@ -66,7 +74,7 @@ class Actuator_Builder:
             instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_keypair)
             remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair, iops_reference, 
                                                                         bs_reference)
-            return KVM_IO_Actuator(instance_locator, remote_kvm)
+            return KVM_IO_Actuator(instance_locator, remote_kvm, authorization_data)
         elif name == "kvm-io-tunnel":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
@@ -79,7 +87,7 @@ class Actuator_Builder:
                                                                 compute_nodes_keypair)
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils({}), compute_nodes_keypair, 
                                                                 iops_reference, bs_reference)
-            return KVM_IO_Actuator(instance_locator, remote_kvm)
+            return KVM_IO_Actuator(instance_locator, remote_kvm, authorization_data)
         elif name == "nop":
             return Nop_Actuator()
         elif name == "service":
