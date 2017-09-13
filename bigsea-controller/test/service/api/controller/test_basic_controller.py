@@ -41,11 +41,19 @@ class Test_Basic_Controller(unittest.TestCase):
         config.get = MagicMock()
         config.get.side_effect = self.config_values
 
-        metric_source = Metric_Source_Builder().get_metric_source("nop", {})
-        actuator = Actuator_Builder().get_actuator("nop")
+        self.bigsea_username = "username"
+        self.bigsea_password = "password"
 
-        parameters = {"check_interval":self.CHECK_INTERVAL, "trigger_down":10, "trigger_up":10,
+        scaling_parameters = {"check_interval":self.CHECK_INTERVAL, "trigger_down":10, "trigger_up":10,
                   "min_cap":10, "max_cap":100, "actuation_size":20, "metric_rounding":2}
+        
+        parameters = {"scaling_parameters":scaling_parameters,
+                      "bigsea_username":self.bigsea_username,
+                      "bigsea_password":self.bigsea_password}
+        
+        metric_source = Metric_Source_Builder().get_metric_source("nop", {})
+        actuator = Actuator_Builder().get_actuator("nop", parameters)
+
 
         self.controller = Basic_Controller(metric_source, actuator, parameters)
         self.application_id_1 = "app-01"

@@ -30,13 +30,13 @@ from service.api.actuator.plugins.kvm_io_actuator import KVM_IO_Actuator
 # TODO: documentation
 class Actuator_Builder:
 
-    def get_actuator(self, name):
+    def get_actuator(self, name, parameters):
         config = ConfigParser.RawConfigParser()
         config.read("controller.cfg")
         
         authorization_url = config.get("authorization", "authorization_url")
-        bigsea_username = config.get("authorization", "bigsea_username") 
-        bigsea_password = config.get("authorization", "bigsea_password")
+        bigsea_username = parameters["bigsea_username"]
+        bigsea_password = parameters["bigsea_password"]
         
         authorization_data = dict(authorization_url=authorization_url,
                                   bigsea_username=bigsea_username,

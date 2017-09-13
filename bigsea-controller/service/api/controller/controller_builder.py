@@ -30,8 +30,6 @@ class Controller_Builder:
         pass
 
     def get_controller(self, name, application_id, parameters):
-        scaling_parameters = parameters["scaling_parameters"]
-        
         if name == "basic":
             config = ConfigParser.RawConfigParser()
             config.read("controller.cfg")
@@ -60,13 +58,13 @@ class Controller_Builder:
         elif name == "single":
             return Single_Application_Controller(application_id, parameters)
         elif name == "progress-error":
-            return Generic_Controller(application_id, scaling_parameters)
+            return Generic_Controller(application_id, parameters)
         elif name == "proportional":
-            return Proportional_Controller(application_id, scaling_parameters)
+            return Proportional_Controller(application_id, parameters)
         elif name == "proportional_derivative":
-            return ProportionalDerivativeController(application_id, scaling_parameters)
+            return ProportionalDerivativeController(application_id, parameters)
         elif name == "progress-tendency":
-            return Tendency_Aware_Proportional_Controller(application_id, scaling_parameters)
+            return Tendency_Aware_Proportional_Controller(application_id, parameters)
         else:
             # FIXME: exception type
             raise Exception("Unknown controller type")

@@ -43,15 +43,15 @@ main_controller = Main_Controller()
 def prepare_environment():
     data = request.json
 
-    plugin_name = data["plugin"]
-    actuator = Actuator_Builder().get_actuator(plugin_name)
+    plugin_name = data["actuator"]
+    actuator = Actuator_Builder().get_actuator(plugin_name, data)
     
     logger.log("%s-Preparing environment for instances %s" % (time.strftime("%H:%M:%S"), str(data)))
 
-    data.pop("plugin")
+    #data.pop("plugin")
     
     try:
-        actuator.prepare_environment(data)
+        actuator.prepare_environment(data["instances_cap"])
     except Exception as e:
         logger.log(e.getMessage())
 

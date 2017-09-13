@@ -26,10 +26,14 @@ class Test_Single_Application_Controller(unittest.TestCase):
     def setUp(self):
         self.app_id_0 = "app-00"
         self.parameters = {}
+        self.scaling_parameters = {}
         
         self.instance_1 = "instance-1"
         self.instance_2 = "instance-2"
         self.instances = [self.instance_1, self.instance_2]
+        
+        self.bigsea_username = "username"
+        self.bigsea_password = "password"
         
         self.check_interval = 2
         self.trigger_down = 10
@@ -41,16 +45,20 @@ class Test_Single_Application_Controller(unittest.TestCase):
         self.actuator = "nop"
         self.metric_source = "nop"
         
-        self.parameters["instances"] = self.instances
-        self.parameters["check_interval"] = self.check_interval
-        self.parameters["trigger_down"] = self.trigger_down
-        self.parameters["trigger_up"] = self.trigger_up
-        self.parameters["min_cap"] = self.min_cap
-        self.parameters["max_cap"] = self.max_cap
-        self.parameters["actuation_size"] = self.actuation_size
-        self.parameters["metric_rounding"] = self.metric_rounding
-        self.parameters["actuator"] = self.actuator
-        self.parameters["metric_source"] = self.metric_source
+        self.scaling_parameters["instances"] = self.instances
+        self.scaling_parameters["check_interval"] = self.check_interval
+        self.scaling_parameters["trigger_down"] = self.trigger_down
+        self.scaling_parameters["trigger_up"] = self.trigger_up
+        self.scaling_parameters["min_cap"] = self.min_cap
+        self.scaling_parameters["max_cap"] = self.max_cap
+        self.scaling_parameters["actuation_size"] = self.actuation_size
+        self.scaling_parameters["metric_rounding"] = self.metric_rounding
+        self.scaling_parameters["actuator"] = self.actuator
+        self.scaling_parameters["metric_source"] = self.metric_source
+        
+        self.parameters = {"scaling_parameters":self.scaling_parameters, 
+                           "bigsea_username":self.bigsea_username,
+                           "bigsea_password":self.bigsea_password}
         
         self.controller = Single_Application_Controller(self.app_id_0, self.parameters)
 
