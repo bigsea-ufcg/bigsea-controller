@@ -42,6 +42,9 @@ class Remote_KVM:
         command_iops_quota = (cap*self.iops_reference)/100
         command_bs_quota = (cap*self.bs_reference)/100
 
+        print "iops",command_iops_quota
+        print "bs",command_bs_quota
+
         command_set_io_quota = "virsh blkdeviotune %s" \
             " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
             " --current --total_iops_sec %s --total_bytes_sec %s" % (vm_id, vm_id, 

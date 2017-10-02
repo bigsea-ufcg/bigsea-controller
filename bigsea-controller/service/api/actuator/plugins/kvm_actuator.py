@@ -30,8 +30,8 @@ class KVM_Actuator(Actuator):
         self.authorization_data = authorization_data
 
     # TODO: validation
-    def prepare_environment(self, vm_data):
-        self.adjust_resources(vm_data)
+#     def prepare_environment(self, vm_data):
+#         self.adjust_resources(vm_data)
 
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
@@ -50,6 +50,7 @@ class KVM_Actuator(Actuator):
                 instance_location = self.instance_locator.locate(instance)
                 # Access a compute node and change cap
                 self.remote_kvm.change_vcpu_quota(instance_location, instance, int(vm_data[instance]))
+                self.remote_kvm.change_io_quota(instance_location, instance, 50)
             except InstanceNotFoundException:
                 print "instance not found:%s" % (instance)
 

@@ -66,9 +66,6 @@ class Test_Generic_Alarm(unittest.TestCase):
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
         self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data)
 
-        self.alarm = Generic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
-                                 self.min_cap, self.max_cap, self.actuation_size, self.metric_round)
-
         self.timestamps = [self.timestamp_1, self.timestamp_2, self.timestamp_3, self.timestamp_4]
 
     # normal cases

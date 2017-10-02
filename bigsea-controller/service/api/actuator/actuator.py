@@ -35,9 +35,9 @@ class Actuator:
         
         Normally used before starting executing.
     '''
-    @abstractmethod
-    def prepare_environment(self, vm_data):
-        pass
+#     @abstractmethod
+#     def prepare_environment(self, vm_data):
+#         pass
 
     '''
         Sets the amount of allocated resources to the given instances, using the given values 
