@@ -47,18 +47,20 @@ class Actuator_Builder:
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
             iops_reference = config.getint("actuator", "iops_reference")
             bs_reference = config.getint("actuator", "bs_reference")
+            default_io_cap = config.getint("actuator", "default_io_cap")
             
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
             
             instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_keypair)
             remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair, 
                                     iops_reference, bs_reference)
-            return KVM_Actuator(instance_locator, remote_kvm, authorization_data)
+            return KVM_Actuator(instance_locator, remote_kvm, authorization_data, default_io_cap)
         elif name == "kvm-tunnel":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
             iops_reference = config.getint("actuator", "iops_reference")
             bs_reference = config.getint("actuator", "bs_reference")
+            default_io_cap = config.getint("actuator", "default_io_cap")
             
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
             
@@ -71,7 +73,7 @@ class Actuator_Builder:
                                                                             compute_nodes_keypair)
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair, 
                                            iops_reference, bs_reference)
-            return KVM_Actuator(instance_locator, remote_kvm, authorization_data)
+            return KVM_Actuator(instance_locator, remote_kvm, authorization_data, default_io_cap)
         elif name == "kvm-io":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")

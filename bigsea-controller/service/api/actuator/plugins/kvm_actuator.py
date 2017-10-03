@@ -23,15 +23,12 @@ from service.exceptions.infra_exceptions import AuthorizationFailedException
 
 class KVM_Actuator(Actuator):
 
-    def __init__(self, instance_locator, remote_kvm, authorization_data):
+    def __init__(self, instance_locator, remote_kvm, authorization_data, default_io_cap):
         self.instance_locator = instance_locator
         self.remote_kvm = remote_kvm
         self.authorizer = Authorizer()
         self.authorization_data = authorization_data
-
-    # TODO: validation
-#     def prepare_environment(self, vm_data):
-#         self.adjust_resources(vm_data)
+        self.default_io_cap = default_io_cap
 
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
@@ -50,7 +47,7 @@ class KVM_Actuator(Actuator):
                 instance_location = self.instance_locator.locate(instance)
                 # Access a compute node and change cap
                 self.remote_kvm.change_vcpu_quota(instance_location, instance, int(vm_data[instance]))
-                self.remote_kvm.change_io_quota(instance_location, instance, 50)
+                self.remote_kvm.change_io_quota(instance_location, instance, self.default_io_cap)
             except InstanceNotFoundException:
                 print "instance not found:%s" % (instance)
 

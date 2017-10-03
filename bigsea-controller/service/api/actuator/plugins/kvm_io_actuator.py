@@ -27,10 +27,6 @@ class KVM_IO_Actuator(Actuator):
         self.authorization_data = authorization_data
 
     # TODO: validation
-#     def prepare_environment(self, vm_data):
-#         self.adjust_resources(vm_data)
-
-    # TODO: validation
     # This method receives as argument a map {vm-id:cap}
     def adjust_resources(self, vm_data):
         authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],

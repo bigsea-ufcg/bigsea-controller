@@ -50,6 +50,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuation_size = 10.0
         self.allocated_resources = 50
         self.metric_round = 2
+        self.default_io_cap = 78
 
         self.bigsea_username = "username"
         self.bigsea_password = "password"
@@ -64,7 +65,8 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.metric_source = Metric_Source_Builder().get_metric_source("nop", {})
         self.instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_key)
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
-        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data)
+        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data,
+                                     self.default_io_cap)
 
         self.conservative_factor = 1
         self.factor_up = 1

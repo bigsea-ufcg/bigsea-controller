@@ -35,6 +35,7 @@ class Test_Basic_Actuator(unittest.TestCase):
 
         self.cap1 = 50
         self.cap2 = 78
+        self.io_cap = 75
 
         self.bigsea_username = "username"
         self.bigsea_password = "password"
@@ -47,7 +48,8 @@ class Test_Basic_Actuator(unittest.TestCase):
         compute_nodes_key = "key"
         self.instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_key)
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
-        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data)
+        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data, 
+                                     self.io_cap)
 
     def locator(self, vm_id):
         return {self.vm_id1:self.host_ip1, self.vm_id2:self.host_ip2}[vm_id]
@@ -58,59 +60,12 @@ class Test_Basic_Actuator(unittest.TestCase):
         else:
             raise InstanceNotFoundException(vm_id)
 
-    # TODO: more cases
-#     def test_prepare_environment_locates_and_acts_correctly_1_instance(self):
-#         vm_data = {self.vm_id1:self.cap1}
-# 
-#         self.instance_locator.locate = MagicMock(return_value=self.host_ip1)
-#         self.remote_kvm.change_vcpu_quota = MagicMock(return_value=None)
-#         self.actuator.authorizer.get_authorization = MagicMock(return_value={'success':True})
-# 
-#         self.actuator.prepare_environment(vm_data)
-# 
-#         # Actuator tries to locate the instances
-#         self.instance_locator.locate.assert_called_once_with(self.vm_id1)
-# 
-#         # Actuator tries to change the cap
-#         self.remote_kvm.change_vcpu_quota.assert_called_once_with(self.host_ip1, self.vm_id1, self.cap1)
-#         
-#         # Actuator tries to authenticate
-#         self.actuator.authorizer.get_authorization.assert_called_once_with(self.authorization_url, 
-#                                             self.bigsea_username, self.bigsea_password)
-# 
-#     def test_prepare_environment_locates_and_acts_correctly_n_instances(self):
-#         vm_data = {self.vm_id1:self.cap1,self.vm_id2:self.cap2}
-# 
-#         self.instance_locator.locate = MagicMock()
-#         self.instance_locator.locate.side_effect = self.locator
-#         self.remote_kvm.change_vcpu_quota = MagicMock(return_value=None)
-#         self.actuator.authorizer.get_authorization = MagicMock(return_value={'success':True})
-# 
-#         self.actuator.prepare_environment(vm_data)
-# 
-#         # Actuator tries to locate the instances
-#         self.instance_locator.locate.assert_any_call(self.vm_id1)
-#         self.instance_locator.locate.assert_any_call(self.vm_id2)
-# 
-#         # Actuator tries to locate only the given instances
-#         self.assertEqual(self.instance_locator.locate.call_count, 2)
-# 
-#         # Actuator tries to change the cap
-#         self.remote_kvm.change_vcpu_quota.assert_any_call(self.host_ip1, self.vm_id1, self.cap1)
-#         self.remote_kvm.change_vcpu_quota.assert_any_call(self.host_ip2, self.vm_id2, self.cap2)
-# 
-#         # Actuator tries to change the cap of only the given instances
-#         self.assertEqual(self.remote_kvm.change_vcpu_quota.call_count, 2)
-#         
-#         # Actuator tries to authenticate
-#         self.actuator.authorizer.get_authorization.assert_called_once_with(self.authorization_url, 
-#                                             self.bigsea_username, self.bigsea_password)
-
     def test_adjust_resources_locates_and_acts_correctly_1_instance(self):
         vm_data = {self.vm_id1:self.cap1}
 
         self.instance_locator.locate = MagicMock(return_value=self.host_ip1)
         self.remote_kvm.change_vcpu_quota = MagicMock(return_value=None)
+        self.remote_kvm.change_io_quota = MagicMock(return_value=None)
         self.actuator.authorizer.get_authorization = MagicMock(return_value={'success':True})
 
         self.actuator.adjust_resources(vm_data)
@@ -120,6 +75,7 @@ class Test_Basic_Actuator(unittest.TestCase):
 
         # Actuator tries to change the cap
         self.remote_kvm.change_vcpu_quota.assert_called_once_with(self.host_ip1, self.vm_id1, self.cap1)
+        self.remote_kvm.change_io_quota.assert_called_once_with(self.host_ip1, self.vm_id1, self.io_cap)
         
         # Actuator tries to authenticate
         self.actuator.authorizer.get_authorization.assert_called_once_with(self.authorization_url, 
@@ -131,6 +87,7 @@ class Test_Basic_Actuator(unittest.TestCase):
         self.instance_locator.locate = MagicMock()
         self.instance_locator.locate.side_effect = self.locator
         self.remote_kvm.change_vcpu_quota = MagicMock(return_value=None)
+        self.remote_kvm.change_io_quota = MagicMock(return_value=None)
         self.actuator.authorizer.get_authorization = MagicMock(return_value={'success':True})
 
         self.actuator.adjust_resources(vm_data)
@@ -144,7 +101,10 @@ class Test_Basic_Actuator(unittest.TestCase):
 
         # Actuator tries to change the cap
         self.remote_kvm.change_vcpu_quota.assert_any_call(self.host_ip1, self.vm_id1, self.cap1)
+        self.remote_kvm.change_io_quota.assert_any_call(self.host_ip1, self.vm_id1, self.io_cap)
+        
         self.remote_kvm.change_vcpu_quota.assert_any_call(self.host_ip2, self.vm_id2, self.cap2)
+        self.remote_kvm.change_io_quota.assert_any_call(self.host_ip2, self.vm_id2, self.io_cap)
 
         # Actuator tries to change the cap of only the given instances
         self.assertEqual(self.remote_kvm.change_vcpu_quota.call_count, 2)
@@ -160,6 +120,7 @@ class Test_Basic_Actuator(unittest.TestCase):
         self.instance_locator.locate.side_effect = self.locator_instance_does_not_exist
         
         self.remote_kvm.change_vcpu_quota = MagicMock(return_value=None)
+        self.remote_kvm.change_io_quota = MagicMock(return_value=None)
         self.actuator.authorizer.get_authorization = MagicMock(return_value={'success':True})
 
         self.actuator.adjust_resources(vm_data)
@@ -170,6 +131,7 @@ class Test_Basic_Actuator(unittest.TestCase):
 
         # Actuator tries to change the cap
         self.remote_kvm.change_vcpu_quota.assert_called_once_with(self.host_ip1, self.vm_id1, self.cap1)
+        self.remote_kvm.change_io_quota.assert_called_once_with(self.host_ip1, self.vm_id1, self.io_cap)
         
         # Actuator tries to authenticate
         self.actuator.authorizer.get_authorization.assert_called_once_with(self.authorization_url, 
