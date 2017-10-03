@@ -41,7 +41,10 @@ class Test_Remote_KVM(unittest.TestCase):
 
         self.remote_kvm.change_vcpu_quota(self.host_ip, self.vm_id, self.cap)
 
-        command = "virsh schedinfo %s --set vcpu_quota=%s > /dev/null" % (self.vm_id, self.cap*1000)
+        command = "virsh schedinfo %s" \
+        " --set vcpu_quota=$(( %s * `virsh schedinfo %s | awk 'FNR == 3 {print $3}'`/100 ))" \
+        " > /dev/null" % (self.vm_id, self.cap, self.vm_id)
+        
         self.ssh_utils.run_command.assert_called_once_with(command, "root", 
                                                             self.host_ip, self.compute_nodes_key)
 
@@ -81,13 +84,14 @@ class Test_Remote_KVM(unittest.TestCase):
                                                     self.vm_id, 100 + 20, self.compute_nodes_key)
 
     def test_get_allocated_resources_success(self):
-        self.ssh_utils.run_and_get_result = MagicMock(return_value="56000")
+        self.ssh_utils.run_and_get_result = MagicMock(return_value="56")
 
         result_cap = self.remote_kvm.get_allocated_resources(self.host_ip, self.vm_id)
 
         self.assertEquals(result_cap, 56)
 
-        command = "virsh schedinfo %s | grep vcpu_quota | awk '{print $3}'" % self.vm_id
+        command = "virsh schedinfo %s" \
+        " | awk '{if(NR==3){period=$3} if(NR==4){print 100*$3/period}}'" % (self.vm_id)
         self.ssh_utils.run_and_get_result.assert_called_once_with(command, "root", 
                                                             self.host_ip, self.compute_nodes_key)
 
@@ -102,7 +106,8 @@ class Test_Remote_KVM(unittest.TestCase):
 
         self.assertEquals(result_cap, 100)
 
-        command = "virsh schedinfo %s | grep vcpu_quota | awk '{print $3}'" % self.vm_id
+        command = "virsh schedinfo %s" \
+        " | awk '{if(NR==3){period=$3} if(NR==4){print 100*$3/period}}'" % (self.vm_id)
         self.ssh_utils.run_and_get_result.assert_called_once_with(command, "root", 
                                                             self.host_ip, self.compute_nodes_key)
 

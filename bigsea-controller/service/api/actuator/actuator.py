@@ -45,3 +45,10 @@ class Actuator:
     @abstractmethod
     def get_allocated_resources(self, vm_id):
         pass
+    
+    '''
+        Returns a number which represents the amount of allocated resources to the given cluster
+    '''
+    @abstractmethod
+    def get_allocated_resources_to_cluster(self, vms_ids):
+        pass
