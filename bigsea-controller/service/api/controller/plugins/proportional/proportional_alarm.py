@@ -161,9 +161,9 @@ class Proportional_Alarm:
             new cap = old cap + conservative_factor*progress_error
         """
         
-        conservative_factor = heuristic_options["conservative_factor"]
+        proportional_factor = heuristic_options["proportional_factor"]
             
-        actuation_size = abs(progress_error*conservative_factor)
+        actuation_size = abs(progress_error*proportional_factor)
             
         if progress_error < 0:
             return min(current_cap + actuation_size, self.max_cap)

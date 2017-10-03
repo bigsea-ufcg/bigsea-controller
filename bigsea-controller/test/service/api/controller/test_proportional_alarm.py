@@ -68,11 +68,11 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data,
                                      self.default_io_cap)
 
-        self.conservative_factor = 1
+        self.proportional_factor = 1
         self.factor_up = 1
         self.factor_down = 0.5
         self.heuristic_options_error_proportional = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":self.conservative_factor}
+                                  "proportional_factor":self.proportional_factor}
         self.heuristic_options_error_proportional_up_down = \
                                 {"heuristic_name":"error_proportional_up_down",
                                   "factor_up":self.factor_up, 
@@ -107,9 +107,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         #
         # Case 1: normal scale down
         #
-        conservative_factor = 1
+        proportional_factor = 1
         heuristic_options = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":conservative_factor}
+                                  "proportional_factor":proportional_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
                                         self.trigger_up, self.min_cap, self.max_cap, 
@@ -135,7 +135,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Remove resources
         error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
                              {"application_id":self.application_id_2})[1]
-        new_cap = self.allocated_resources - self.conservative_factor*error
+        new_cap = self.allocated_resources - self.proportional_factor*error
         # The method tries to adjust the amount of resources
         self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
                                                                 self.instance_name_2:new_cap})
@@ -143,9 +143,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         #
         # Case 2: calculated cap is too low. Use min cap instead
         #
-        conservative_factor = 3
+        proportional_factor = 3
         heuristic_options = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":conservative_factor}
+                                  "proportional_factor":proportional_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                     self.trigger_down, self.trigger_up, self.min_cap, 
@@ -180,9 +180,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         #
         # Case 1: normal scale up
         #
-        conservative_factor = 1
+        proportional_factor = 1
         heuristic_options = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":conservative_factor}
+                                  "proportional_factor":proportional_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                 self.trigger_down, self.trigger_up, self.min_cap, 
@@ -208,7 +208,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Add resources
         error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
                             {"application_id":self.application_id_0})[1]
-        new_cap = self.allocated_resources + conservative_factor*abs(error)
+        new_cap = self.allocated_resources + proportional_factor*abs(error)
         # The method tries to adjust the amount of resources
         self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
                                                                 self.instance_name_2:new_cap})
@@ -216,9 +216,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         #
         # Case 2: calculated cap is too high. Use max cap instead
         #
-        conservative_factor = 3
+        proportional_factor = 3
         heuristic_options = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":conservative_factor}
+                                  "proportional_factor":proportional_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                 self.trigger_down, self.trigger_up, self.min_cap, 
@@ -248,9 +248,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
                                                                 self.instance_name_2:new_cap})
 
     def test_alarm_does_nothing(self):
-        conservative_factor = 1
+        proportional_factor = 1
         heuristic_options = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":conservative_factor}
+                                  "proportional_factor":proportional_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
                                 self.trigger_up, self.min_cap, self.max_cap, self.metric_round, 
@@ -276,9 +276,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources.assert_not_called()
 
     def test_alarm_does_not_reuse_metrics_with_same_timestamp(self):
-        conservative_factor = 1
+        proportional_factor = 1
         heuristic_options = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":conservative_factor}
+                                  "proportional_factor":proportional_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, self.trigger_down, 
                                         self.trigger_up, self.min_cap, self.max_cap, 
@@ -303,7 +303,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Add resources
         error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
                         {"application_id":self.application_id_0})[1]
-        new_cap = self.allocated_resources + conservative_factor*abs(error)
+        new_cap = self.allocated_resources + proportional_factor*abs(error)
         # The method tries to adjust the amount of resources
         self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
                                                                 self.instance_name_2:new_cap})
@@ -331,9 +331,9 @@ class Test_Proportional_Alarm(unittest.TestCase):
         self.actuator.adjust_resources.assert_not_called()
         
     def test_alarm_metrics_with_different_timestamps(self):
-        conservative_factor = 1
+        proportional_factor = 1
         heuristic_options = {"heuristic_name":"error_proportional",
-                                  "conservative_factor":conservative_factor}
+                                  "proportional_factor":proportional_factor}
         
         self.alarm = Proportional_Alarm(self.actuator, self.metric_source, 
                                 self.trigger_down, self.trigger_up, self.min_cap, 
@@ -359,7 +359,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         # Remove resources
         error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
                         {"application_id":self.application_id_2})[1]
-        new_cap = self.allocated_resources - self.conservative_factor*error
+        new_cap = self.allocated_resources - self.proportional_factor*error
         # The method tries to adjust the amount of resources
         self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
                                                                 self.instance_name_2:new_cap})
@@ -388,7 +388,7 @@ class Test_Proportional_Alarm(unittest.TestCase):
         
         error = self.metrics(Proportional_Alarm.ERROR_METRIC_NAME, 
                         {"application_id":self.application_id_2})[1]
-        new_cap = self.allocated_resources - self.conservative_factor*error
+        new_cap = self.allocated_resources - self.proportional_factor*error
         # The method tries to adjust the amount of resources
         self.actuator.adjust_resources.assert_called_once_with({self.instance_name_1:new_cap, 
                                                                 self.instance_name_2:new_cap})
