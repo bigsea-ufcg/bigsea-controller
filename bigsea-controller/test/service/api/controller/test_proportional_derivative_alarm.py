@@ -59,6 +59,7 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.allocated_resources_scale_down = 100
         self.allocated_resources_scale_up = 10
         self.metric_round = 2
+        self.default_io_cap = 34
 
         self.bigsea_username = "username"
         self.bigsea_password = "password"
@@ -73,7 +74,8 @@ class TestProportionalDerivativeAlarm(unittest.TestCase):
         self.metric_source = Metric_Source_Builder().get_metric_source("nop", {})
         self.instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_key)
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
-        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data)
+        self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, self.authorization_data,
+                                     self.default_io_cap)
 
         self.proportional_factor = 1.5
         self.derivative_factor = 0.5

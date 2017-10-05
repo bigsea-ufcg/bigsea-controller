@@ -48,12 +48,10 @@ def prepare_environment():
     
     logger.log("%s-Preparing environment for instances %s" % (time.strftime("%H:%M:%S"), str(data)))
 
-    #data.pop("plugin")
-    
     try:
-        actuator.prepare_environment(data["instances_cap"])
+        actuator.adjust_resources(data['instances_cap'])
     except Exception as e:
-        logger.log(e.getMessage())
+        logger.log(str(e))
 
     return "prepared_environment"
 

@@ -22,7 +22,6 @@ class Remote_KVM:
         self.iops_reference = iops_reference
         self.bs_reference = bs_reference
 
-    # Warning: This code requires that the vcpu_quota parameter is between 0 and 100000
     def change_vcpu_quota(self, host_ip, vm_id, cap):
         # TODO: check ip value
         # TODO: check id value
@@ -30,7 +29,10 @@ class Remote_KVM:
             # FIXME review this exception type
             raise Exception("Invalid cap value")
         
-        command = "virsh schedinfo %s --set vcpu_quota=%s > /dev/null" % (vm_id, cap*1000)
+        command = "virsh schedinfo %s" \
+        " --set vcpu_quota=$(( %s * `virsh schedinfo %s | awk 'FNR == 3 {print $3}'`/100 ))" \
+        " > /dev/null" % (vm_id, cap, vm_id)
+
         # TODO: check errors
         self.ssh_utils.run_command(command, "root", host_ip, self.compute_nodes_key)
 
@@ -49,12 +51,13 @@ class Remote_KVM:
         
         self.ssh_utils.run_command(command_set_io_quota, "root", host_ip, self.compute_nodes_key)
 
-    # Warning: This code requires that the vcpu_quota parameter is between 0 and 100000
     # TODO: Change this method name to get_vcpu_quota
     def get_allocated_resources(self, host_ip, vm_id):
         # TODO: check ip value
         # TODO: check id value
-        command = "virsh schedinfo %s | grep vcpu_quota | awk '{print $3}'" % (vm_id)
+        command = "virsh schedinfo %s" \
+        " | awk '{if(NR==3){period=$3} if(NR==4){print 100*$3/period}}'" % (vm_id)
+        
         # TODO: check errors
         ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip, 
                                                        self.compute_nodes_key)
@@ -65,9 +68,9 @@ class Remote_KVM:
             if cap == 0:
                 raise Exception("Could not get allocated resources")
             
-            if cap == -1:
+            if cap < 0:
                 return 100
-            return cap/1000
+            return cap
         except:
             # FIXME: review this exception type
             raise Exception("Could not get allocated resources")

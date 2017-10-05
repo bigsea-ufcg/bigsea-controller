@@ -56,6 +56,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.actuation_size = 10.0
         self.allocated_resources = 50
         self.metric_round = 2
+        self.default_io_cap = 56
 
         compute_nodes = []
         compute_nodes_key = "key"
@@ -64,7 +65,7 @@ class Test_Basic_Alarm(unittest.TestCase):
         self.instance_locator = Instance_Locator(SSH_Utils({}), compute_nodes, compute_nodes_key)
         self.remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_key)
         self.actuator = KVM_Actuator(self.instance_locator, self.remote_kvm, 
-                                     self.authorization_data)
+                                     self.authorization_data, self.default_io_cap)
 
         self.alarm = Basic_Alarm(self.actuator, self.metric_source, self.trigger_down, self.trigger_up,
                                  self.min_cap, self.max_cap, self.actuation_size, self.metric_round)

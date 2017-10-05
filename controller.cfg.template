@@ -32,6 +32,8 @@ actuator_port = 5047
 iops_reference = 
 # The max possible disk throughput, in bytes/sec, that can be allocated to a virtual machine.
 bs_reference =  
+# The I/O cap to use in the CPU only actuators.
+default_io_cap = 
 
 [monasca]
 # The endpoint for the Monasca's service.

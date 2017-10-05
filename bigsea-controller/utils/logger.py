@@ -16,7 +16,7 @@
 import logging
 from datetime import datetime
 
-global_enabled = True
+global_enabled = False
 
 class Log:
     def __init__(self, name, output_file_path):
