@@ -24,10 +24,10 @@ from utils.logger import Log
 from utils.logger import configure_logging
 
 
-SETUP_ROUTE="/scaler/setup_env"
-START_SCALING_ROUTE = '/scaler/start_scaling/<app_id>'
-STOP_SCALING_ROUTE = '/scaler/stop_scaling/<app_id>'
-STATUS = '/scaler/status'
+SETUP_ROUTE="/controller/setup_env"
+START_SCALING_ROUTE = '/controller/start_scaling/<app_id>'
+STOP_SCALING_ROUTE = '/controller/stop_scaling/<app_id>'
+STATUS = '/controller/status'
 
 app = Flask(__name__)
 
