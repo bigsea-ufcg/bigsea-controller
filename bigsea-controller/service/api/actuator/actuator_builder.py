@@ -93,9 +93,14 @@ class Actuator_Builder:
 
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
 
-            instance_locator = Instance_Locator_Tunnel(SSH_Utils({}), compute_nodes, 
+            ports_str = config.get("actuator", "tunnel_ports")
+            ports = [x.strip() for x in ports_str.split(",")]
+
+            hosts_ports = {compute_nodes[i]:ports[i] for i in xrange(len(ports))}
+
+            instance_locator = Instance_Locator_Tunnel(SSH_Utils(hosts_ports), compute_nodes,
                                                                 compute_nodes_keypair)
-            remote_kvm = Remote_KVM_Tunnel(SSH_Utils({}), compute_nodes_keypair, 
+            remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair,
                                                                 iops_reference, bs_reference)
             return KVM_IO_Actuator(instance_locator, remote_kvm, authorization_data)
         elif name == "nop":
