@@ -1,4 +1,4 @@
-# Controller Plugin - "progress-error"
+# Controller plugin - "proportional-derivative"
 
 ## Start Scaling
 
@@ -24,14 +24,14 @@ The minimum possible value of resources that can be allocated to the application
 
 The maximum possible value of resources that can be allocated to the application. Must be in range [0,100].
 
-#### actuation_size
-
-Amount of resources added or removed when scaling up or down. Must be in range [0,100].
-
 #### metric_rounding
 
 The amount of decimal digits considered when taking scaling decisions.
 e.g.: If the scaler gets a metric value 0.567 from the metric source and metric_rounding = 2 then the value the scaler will use is 0.57.
+
+#### heuristic_options
+
+Options for the heuristic used in the controller. Must contain at least "heuristic-name".
 
 ## Request example
 
@@ -48,7 +48,12 @@ e.g.: If the scaler gets a metric value 0.567 from the metric source and metric_
 	"trigger_up":10,
 	"min_cap":10,
 	"max_cap":100,
-	"actuation_size":20,
-	"metric_rounding":2
+	"metric_rounding":2,
+	
+	"heuristic_options":{
+		"heuristic-name":"error_proportional_derivative",
+		"proportional_factor":1.5,
+		"derivative_factor":0.5
+	}
 }
 ```

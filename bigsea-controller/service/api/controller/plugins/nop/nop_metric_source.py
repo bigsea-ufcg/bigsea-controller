@@ -13,7 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PYTHONPATH="$PYTHONPATH:$script_dir/bigsea-controller"
+import datetime
 
-python bigsea-controller/cli/main.py
+class Nop_Metric_Source:
+
+    def get_most_recent_value(self, metric_name, options):
+        return datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ'), 0
+    

@@ -13,7 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PYTHONPATH="$PYTHONPATH:$script_dir/bigsea-controller"
-
-python bigsea-controller/cli/main.py
+class No_Metrics_Exception(Exception):
+    pass

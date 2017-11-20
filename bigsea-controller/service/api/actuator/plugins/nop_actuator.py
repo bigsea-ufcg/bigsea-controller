@@ -13,7 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PYTHONPATH="$PYTHONPATH:$script_dir/bigsea-controller"
+from service.api.actuator.actuator import Actuator
 
-python bigsea-controller/cli/main.py
+class Nop_Actuator(Actuator):
+
+    def prepare_environment(self, vm_data):
+        pass
+
+    def adjust_resources(self, vm_data):
+        pass
+
+    def get_allocated_resources(self, vm_id):
+        return 100

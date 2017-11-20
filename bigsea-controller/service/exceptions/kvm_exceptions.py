@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PYTHONPATH="$PYTHONPATH:$script_dir/bigsea-controller"
+class InstanceNotFoundException(Exception):
 
-python bigsea-controller/cli/main.py
+    def __init__(self, instance_id=None, message=None):
+        self.instance_id = instance_id
+        self.message = message

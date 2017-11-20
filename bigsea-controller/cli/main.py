@@ -13,7 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PYTHONPATH="$PYTHONPATH:$script_dir/bigsea-controller"
+from api.v10 import app
+import ConfigParser
+import utils.logger as logging
 
-python bigsea-controller/cli/main.py
+def main():
+    config = ConfigParser.RawConfigParser()
+    config.read("controller.cfg")
+
+    host = config.get("flask", "host")
+    port = config.getint("flask", "port")
+    
+    enable_logging = config.get("logging", "enable")
+    logging_level = config.get("logging", "level")
+
+    if enable_logging == "True":
+        logging.enable()
+        logging.configure_logging(logging_level)
+    else:
+        logging.disable()
+    
+    app.run(host, port, debug = True)
+
+if __name__ == "__main__":
+    main()

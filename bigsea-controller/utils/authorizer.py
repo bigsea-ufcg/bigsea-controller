@@ -1,4 +1,5 @@
-# Copyright (c) 2017 LSD - UFCG.
+
+# Copyright (c) 2017 UFCG-LSD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PYTHONPATH="$PYTHONPATH:$script_dir/bigsea-controller"
+import requests
 
-python bigsea-controller/cli/main.py
+class Authorizer:
+    
+    def _get_authorization_data(self, username, password):
+        authorization_data = "user=%s&pwd=%s" % (username, password)
+        return authorization_data
+    
+    def get_authorization(self, authorizer_url, username, password):
+        data = self._get_authorization_data(username, password)
+        r = requests.post(authorizer_url, data=data)
+        content_dict = eval(r.content.replace("true", "True").replace("false", "False"))
+        return content_dict

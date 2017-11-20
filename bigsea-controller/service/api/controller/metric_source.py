@@ -13,7 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-export PYTHONPATH="$PYTHONPATH:$script_dir/bigsea-controller"
+from abc import abstractmethod
+from abc import ABCMeta
 
-python bigsea-controller/cli/main.py
+
+class Metric_Source:
+    __metaclass__ = ABCMeta
+
+    '''
+        Returns the most recent measured value of the metric "metric_name", using the given options
+        as filter parameters
+    '''
+    @abstractmethod
+    def get_most_recent_value(self, metric_name, options):
+        pass
