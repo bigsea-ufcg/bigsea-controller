@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import ConfigParser
+import paramiko
 
 from service.api.actuator.plugins.instance_locator_tunnel import Instance_Locator_Tunnel
 from service.api.actuator.plugins.remote_KVM_tunnel import Remote_KVM_Tunnel
@@ -25,6 +26,7 @@ from service.api.actuator.plugins.nop_actuator import Nop_Actuator
 from service.api.actuator.plugins.service_actuator import Service_Actuator
 from service.api.actuator.plugins.service_instance_locator import Service_Instance_Locator
 from service.api.actuator.plugins.kvm_io_actuator import KVM_IO_Actuator
+from service.api.actuator.plugins.kvm_upv import KVM_Actuator_UPV
 
 
 # TODO: documentation
@@ -103,6 +105,15 @@ class Actuator_Builder:
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair,
                                                                 iops_reference, bs_reference)
             return KVM_IO_Actuator(instance_locator, remote_kvm, authorization_data)
+        elif name == "kvm-upv":
+            conn = paramiko.SSHClient()
+            conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            conn.connect(hostname=config.get("actuator", "access_ip"),
+                         username=config.get("actuator", "access_username"),
+                         password=config.get("actuator", "access_password"))
+
+            conn.exec_command("ssh -i hostkey root@niebla.i3m.upv.edu")
+            return KVM_Actuator_UPV(conn)
         elif name == "nop":
             return Nop_Actuator()
         elif name == "service":

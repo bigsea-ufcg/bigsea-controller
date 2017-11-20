@@ -66,10 +66,11 @@ class KVM_Actuator_UPV(Actuator):
         # Go back to the access node
         self.conn.exec_command("logout")
 
-    def _find_host(self, vm_id):
+    def x_find_host(self, vm_id):
         bashCommand = ("onevm show %s --user %s " +
                        "--password %s --endpoint %s") % (vm_id, self.one_user,
                                                          self.one_password, self.one_url)
+
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
         output, error = process.communicate()
 
