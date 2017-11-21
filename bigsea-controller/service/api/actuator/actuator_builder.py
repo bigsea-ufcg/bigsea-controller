@@ -57,6 +57,7 @@ class Actuator_Builder:
             remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair, 
                                     iops_reference, bs_reference)
             return KVM_Actuator(instance_locator, remote_kvm, authorization_data, default_io_cap)
+
         elif name == "kvm-tunnel":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
@@ -76,6 +77,7 @@ class Actuator_Builder:
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair, 
                                            iops_reference, bs_reference)
             return KVM_Actuator(instance_locator, remote_kvm, authorization_data, default_io_cap)
+
         elif name == "kvm-io":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
@@ -87,6 +89,7 @@ class Actuator_Builder:
             remote_kvm = Remote_KVM(SSH_Utils({}), compute_nodes_keypair, iops_reference, 
                                                                         bs_reference)
             return KVM_IO_Actuator(instance_locator, remote_kvm, authorization_data)
+
         elif name == "kvm-io-tunnel":
             compute_nodes_str = config.get("actuator", "compute_nodes")
             compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
@@ -105,6 +108,7 @@ class Actuator_Builder:
             remote_kvm = Remote_KVM_Tunnel(SSH_Utils(hosts_ports), compute_nodes_keypair,
                                                                 iops_reference, bs_reference)
             return KVM_IO_Actuator(instance_locator, remote_kvm, authorization_data)
+
         elif name == "kvm-upv":
             conn = paramiko.SSHClient()
             conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -112,8 +116,9 @@ class Actuator_Builder:
                          username=config.get("actuator", "access_username"),
                          password=config.get("actuator", "access_password"))
 
-            conn.exec_command("ssh -i hostkey root@niebla.i3m.upv.edu")
+            conn.exec_command("ssh -i ~/.ssh/id_rsa root@niebla.i3m.upv.edu")
             return KVM_Actuator_UPV(conn)
+
         elif name == "nop":
             return Nop_Actuator()
         elif name == "service":

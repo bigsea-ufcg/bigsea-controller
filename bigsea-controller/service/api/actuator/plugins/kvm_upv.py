@@ -11,7 +11,7 @@ class KVM_Actuator_UPV(Actuator):
     def __init__(self, conn):
         self.conn = conn
         self.config = ConfigParser.RawConfigParser()
-        self.config.read("scaler.cfg")
+        self.config.read("controller.cfg")
         self.one_user = self.config.get("actuator", "one_username")
         self.one_password = self.config.get("actuator", "one_password")
         self.one_url = self.config.get("actuator", "one_url")
