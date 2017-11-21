@@ -1,4 +1,5 @@
 from service.api.actuator.actuator import Actuator
+from service.exceptions.kvm_exceptions import InstanceNotFoundException
 
 import ConfigParser
 import subprocess
@@ -8,8 +9,9 @@ import subprocess
 
 class KVM_Actuator_UPV(Actuator):
 
-    def __init__(self, conn):
-        self.conn = conn
+    def __init__(self, conn_compute, conn_onevm):
+        self.conn_compute = conn_compute
+        self.conn_onevm = conn_onevm
         self.config = ConfigParser.RawConfigParser()
         self.config.read("controller.cfg")
         self.one_user = self.config.get("actuator", "one_username")
@@ -40,16 +42,18 @@ class KVM_Actuator_UPV(Actuator):
     # TODO: validation
     def get_allocated_resources(self, vm_id):
         # Access compute nodes to discover vm location
+        import pdb; pdb.set_trace()
         host = self._find_host(vm_id)
         # ssh for the actual host
-        self.conn.exec_command("ssh %s") % host
+        self.conn_compute.exec_command("ssh %s" % host)
         # List all the vms to get the ONE id and map with the KVM id
-        stdin, stdout, stderr = self.conn.exec_command("virsh list")
+        stdin, stdout, stderr = self.conn_compute.exec_command("virsh list")
         vm_list = stdout.read().split("\n")
         virsh_id = self._extract_id(vm_list, vm_id)
         command = ("virsh schedinfo %s | grep vcpu_quota " +
                    "| awk '{print $3}'" % (virsh_id))
-        stdin, stdout, stderr = self.conn.exec_command(command)
+        stdin, stdout, stderr = self.conn_compute.exec_command(command)
+        self.conn_compute.exec_command("logout")
         return stdout.read()
 
     def get_allocated_resources_to_cluster(self, vms_ids):
@@ -63,27 +67,26 @@ class KVM_Actuator_UPV(Actuator):
 
     def _change_vcpu_quota(self, host, vm_id, cap):
         # ssh for the actual host
-        self.conn.exec_command("ssh %s") % host
+        self.conn_compute.exec_command("ssh %s" % host)
         # List all the vms to get the ONE id and map with the KVM id
-        stdin, stdout, stderr = self.conn.exec_command("virsh list")
+        stdin, stdout, stderr = self.conn_compute.exec_command("virsh list")
         vm_list = stdout.read().split("\n")
         virsh_id = self._extract_id(vm_list, vm_id)
         # Set the CPU cap
-        self.conn.exec_command("virsh schedinfo %s " +
+        self.conn_compute.exec_command("virsh schedinfo %s " +
                                "--set vcpu_quota=%s " +
                                "> /dev/null") % (virsh_id, cap)
         # Go back to the access node
-        self.conn.exec_command("logout")
+        self.conn_compute.exec_command("logout")
 
-    def x_find_host(self, vm_id):
-        bashCommand = ("onevm show %s --user %s " +
+    def _find_host(self, vm_id):
+        list_vms = ("onevm show %s --user %s " +
                        "--password %s --endpoint %s") % (vm_id, self.one_user,
                                                          self.one_password, self.one_url)
 
-        process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
-        output, error = process.communicate()
+        stdin, stdout, stderr = self.conn_onevm.exec_command(list_vms)
 
-        for line in output.split('\n'):
+        for line in stdout.read().split('\n'):
             if "HOST" in line and "niebla" in line:
                 return line.split()[2]
 

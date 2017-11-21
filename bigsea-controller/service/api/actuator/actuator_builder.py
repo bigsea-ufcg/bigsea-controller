@@ -110,14 +110,20 @@ class Actuator_Builder:
             return KVM_IO_Actuator(instance_locator, remote_kvm, authorization_data)
 
         elif name == "kvm-upv":
-            conn = paramiko.SSHClient()
-            conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            conn.connect(hostname=config.get("actuator", "access_ip"),
+            conn_compute = paramiko.SSHClient()
+            conn_compute.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            conn_compute.connect(hostname=config.get("actuator", "access_ip"),
                          username=config.get("actuator", "access_username"),
                          password=config.get("actuator", "access_password"))
 
-            conn.exec_command("ssh -i ~/.ssh/id_rsa root@niebla.i3m.upv.edu")
-            return KVM_Actuator_UPV(conn)
+            conn_onevm = paramiko.SSHClient()
+            conn_onevm.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            conn_onevm.connect(hostname=config.get("actuator", "access_ip"),
+                         username=config.get("actuator", "access_username"),
+                         password=config.get("actuator", "access_password"))
+
+            conn_compute.exec_command("ssh -i ~/.ssh/id_rsa root@niebla.i3m.upv.es")
+            return KVM_Actuator_UPV(conn_compute, conn_onevm)
 
         elif name == "nop":
             return Nop_Actuator()
