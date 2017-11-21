@@ -52,6 +52,15 @@ class KVM_Actuator_UPV(Actuator):
         stdin, stdout, stderr = self.conn.exec_command(command)
         return stdout.read()
 
+    def get_allocated_resources_to_cluster(self, vms_ids):
+        for vm_id in vms_ids:
+            try:
+                return self.get_allocated_resources(vm_id)
+            except InstanceNotFoundException:
+                print "instance not found:%s" % (vm_id)
+                
+        raise Exception("Could not get allocated resources")
+
     def _change_vcpu_quota(self, host, vm_id, cap):
         # ssh for the actual host
         self.conn.exec_command("ssh %s") % host
