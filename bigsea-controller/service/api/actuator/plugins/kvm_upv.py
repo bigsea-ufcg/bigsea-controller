@@ -6,12 +6,10 @@ import subprocess
 
 # TODO: documentation
 
-
 class KVM_Actuator_UPV(Actuator):
 
-    def __init__(self, conn_compute, conn_onevm):
-        self.conn_compute = conn_compute
-        self.conn_onevm = conn_onevm
+    def __init__(self, conn):
+        self.conn = conn
         self.config = ConfigParser.RawConfigParser()
         self.config.read("controller.cfg")
         self.one_user = self.config.get("actuator", "one_username")
@@ -42,19 +40,29 @@ class KVM_Actuator_UPV(Actuator):
     # TODO: validation
     def get_allocated_resources(self, vm_id):
         # Access compute nodes to discover vm location
-        import pdb; pdb.set_trace()
         host = self._find_host(vm_id)
-        # ssh for the actual host
-        self.conn_compute.exec_command("ssh %s" % host)
+
         # List all the vms to get the ONE id and map with the KVM id
-        stdin, stdout, stderr = self.conn_compute.exec_command("virsh list")
+        virsh_list = "virsh list"
+        command = ("ssh root@niebla.i3m.upv.es \'ssh %s \"%s\"\'" % (host, virsh_list))
+        stdin, stdout, stderr = self.conn.exec_command(command)
+
         vm_list = stdout.read().split("\n")
         virsh_id = self._extract_id(vm_list, vm_id)
-        command = ("virsh schedinfo %s | grep vcpu_quota " +
-                   "| awk '{print $3}'" % (virsh_id))
-        stdin, stdout, stderr = self.conn_compute.exec_command(command)
-        self.conn_compute.exec_command("logout")
-        return stdout.read()
+        virsh_schedinfo = (("virsh schedinfo %s | grep vcpu_quota " % (virsh_id)) + "| awk \'{print $3}\'")
+
+        command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, virsh_schedinfo))
+
+        stdin, stdout, stderr = self.conn.exec_command(command)
+
+        cap = int(stdout.read())
+
+        print "get_allocated_resources: id: %s - cap: %s" % (vm_id, cap)
+
+        if cap == -1:
+            return 100
+        else:
+            return cap/1000
 
     def get_allocated_resources_to_cluster(self, vms_ids):
         for vm_id in vms_ids:
@@ -67,24 +75,36 @@ class KVM_Actuator_UPV(Actuator):
 
     def _change_vcpu_quota(self, host, vm_id, cap):
         # ssh for the actual host
-        self.conn_compute.exec_command("ssh %s" % host)
+        virsh_list = "virsh list"
+        command = ("ssh root@niebla.i3m.upv.es \'ssh %s \"%s\"\'" % (host, virsh_list))
+
         # List all the vms to get the ONE id and map with the KVM id
-        stdin, stdout, stderr = self.conn_compute.exec_command("virsh list")
+        stdin, stdout, stderr = self.conn.exec_command(command)
         vm_list = stdout.read().split("\n")
         virsh_id = self._extract_id(vm_list, vm_id)
+
+        virsh_cap = "virsh schedinfo %s | awk 'FNR == 3 {print $3}'" % virsh_id
+        command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, virsh_cap))
+        stdin, stdout, stderr = self.conn.exec_command(command)
+        vm_cap = int(stdout.read().replace('\n',''))
+
+        virsh_schedinfo = (("virsh schedinfo %s" % virsh_id) 
+                         + (" --set vcpu_quota=$(( %s * 1000 ))" 
+                                % (cap)) + " > /dev/null")
+
+        command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, virsh_schedinfo))
+
+        print "_change_vcpu_quota: id: %s - cap: %s" % (vm_id, cap * 1000)
+
         # Set the CPU cap
-        self.conn_compute.exec_command("virsh schedinfo %s " +
-                               "--set vcpu_quota=%s " +
-                               "> /dev/null") % (virsh_id, cap)
-        # Go back to the access node
-        self.conn_compute.exec_command("logout")
+        self.conn.exec_command(command)
 
     def _find_host(self, vm_id):
         list_vms = ("onevm show %s --user %s " +
                        "--password %s --endpoint %s") % (vm_id, self.one_user,
                                                          self.one_password, self.one_url)
 
-        stdin, stdout, stderr = self.conn_onevm.exec_command(list_vms)
+        stdin, stdout, stderr = self.conn.exec_command(list_vms)
 
         for line in stdout.read().split('\n'):
             if "HOST" in line and "niebla" in line:
