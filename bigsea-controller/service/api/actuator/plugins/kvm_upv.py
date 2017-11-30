@@ -15,8 +15,8 @@ class KVM_Actuator_UPV(Actuator):
         self.one_user = self.config.get("actuator", "one_username")
         self.one_password = self.config.get("actuator", "one_password")
         self.one_url = self.config.get("actuator", "one_url")
-	self.iops_reference = iops_reference
-	self.bs_reference = bs_reference
+        self.iops_reference = iops_reference
+        self.bs_reference = bs_reference
 
     # TODO: validation
     def prepare_environment(self, vm_data):
@@ -54,7 +54,8 @@ class KVM_Actuator_UPV(Actuator):
 
         vm_list = stdout.read().split("\n")
         virsh_id = self._extract_id(vm_list, vm_id)
-        virsh_schedinfo = (("virsh schedinfo %s | grep vcpu_quota " % (virsh_id)) + "| awk \'{print $3}\'")
+        virsh_schedinfo = (("virsh schedinfo %s | grep vcpu_quota " % (virsh_id)) + 
+                                                             "| awk \'{print $3}\'")
 
         command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, virsh_schedinfo))
 
@@ -105,7 +106,7 @@ class KVM_Actuator_UPV(Actuator):
         self.conn.exec_command(command)
 
     def _change_io_quota(self, host, vm_id, cap):
-	virsh_list = "virsh list"
+        virsh_list = "virsh list"
         command = ("ssh root@niebla.i3m.upv.es \'ssh %s \"%s\"\'" % (host, virsh_list))
 
         # List all the vms to get the ONE id and map with the KVM id
@@ -113,28 +114,31 @@ class KVM_Actuator_UPV(Actuator):
         vm_list = stdout.read().split("\n")
         virsh_id = self._extract_id(vm_list, vm_id)
 
-	# Get device to set cap
-	command_get_block_device = "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (virsh_id)
-	command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, command_get_block_device))
-	stdin, stdout, stderr = self.conn.exec_command(command)
-	block_device = stdout.read().strip()
+        # Get device to set cap
+        command_get_block_device = "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (virsh_id)
+        command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, command_get_block_device))
+        stdin, stdout, stderr = self.conn.exec_command(command)
+        block_device = stdout.read().strip()
 
         command_iops_quota = (cap*self.iops_reference)/100
         command_bs_quota = (cap*self.bs_reference)/100
 
-        command_set_io_quota = "virsh blkdeviotune %s %s --current --total_iops_sec %s --total_bytes_sec %s" % (virsh_id, 
-							block_device, command_iops_quota, command_bs_quota)
-	command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, command_set_io_quota))
+        command_set_io_quota = "virsh blkdeviotune %s %s "\
+                           "--current --total_iops_sec %s "\
+			   "--total_bytes_sec %s" % (virsh_id, 
+                           block_device, command_iops_quota, 
+                           command_bs_quota)
+        command = ("ssh root@niebla.i3m.upv.es \'ssh %s \'%s\'\'" % (host, command_set_io_quota))
 	
-	print "_change_io_quota: id: %s - iops: %s - bs: %s" % (virsh_id, 
-				str(command_iops_quota), str(command_bs_quota))
+        print "_change_io_quota: id: %s - iops: %s - bs: %s" % (virsh_id, 
+                     str(command_iops_quota), str(command_bs_quota))
 
-	# Set I/O cap
-	self.conn.exec_command(command)
+        # Set I/O cap
+        self.conn.exec_command(command)
 
 
     def _find_host(self, vm_id):
-	list_vms = ("onevm show %s --user %s " +
+        list_vms = ("onevm show %s --user %s " +
                        "--password %s --endpoint %s") % (vm_id, self.one_user,
                                                          self.one_password, self.one_url)
         stdin, stdout, stderr = self.conn.exec_command(list_vms)
