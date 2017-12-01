@@ -33,14 +33,15 @@ class KVM_Actuator(Actuator):
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
-        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
-                                                 self.authorization_data['bigsea_username'],
-                                                 self.authorization_data['bigsea_password'])
+#        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
+#                                                 self.authorization_data['bigsea_username'],
+#                                                 self.authorization_data['bigsea_password'])
         
-        if not authorization['success']:
-            raise AuthorizationFailedException()
+#        if not authorization['success']:
+#            raise AuthorizationFailedException()
         
         # Discover vm_id - compute nodes map
+        print "DESCOBRINDO INSTANCIAS"
         for instance in vm_data.keys():
             try:
                 # Access compute nodes to discover vms location
@@ -53,12 +54,12 @@ class KVM_Actuator(Actuator):
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
-        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
-                                                self.authorization_data['bigsea_username'],
-                                                self.authorization_data['bigsea_password'])
+#        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
+#                                                self.authorization_data['bigsea_username'],
+#                                                self.authorization_data['bigsea_password'])
         
-        if not authorization['success']:
-            raise AuthorizationFailedException()
+#        if not authorization['success']:
+#            raise AuthorizationFailedException()
         
         # Access compute nodes to discover vm location
         host = self.instance_locator.locate(vm_id)

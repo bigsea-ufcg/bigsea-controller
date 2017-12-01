@@ -19,6 +19,7 @@ from service.api.controller.plugins.basic.basic_controller import Basic_Controll
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.plugins.single_application_controller import Single_Application_Controller
+from service.api.controller.plugins.fuzzy.fuzzy_controller import Fuzzy_Controller
 from service.api.controller.plugins.generic.generic_controller import Generic_Controller
 from service.api.controller.plugins.tendency.tendency_aware_proportional_controller import Tendency_Aware_Proportional_Controller
 from service.api.controller.plugins.proportional.proportional_controller import Proportional_Controller
@@ -65,6 +66,9 @@ class Controller_Builder:
             return ProportionalDerivativeController(application_id, parameters)
         elif name == "progress-tendency":
             return Tendency_Aware_Proportional_Controller(application_id, parameters)
+        elif name == "fuzzy":
+            return Fuzzy_Controller(application_id, parameters)
+
         else:
             # FIXME: exception type
             raise Exception("Unknown controller type")
