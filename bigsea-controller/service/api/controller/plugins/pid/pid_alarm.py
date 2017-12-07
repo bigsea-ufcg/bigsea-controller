@@ -64,8 +64,8 @@ class PIDAlarm:
 
         # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
         if self._check_measurements_are_new(progress_error_timestamp):
-            self._scale_down(progress_error, self.instances)
-            self._scale_up(progress_error, self.instances)
+            self._scale(progress_error, self.instances)
+            #self._scale_up(progress_error, self.instances)
                     
             if self.cap != -1:
                 self.cap_logger.log("%.0f|%s|%s" % (time.time(), str(self.application_id), str(self.cap)))
@@ -76,59 +76,30 @@ class PIDAlarm:
             self.last_action += " Could not acquire more recent metrics"
             self.logger.log("Could not acquire more recent metrics")
 
-    def _scale_down(self, progress_error, instances):
+    def _scale(self, progress_error, instances):
         """
-            Checks if it is necessary to scale down, according to
+            Checks if it is necessary to scale, according to
             the progress_error. If it is, calculates the new CPU cap
             value and tries to modify the cap of the vms.
         """
-        
-        # If the error is positive and its absolute value is too high, scale down
-        if progress_error > 0 and progress_error >= self.trigger_down:
-            self.logger.log("Scaling down")
-            self.last_action = "Getting allocated resources"
+
+        self.logger.log("Scaling down")
+        self.last_action = "Getting allocated resources"
             
-            # Get current CPU cap
-            cap = self.actuator.get_allocated_resources_to_cluster(instances)
-            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
+        # Get current CPU cap
+        cap = self.actuator.get_allocated_resources_to_cluster(instances)
+        new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
             
-            self.logger.log("Scaling from %d to %d" % (cap, new_cap))
-            self.last_action = "Scaling from %d to %d" % (cap, new_cap)
+        self.logger.log("Scaling from %d to %d" % (cap, new_cap))
+        self.last_action = "Scaling from %d to %d" % (cap, new_cap)
             
-            # Currently, we use the same cap for all the vms
-            cap_instances = {instance:new_cap for instance in instances}
+        # Currently, we use the same cap for all the vms
+        cap_instances = {instance:new_cap for instance in instances}
             
-            # Set the new cap
-            self.actuator.adjust_resources(cap_instances)
+        # Set the new cap
+        self.actuator.adjust_resources(cap_instances)
             
-            self.cap = new_cap
-            
-    def _scale_up(self, progress_error, instances):
-        """
-            Checks if it is necessary to scale up, according to
-            the progress_error. If it is, calculates the new CPU cap
-            value and tries to modify the cap of the vms.
-        """
-        
-        # If the error is negative and its absolute value is too high, scale up
-        if progress_error < 0 and abs(progress_error) >= self.trigger_up:
-            self.logger.log("Scaling up")
-            self.last_action = "Getting allocated resources"
-            
-            # Get current CPU cap
-            cap = self.actuator.get_allocated_resources_to_cluster(instances)
-            new_cap = self._decide_next_cap(cap, progress_error, self.heuristic_options)
-            
-            self.logger.log("Scaling from %f to %f" % (cap, new_cap))
-            self.last_action = "Scaling from %d to %d" % (cap, new_cap)
-            
-            # Currently, we use the same cap for all the vms
-            cap_instances = {instance:new_cap for instance in instances}
-    
-            # Set the new cap
-            self.actuator.adjust_resources(cap_instances)
-            
-            self.cap = new_cap
+        self.cap = new_cap
     
     def _get_progress_error(self, application_id):
         progress_error_measurement = self.metric_source.get_most_recent_value(PIDAlarm.ERROR_METRIC_NAME,
@@ -172,7 +143,7 @@ class PIDAlarm:
     
         self.integrated_error += progress_error
         integrative_component = -1 * self.integrated_error * integrative_factor 
-    
+        
         new_cap = current_cap + proportional_component + derivative_component + integrative_component
         new_cap = max(min(new_cap, self.max_cap), self.min_cap)
     
