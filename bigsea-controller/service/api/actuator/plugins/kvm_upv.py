@@ -2,6 +2,7 @@ from service.api.actuator.actuator import Actuator
 from service.exceptions.kvm_exceptions import InstanceNotFoundException
 
 import ConfigParser
+import paramiko
 
 
 # TODO: documentation
@@ -9,8 +10,9 @@ import ConfigParser
 
 class KVM_Actuator_UPV(Actuator):
 
-    def __init__(self, conn, iops_reference, bs_reference):
-        self.conn = conn
+    def __init__(self, iops_reference, bs_reference):
+        self.conn = paramiko.SSHClient()
+        self.conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.config = ConfigParser.RawConfigParser()
         self.config.read("controller.cfg")
         self.one_user = self.config.get("actuator", "one_username")
@@ -20,6 +22,11 @@ class KVM_Actuator_UPV(Actuator):
         self.iops_reference = iops_reference
         self.bs_reference = bs_reference
 
+    def _connect(self):
+        self.conn.connect(hostname=self.config.get("actuator", "access_ip"),
+                     username=self.config.get("actuator", "access_username"),
+                     password=self.config.get("actuator", "access_password"))
+
     # TODO: validation
     def prepare_environment(self, vm_data):
         self.adjust_resources(vm_data)
@@ -27,6 +34,8 @@ class KVM_Actuator_UPV(Actuator):
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
+        self._connect()
+        
         instances_locations = {}
 
         # Discover vm_id - compute nodes map
@@ -41,9 +50,12 @@ class KVM_Actuator_UPV(Actuator):
 
             self._change_io_quota(instances_locations[instance],
                                   instance, int(vm_data[instance]))
+            
+        self.conn.close()
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
+        self._connect()
         # Access compute nodes to discover vm location
         host = self._find_host(vm_id)
 
@@ -64,6 +76,8 @@ class KVM_Actuator_UPV(Actuator):
         cap = int(stdout.read())
 
         print "get_allocated_resources: id: %s - cap: %s" % (vm_id, cap)
+
+        self.conn.close()
 
         if cap == -1:
             return 100

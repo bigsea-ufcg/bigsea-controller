@@ -113,14 +113,8 @@ class Actuator_Builder:
             iops_reference = config.getint("actuator", "iops_reference")
             bs_reference = config.getint("actuator", "bs_reference")
 
-            conn = paramiko.SSHClient()
-            conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            conn.connect(hostname=config.get("actuator", "access_ip"),
-                         username=config.get("actuator", "access_username"),
-                         password=config.get("actuator", "access_password"))
-
-            return KVM_Actuator_UPV(conn, iops_reference, bs_reference)
-
+            return KVM_Actuator_UPV(iops_reference, bs_reference)
+        
         elif name == "nop":
             return Nop_Actuator()
         elif name == "service":
