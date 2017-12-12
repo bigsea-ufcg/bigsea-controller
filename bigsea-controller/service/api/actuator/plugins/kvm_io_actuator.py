@@ -25,27 +25,23 @@ class KVM_IO_Actuator(Actuator):
         self.instance_locator = instance_locator
         self.remote_kvm = remote_kvm
         self.authorizer = Authorizer()
-        self.authorization_data = authorization_data
+        self.auth_data = authorization_data
 
     # TODO: validation
     # This method receives as argument a map {vm-id:cap}
     def adjust_resources(self, vm_data):
-        print "here1"
-        
-        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
-                                                          self.authorization_data['bigsea_username'],
-                                                          self.authorization_data['bigsea_password'])
+        authorization = self.authorizer.get_authorization(
+            self.auth_data['authorization_url'],
+            self.auth_data['bigsea_username'],
+            self.auth_data['bigsea_password']
+        )
 
         if not authorization['success']:
             raise AuthorizationFailedException()
 
-        print "here2"
-
         for instance in vm_data.keys():
-            print instance
             try:
                 # Access compute nodes to discover vms location
-                print "here3"
                 instance_location = self.instance_locator.locate(instance)
                 # Access a compute node and change cap
                 self.remote_kvm.change_vcpu_quota(
@@ -57,9 +53,11 @@ class KVM_IO_Actuator(Actuator):
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
-        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
-                                                          self.authorization_data['bigsea_username'],
-                                                          self.authorization_data['bigsea_password'])
+        authorization = self.authorizer.get_authorization(
+            self.auth_data['authorization_url'],
+            self.auth_data['bigsea_username'],
+            self.auth_data['bigsea_password']
+        )
 
         if not authorization['success']:
             raise AuthorizationFailedException()

@@ -15,7 +15,7 @@
 
 from service.api.controller.metric_source import Metric_Source
 from utils.logger import Log, configure_logging
-import paramiko
+from utils.ssh_utils import SSH_Utils
 import time
 import datetime
 
@@ -27,7 +27,7 @@ class OS_Generic_Metric_Source(Metric_Source):
         self.host_ip = parameters['host_ip']
         self.log_path = parameters['log_path']
         self.start_time = parameters['start_time']
-        self.expected_time = parameters['expected_time']
+        self.expected_time = parameters['reference_value']
         self.host_username = 'ubuntu'
         self.last_checked = ''
         self.logger = Log("metrics.log", "metrics.log")
@@ -44,18 +44,6 @@ class OS_Generic_Metric_Source(Metric_Source):
         delay = time.time() - self.start_time
         return delay
 
-    # This method returns a remote connection with the host where
-    # the log will be captured. It is possible to execute a command
-    # in the host using the function c.exec_command("write_command_here")
-    # with the object returned here
-    def _get_ssh_connection(self):
-        keypair = paramiko.RSAKey.from_private_key_file(self.keypair_path)
-        conn = paramiko.SSHClient()
-        conn.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        conn.connect(hostname=self.host_ip,
-                     username=self.host_username, pkey=keypair)
-        return conn
-
     # This is an auxiliary function to prepare and publish the metric. The point is to keep
     # monitoring_application as simple as possible.
     def _extract_metric_from_log(self, last_log):
@@ -67,21 +55,18 @@ class OS_Generic_Metric_Source(Metric_Source):
             error = measurement_value - ref_value
             self.logger.log("ref-value:%f|measurement-value:%f|error:%f" % (ref_value,
                                                                             measurement_value, error))
-            return error
+            return 100 * error
         # Flag that checks if the log capture is ended
         elif '[END]' in last_log:
             self.running = False
 
     def _monitoring_application(self):
         try:
-            # First of all, a connection with the host is created.
-            conn = self._get_ssh_connection()
-            # The second step consists in execute the command to capture the last log line from
-            # the log file using the connection create below and saving the outputs.
-            stdin, stdout, stderr = conn.exec_command(
-                "sudo tail -1 %s" % self.log_path)
+            result = SSH_Utils().run_and_get_result("sudo tail -1 %s" % self.log_path,
+                                                    self.host_username, self.host_ip,
+                                                    self.keypair_path)
             timestamp = datetime.datetime.fromtimestamp(time.time())
-            return timestamp, self._extract_metric_from_log(stdout.read())
+            return timestamp, self._extract_metric_from_log(result)
 
         except Exception as ex:
             print "Monitoring is not possible. \nError: %s" % (ex.message)
