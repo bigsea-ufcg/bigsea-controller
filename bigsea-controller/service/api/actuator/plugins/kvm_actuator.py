@@ -27,15 +27,15 @@ class KVM_Actuator(Actuator):
         self.instance_locator = instance_locator
         self.remote_kvm = remote_kvm
         self.authorizer = Authorizer()
-        self.authorization_data = authorization_data
+        self.auth_data = authorization_data
         self.default_io_cap = default_io_cap
 
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
-        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
-                                                          self.authorization_data['bigsea_username'],
-                                                          self.authorization_data['bigsea_password'])
+        authorization = self.authorizer.get_authorization(self.auth_data['authorization_url'],
+                                                          self.auth_data['bigsea_username'],
+                                                          self.auth_data['bigsea_password'])
 
         if not authorization['success']:
             raise AuthorizationFailedException()
@@ -55,9 +55,9 @@ class KVM_Actuator(Actuator):
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
-        authorization = self.authorizer.get_authorization(self.authorization_data['authorization_url'],
-                                                          self.authorization_data['bigsea_username'],
-                                                          self.authorization_data['bigsea_password'])
+        authorization = self.authorizer.get_authorization(self.auth_data['authorization_url'],
+                                                          self.auth_data['bigsea_username'],
+                                                          self.auth_data['bigsea_password'])
 
         if not authorization['success']:
             raise AuthorizationFailedException()

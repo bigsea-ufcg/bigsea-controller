@@ -24,8 +24,8 @@ class KVM_Actuator_UPV(Actuator):
 
     def _connect(self):
         self.conn.connect(hostname=self.config.get("actuator", "access_ip"),
-                     username=self.config.get("actuator", "access_username"),
-                     password=self.config.get("actuator", "access_password"))
+                          username=self.config.get("actuator", "access_username"),
+                          password=self.config.get("actuator", "access_password"))
 
     # TODO: validation
     def prepare_environment(self, vm_data):
@@ -35,7 +35,7 @@ class KVM_Actuator_UPV(Actuator):
     # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
         self._connect()
-        
+
         instances_locations = {}
 
         # Discover vm_id - compute nodes map
@@ -50,7 +50,7 @@ class KVM_Actuator_UPV(Actuator):
 
             self._change_io_quota(instances_locations[instance],
                                   instance, int(vm_data[instance]))
-            
+
         self.conn.close()
 
     # TODO: validation

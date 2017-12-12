@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import ConfigParser
-import paramiko
 
 from service.api.actuator.plugins.instance_locator_tunnel import Instance_Locator_Tunnel
 from service.api.actuator.plugins.remote_KVM_tunnel import Remote_KVM_Tunnel
@@ -114,7 +113,7 @@ class Actuator_Builder:
             bs_reference = config.getint("actuator", "bs_reference")
 
             return KVM_Actuator_UPV(iops_reference, bs_reference)
-        
+
         elif name == "nop":
             return Nop_Actuator()
         elif name == "service":
