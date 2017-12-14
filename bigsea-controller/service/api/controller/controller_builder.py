@@ -15,19 +15,19 @@
 
 import ConfigParser
 
-from service.api.controller.plugins.basic.basic_controller import Basic_Controller
+from service.api.controller.plugins.basic.controller import Basic_Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.plugins.single_application_controller import Single_Application_Controller
-from service.api.controller.plugins.generic.generic_controller import Generic_Controller
-from service.api.controller.plugins.tendency.tendency_aware_proportional_controller import (
+from service.api.controller.plugins.generic.controller import Generic_Controller
+from service.api.controller.plugins.tendency.controller import (
     Tendency_Aware_Proportional_Controller
 )
-from service.api.controller.plugins.proportional.proportional_controller import Proportional_Controller
-from service.api.controller.plugins.proportional_derivative.proportional_derivative_controller import (
+from service.api.controller.plugins.proportional.controller import Proportional_Controller
+from service.api.controller.plugins.proportional_derivative.controller import (
     ProportionalDerivativeController
 )
-from service.api.controller.plugins.pid.pid_controller import PIDController
+from service.api.controller.plugins.pid.controller import PIDController
 
 
 class Controller_Builder:

@@ -18,7 +18,7 @@ import unittest
 
 from mock.mock import MagicMock
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.controller.plugins.generic.generic_alarm import Generic_Alarm
+from service.api.controller.plugins.generic.alarm import Generic_Alarm
 from utils.ssh_utils import SSH_Utils
 from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
 from service.api.actuator.plugins.instance_locator import Instance_Locator

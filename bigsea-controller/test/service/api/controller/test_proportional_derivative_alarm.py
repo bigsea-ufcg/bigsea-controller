@@ -19,7 +19,7 @@ from service.api.actuator.plugins.instance_locator import Instance_Locator
 from utils.ssh_utils import SSH_Utils
 from service.api.actuator.plugins.remote_kvm import Remote_KVM
 from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
-from service.api.controller.plugins.proportional_derivative.proportional_derivative_alarm import (
+from service.api.controller.plugins.proportional_derivative.alarm import (
     ProportionalDerivativeAlarm
 )
 from mock.mock import MagicMock

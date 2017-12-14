@@ -16,7 +16,7 @@
 import threading
 import time
 
-from service.api.controller.plugins.basic.basic_alarm import Basic_Alarm
+from service.api.controller.plugins.basic.alarm import Basic_Alarm
 from service.api.controller.controller import Controller
 from utils.logger import Log, configure_logging
 
