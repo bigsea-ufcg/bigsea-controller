@@ -18,7 +18,7 @@ import threading
 import time
 import unittest
 
-from service.api.controller.plugins.generic.generic_controller import Generic_Controller
+from service.api.controller.plugins.generic.controller import Generic_Controller
 
 
 class Test_Generic_Controller(unittest.TestCase):

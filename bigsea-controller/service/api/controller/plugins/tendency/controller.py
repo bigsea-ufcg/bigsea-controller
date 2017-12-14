@@ -13,24 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from service.api.controller.controller import Controller
+from utils.logger import Log, configure_logging
+from service.api.controller.metric_source_builder import Metric_Source_Builder
+from service.api.actuator.actuator_builder import Actuator_Builder
 import threading
 import time
-
-from service.api.actuator.actuator_builder import Actuator_Builder
-from service.api.controller.controller import Controller
-from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.controller.plugins.generic.generic_alarm import Generic_Alarm
-from utils.logger import ScalingLog
-
-# This class dictates the pace of the scaling process. It controls when Generic_Alarm
-# is called to check application state and when is necessary to wait.
+from service.api.controller.plugins.tendency.alarm import Tendency_Aware_Proportional_Alarm
+from service.exceptions.monasca_exceptions import No_Metrics_Exception
 
 
-class Generic_Controller(Controller):
+class Tendency_Aware_Proportional_Controller(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = ScalingLog(
-            "diff.controller.log", "controller.log", application_id)
+        self.logger = Log(
+            "tendency.proportional.controller.log", "controller.log")
+        configure_logging()
 
         scaling_parameters = parameters["scaling_parameters"]
 
@@ -42,8 +40,8 @@ class Generic_Controller(Controller):
         self.trigger_up = scaling_parameters["trigger_up"]
         self.min_cap = scaling_parameters["min_cap"]
         self.max_cap = scaling_parameters["max_cap"]
-        self.actuation_size = scaling_parameters["actuation_size"]
         self.metric_rounding = scaling_parameters["metric_rounding"]
+        self.actuation_size = scaling_parameters["actuation_size"]
         # The actuator plugin name
         self.actuator_type = scaling_parameters["actuator"]
         # The metric source plugin name
@@ -59,19 +57,25 @@ class Generic_Controller(Controller):
         # Gets a new actuator plugin using the given name
         actuator = Actuator_Builder().get_actuator(self.actuator_type, parameters)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
-        self.alarm = Generic_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up,
-                                   self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding,
-                                   application_id, self.instances)
+        self.alarm = Tendency_Aware_Proportional_Alarm(actuator, metric_source, self.trigger_down,
+                                                       self.trigger_up, self.min_cap, self.max_cap,
+                                                       self.actuation_size, self.metric_rounding)
 
     def start_application_scaling(self):
         run = True
-
+        # FIXME: add exception handling
         while run:
             self.logger.log("Monitoring application: %s" %
                             (self.application_id))
 
             # Call the alarm to check the application
-            self.alarm.check_application_state()
+            try:
+                self.alarm.check_application_state(
+                    self.application_id, self.instances)
+            except No_Metrics_Exception:
+                self.logger.log("No metrics available")
+            except Exception as e:
+                self.logger.log(str(e))
 
             # Wait some time
             time.sleep(float(self.check_interval))

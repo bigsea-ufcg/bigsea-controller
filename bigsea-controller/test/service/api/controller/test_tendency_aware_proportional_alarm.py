@@ -21,7 +21,7 @@ from service.api.actuator.plugins.instance_locator import Instance_Locator
 from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
 from service.api.actuator.plugins.remote_kvm import Remote_KVM
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.controller.plugins.tendency.tendency_aware_proportional_alarm import Tendency_Aware_Proportional_Alarm
+from service.api.controller.plugins.tendency.alarm import Tendency_Aware_Proportional_Alarm
 from utils.ssh_utils import SSH_Utils
 
 

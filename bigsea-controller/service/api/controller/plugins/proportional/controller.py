@@ -16,20 +16,18 @@
 from service.api.controller.controller import Controller
 from utils.logger import ScalingLog
 import threading
+import time
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.actuator.actuator_builder import Actuator_Builder
-from service.api.controller.plugins.proportional_derivative.proportional_derivative_alarm import (
-    ProportionalDerivativeAlarm
-)
+from service.api.controller.plugins.proportional.alarm import Proportional_Alarm
 from service.exceptions.monasca_exceptions import No_Metrics_Exception
-import time
 
 
-class ProportionalDerivativeController(Controller):
+class Proportional_Controller(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = ScalingLog("proportional_derivative.controller.log", "controller.log",
-                                 application_id)
+        self.logger = ScalingLog(
+            "proportional.controller.log", "controller.log", application_id)
 
         scaling_parameters = parameters["scaling_parameters"]
 
@@ -58,9 +56,9 @@ class ProportionalDerivativeController(Controller):
         # Gets a new actuator plugin using the given name
         actuator = Actuator_Builder().get_actuator(self.actuator_type, parameters)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
-        self.alarm = ProportionalDerivativeAlarm(actuator, metric_source, self.trigger_down,
-                                                 self.trigger_up, self.min_cap, self.max_cap, self.metric_rounding,
-                                                 self.heuristic_options, application_id, self.instances)
+        self.alarm = Proportional_Alarm(actuator, metric_source, self.trigger_down, self.trigger_up,
+                                        self.min_cap, self.max_cap, self.metric_rounding, self.heuristic_options,
+                                        self.application_id, self.instances)
 
     def start_application_scaling(self):
         run = True
