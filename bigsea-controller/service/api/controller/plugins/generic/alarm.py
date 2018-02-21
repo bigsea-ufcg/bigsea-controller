@@ -14,6 +14,8 @@
 # limitations under the License.
 
 from utils.logger import ScalingLog
+from utils.logger import TableLog, configure_logging
+from utils.monasca import MonascaMonitor
 import datetime
 import time
 
@@ -23,6 +25,10 @@ import time
 class Generic_Alarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
+    JOB_PROGRESS_METRIC_NAME = "application-progress.job_progress"
+    TIME_PROGRESS_METRIC_NAME = "application-progress.ref_value"
+    CURRENT_CAP_METRIC_NAME = "application-progress.current_cap"
+    PREVIOUS_CAP_METRIC_NAME = "application-progress.previous_cap"
 
     def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap,
                  actuation_size, metric_rounding, application_id, instances):
@@ -37,11 +43,17 @@ class Generic_Alarm:
         self.metric_rounding = metric_rounding
         self.application_id = application_id
         self.instances = instances
+        self.monasca = MonascaMonitor()
+        self.dimensions = {'application_id': self.application_id,
+                           'service': 'spark-sahara'}
 
         self.logger = ScalingLog("%s.generic.alarm.log" % (application_id), "controller.log",
                                  application_id)
+
         self.cap_logger = ScalingLog("%s.cap.log" % (
             application_id), "cap.log", application_id)
+
+        self.table_logger = TableLog("%s.generic.alarm.table.log" % (application_id), "controller.table.log")
 
         self.last_progress_error_timestamp = datetime.datetime.strptime("0001-01-01T00:00:00.0Z",
                                                                         '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -57,6 +69,11 @@ class Generic_Alarm:
 
         # TODO: Check parameters
         try:
+            action = "Getting metrics"
+            job_progress = self._get_job_progress(self.application_id)
+            time_progress = self._get_time_progress(self.application_id)
+            self.table_logger.log(self.application_id, job_progress, time_progress, self.cap, '--', action)
+
             self.logger.log("Getting progress error")
             self.last_action = "getting progress error"
             # Get the progress error value and timestamp
@@ -64,9 +81,8 @@ class Generic_Alarm:
                 self.application_id)
 
             self.logger.log(
-                "Progress error-[%s]-%f" % (str(progress_error_timestamp), progress_error))
-            self.last_action = "Progress error-[%s]-%f" % (
-                str(progress_error_timestamp), progress_error)
+                "Progress error: %.2f" % (progress_error))
+            self.last_action = "Progress error: %.2f" % (progress_error)
 
             # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
             if self._check_measurements_are_new(progress_error_timestamp):
@@ -105,6 +121,25 @@ class Generic_Alarm:
             self.logger.log("Scaling from %d to %d" % (cap, new_cap))
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
 
+            action = "Scaling down"
+            job_progress = self._get_job_progress(self.application_id)
+            time_progress = self._get_time_progress(self.application_id)
+            self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
+
+            previous_cap = {}
+            previous_cap['name'] = ('application-progress.previous_cap')
+            previous_cap['value'] = cap
+            previous_cap['timestamp'] = time.time() * 1000
+            previous_cap['dimensions'] = self.dimensions
+            self.monasca.send_metrics([previous_cap])
+
+            current_cap = {}
+            previous_cap['name'] = ('application-progress.current_cap')
+            previous_cap['value'] = new_cap
+            previous_cap['timestamp'] = time.time() * 1000
+            previous_cap['dimensions'] = self.dimensions
+            self.monasca.send_metrics([current_cap])
+
             # Currently, we use the same cap for all the vms
             cap_instances = {instance: new_cap for instance in instances}
 
@@ -132,6 +167,11 @@ class Generic_Alarm:
             self.logger.log("Scaling from %d to %d" % (cap, new_cap))
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
 
+            action = "Scaling up"
+            job_progress = self._get_job_progress(self.application_id)
+            time_progress = self._get_time_progress(self.application_id)
+            self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
+
             # Currently, we use the same cap for all the vms
             cap_instances = {instance: new_cap for instance in instances}
 
@@ -147,6 +187,20 @@ class Generic_Alarm:
         progress_error = progress_error_measurement[1]
         progress_error = round(progress_error, self.metric_rounding)
         return progress_error_timestamp, progress_error
+
+    def _get_job_progress(self, application_id):
+        job_progress_measurement = self.metric_source.get_most_recent_value(Generic_Alarm.JOB_PROGRESS_METRIC_NAME,
+                                                                            {"application_id": application_id})
+        job_progress_timestamp = job_progress_measurement[0]
+        job_progress = job_progress_measurement[1]
+        return job_progress
+
+    def _get_time_progress(self, application_id):
+        time_progress_measurement = self.metric_source.get_most_recent_value(Generic_Alarm.TIME_PROGRESS_METRIC_NAME,
+                                                                            {"application_id": application_id})
+        time_progress_timestamp = time_progress_measurement[0]
+        time_progress = time_progress_measurement[1]
+        return time_progress
 
     def _check_measurements_are_new(self, progress_error_timestamp):
         return self.last_progress_error_timestamp < progress_error_timestamp

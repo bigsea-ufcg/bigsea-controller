@@ -15,6 +15,8 @@
 
 import logging
 from datetime import datetime
+import time
+import texttable
 
 global_enabled = False
 
@@ -41,8 +43,76 @@ class ScalingLog:
 
     def log(self, text):
         timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-        log_string = "%s|%s|%s" % (self.application_id, timestamp, text)
+        log_string = "%s | %s: %s" % (time.strftime("%H:%M:%S"), self.application_id, text)
         self.logger.log(log_string)
+
+    def log_table(self, app_id, job_progress, time_progress, current_cap, previous_cap, action):
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        line = timestamp, app_id, job_progress, time_progress, previous_cap, current_cap, action
+        self.logger.log(line)
+
+
+class TableLog:
+    def __init__(self, name, output_file_path):
+        self.logger = Log(name, output_file_path)
+        self.table = texttable.Texttable()
+        self.table.set_cols_align(["c", "c", "c", 'c', 'c', 'c', 'c'])
+#        self.table.set_cols_dtype(["t", "t", "t", 't', 't' 't' 't'])
+        self.table.set_cols_width([8, 24, 15, 15, 15, 15, 26])
+        
+    def log(self, app_id, job_progress, time_progress, current_cap, previous_cap, action):
+#       line = "%s %s %s %s %s %s %s" % (timestamp, app_id, job_progress, time_progress, previous_cap, current_cap, action)
+        timestamp = time.strftime("%H:%M:%S")
+
+        if job_progress != '--':
+            job_progress_formatted = str(float("{0:.1f}".format(float(job_progress)))) + "%"
+        else:
+            job_progress_formatted = job_progress
+
+        if time_progress != '--':
+            time_progress_formatted = str(float("{0:.1}".format(float(time_progress)))) + "%"
+        else:
+            time_progress_formatted = time_progress
+
+        if previous_cap != '--':
+            previous_cap_formatted = str(previous_cap) + "%"
+        else:
+            previous_cap_formatted = previous_cap
+
+        if current_cap != '--':
+            current_cap_formatted = str(current_cap) + "%"
+        else:
+            current_cap_formatted = current_cap
+
+        line = [timestamp, app_id, job_progress_formatted, time_progress_formatted, previous_cap_formatted, current_cap_formatted, action]
+        self.table.add_row(line)
+        last_line = self.table.draw().split('\n')[-2]
+        self.logger.log(last_line)
+
+    def header_log(self):
+        header_row = [["Time", "Application ID", "Job Progress", "Time Progress", "Previous Cap", "Current Cap", "Action"]]
+        self.table.add_rows(header_row)
+        last_line = self.table.draw().split('\n')[:3]
+        self.logger.log(last_line[0])
+        self.logger.log(last_line[1])
+        self.logger.log(last_line[2])
+
+#       table = texttable.Texttable() 
+#       self.table.set_cols_align(["c", "c", "c", 'c', 'c', 'c', 'c'])
+#       self.table.set_cols_dtype(["t", "t", "f", 'f', 'i', 'i', 't'])
+#       self.table.set_cols_width([9, 22, 4, 4, 4, 4, 12])
+#       header = ["     Time     ", "     Application ID     ", "Job Progress", "Time Progress", "Previous Cap", "Current Cap", "               Action               "]
+#       table.add_row(header)
+#       self.logger.log(self.table.draw())
+
+#   def log(self, app_id, job_progress, time_progress, current_cap, previous_cap, action):
+#        timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+#        line = timestamp, app_id, job_progress, time_progress, previous_cap, current_cap, action
+
+#        self.table.add_row(line)
+#        last_line = self.table.draw().split('\n')[-2]
+
+#        self.logger.log(line)
 
 
 def enable():

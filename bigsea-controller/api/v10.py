@@ -20,8 +20,9 @@ from flask import request
 
 from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.main_controller import Main_Controller
-from utils.logger import Log
+from utils.logger import Log, TableLog
 from utils.logger import configure_logging
+from datetime import datetime
 
 
 SETUP_ROUTE = "/controller/setup_env"
@@ -33,6 +34,8 @@ app = Flask(__name__)
 
 # Set up logging
 logger = Log("controller.api.logger", "controller.api.log")
+controller_logger = Log("controller.logger", "controller.log")
+table_logger = TableLog("controller.table.logger", "controller.table.log")
 configure_logging()
 
 main_controller = Main_Controller()
@@ -48,8 +51,16 @@ def prepare_environment():
     plugin_name = data["actuator"]
     actuator = Actuator_Builder().get_actuator(plugin_name, data)
 
+
     logger.log("%s-Preparing environment for instances %s" %
                (time.strftime("%H:%M:%S"), str(data)))
+
+    table_logger.header_log()
+  
+    text = "Preparing environment"
+    log_string = "%s | %s" % (time.strftime("%H:%M:%S"), text)
+    controller_logger.log(log_string)
+    table_logger.log('--', '--', '--', '--', '--', text)
 
     try:
         actuator.adjust_resources(data['instances_cap'])

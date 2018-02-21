@@ -20,7 +20,7 @@ from service.api.actuator.actuator_builder import Actuator_Builder
 from service.api.controller.controller import Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
 from service.api.controller.plugins.generic.alarm import Generic_Alarm
-from utils.logger import ScalingLog
+from utils.logger import ScalingLog, TableLog
 
 # This class dictates the pace of the scaling process. It controls when Generic_Alarm
 # is called to check application state and when is necessary to wait.
@@ -31,6 +31,9 @@ class Generic_Controller(Controller):
     def __init__(self, application_id, parameters):
         self.logger = ScalingLog(
             "diff.controller.log", "controller.log", application_id)
+
+        self.table_logger = TableLog(
+            "diff.controller.table.log", "controller.table.log")
 
         scaling_parameters = parameters["scaling_parameters"]
 
