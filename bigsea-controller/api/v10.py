@@ -55,12 +55,12 @@ def prepare_environment():
     logger.log("%s-Preparing environment for instances %s" %
                (time.strftime("%H:%M:%S"), str(data)))
 
-    table_logger.header_log()
+#   table_logger.header_log()
   
     text = "Preparing environment"
     log_string = "%s | %s" % (time.strftime("%H:%M:%S"), text)
     controller_logger.log(log_string)
-    table_logger.log('--', '--', '--', '--', '--', text)
+#   table_logger.log('--', '--', '--', '--', '--', text)
 
     try:
         actuator.adjust_resources(data['instances_cap'])

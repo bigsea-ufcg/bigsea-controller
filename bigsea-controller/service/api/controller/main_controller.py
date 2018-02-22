@@ -37,7 +37,7 @@ class Main_Controller:
         self.logger.log(log_string)
 
         action = "Starting scaling"
-        self.table_logger.log(application_id, '--', '--', '--', '--', action)
+#       self.table_logger.log(application_id, '--', '--', '--', '--', action)
 
         plugin_name = parameters["scaler_plugin"]
         controller = self.controller_builder.get_controller(plugin_name, application_id, parameters)
@@ -53,7 +53,7 @@ class Main_Controller:
             log_string = "%s | %s" % (time.strftime("%H:%M:%S"), text)
             self.logger.log(log_string)
             action = "Stopping scaling"
-            self.table_logger.log(app_id, '--', '--', '--', '--', action)
+#           self.table_logger.log(app_id, '--', '--', '--', '--', action)
             app_controller = self.controller_thread_pool[app_id]
             app_controller.stop_application_scaling()
             self.controller_thread_pool.pop(app_id)

@@ -72,7 +72,7 @@ class Generic_Alarm:
             action = "Getting metrics"
             job_progress = self._get_job_progress(self.application_id)
             time_progress = self._get_time_progress(self.application_id)
-            self.table_logger.log(self.application_id, job_progress, time_progress, self.cap, '--', action)
+#          #self.table_logger.log(self.application_id, job_progress, time_progress, self.cap, '--', action)
 
             self.logger.log("Getting progress error")
             self.last_action = "getting progress error"
@@ -124,7 +124,7 @@ class Generic_Alarm:
             action = "Scaling down"
             job_progress = self._get_job_progress(self.application_id)
             time_progress = self._get_time_progress(self.application_id)
-            self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
+           #self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
 
             previous_cap = {}
             previous_cap['name'] = ('application-progress.previous_cap')
@@ -170,7 +170,7 @@ class Generic_Alarm:
             action = "Scaling up"
             job_progress = self._get_job_progress(self.application_id)
             time_progress = self._get_time_progress(self.application_id)
-            self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
+           #self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
 
             # Currently, we use the same cap for all the vms
             cap_instances = {instance: new_cap for instance in instances}
