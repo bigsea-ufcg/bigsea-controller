@@ -84,7 +84,7 @@ class TableLog:
         self.logger.log(last_line)
 
     def header_log(self):
-        header_row = [["Time", "Application ID", "Controller Name", "Actuator Name", "Previous Cap", "Current Cap", "Progress Error", "Action"]]
+        header_row = [["Time", "Application ID", "Controller Name", "Actuator Name", "Current Cap", "Previous Cap", "Progress Error", "Action"]]
         self.table.add_rows(header_row)
         last_line = self.table.draw().split('\n')[:3]
         self.logger.log(last_line[0])

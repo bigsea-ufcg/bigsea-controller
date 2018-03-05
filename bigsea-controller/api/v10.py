@@ -37,7 +37,6 @@ logger = Log("controller.api.logger", "controller.api.log")
 controller_logger = Log("controller.logger", "controller.log")
 table_logger = TableLog("controller.table.logger", "controller.table.log")
 configure_logging()
-
 main_controller = Main_Controller()
 
 # API methods
@@ -46,6 +45,7 @@ main_controller = Main_Controller()
 
 @app.route(SETUP_ROUTE, methods=['POST'])
 def prepare_environment():
+    table_logger.header_log()
     data = request.json
 
     plugin_name = data["actuator"]
@@ -55,11 +55,11 @@ def prepare_environment():
     logger.log("%s-Preparing environment for instances %s" %
                (time.strftime("%H:%M:%S"), str(data)))
 
-#   table_logger.header_log()
   
     text = "Preparing environment"
     log_string = "%s | %s" % (time.strftime("%H:%M:%S"), text)
     controller_logger.log(log_string)
+    table_logger.log('--', "--", '--', '--', '--', '--', text)
 #   table_logger.log('--', '--', '--', '--', '--', text)
 
     try:

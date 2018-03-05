@@ -69,16 +69,17 @@ class Generic_Alarm:
 
         # TODO: Check parameters
         try:
-            action = "Getting metrics"
             job_progress = self._get_job_progress(self.application_id)
             time_progress = self._get_time_progress(self.application_id)
-#          #self.table_logger.log(self.application_id, job_progress, time_progress, self.cap, '--', action)
 
             self.logger.log("Getting progress error")
             self.last_action = "getting progress error"
             # Get the progress error value and timestamp
             progress_error_timestamp, progress_error = self._get_progress_error(
                 self.application_id)
+
+            action = "Getting metrics"
+            self.table_logger.log(self.application_id, "Progress-Error", "KVM-IO", self.cap, '--', progress_error, action)
 
             self.logger.log(
                 "Progress error: %.2f" % (progress_error))
@@ -124,7 +125,8 @@ class Generic_Alarm:
             action = "Scaling down"
             job_progress = self._get_job_progress(self.application_id)
             time_progress = self._get_time_progress(self.application_id)
-           #self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
+
+            self.table_logger.log(self.application_id, "Progress-Error", "KVM-IO", cap, new_cap, progress_error, action)
 
             previous_cap = {}
             previous_cap['name'] = ('application-progress.previous_cap')
@@ -170,7 +172,8 @@ class Generic_Alarm:
             action = "Scaling up"
             job_progress = self._get_job_progress(self.application_id)
             time_progress = self._get_time_progress(self.application_id)
-           #self.table_logger.log(self.application_id, job_progress, time_progress, cap, new_cap, action)
+
+            self.table_logger.log(self.application_id, "Progress-Error", "KVM-IO", cap, new_cap, progress_error, action)
 
             # Currently, we use the same cap for all the vms
             cap_instances = {instance: new_cap for instance in instances}
