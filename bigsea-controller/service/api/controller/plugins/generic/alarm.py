@@ -26,7 +26,7 @@ class Generic_Alarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
     JOB_PROGRESS_METRIC_NAME = "application-progress.job_progress"
-    TIME_PROGRESS_METRIC_NAME = "application-progress.ref_value"
+    TIME_PROGRESS_METRIC_NAME = "application-progress.time_progress"
     CURRENT_CAP_METRIC_NAME = "application-progress.current_cap"
     PREVIOUS_CAP_METRIC_NAME = "application-progress.previous_cap"
 
@@ -60,6 +60,21 @@ class Generic_Alarm:
         self.last_action = ""
         self.cap = -1
 
+        cap = self.actuator.get_allocated_resources_to_cluster(instances)
+        previous_cap = {}
+        previous_cap['name'] = ('application-progress.previous_cap')
+        previous_cap['value'] = cap
+        previous_cap['timestamp'] = time.time() * 1000
+        previous_cap['dimensions'] = self.dimensions
+        self.monasca.send_metrics([previous_cap])
+        current_cap = {}
+        current_cap['name'] = ('application-progress.current_cap')
+        current_cap['value'] = cap
+        current_cap['timestamp'] = time.time() * 1000
+        current_cap['dimensions'] = self.dimensions
+        self.monasca.send_metrics([current_cap])
+
+
     def check_application_state(self):
         """
             Checks the application progress by getting progress metrics from a
@@ -69,8 +84,8 @@ class Generic_Alarm:
 
         # TODO: Check parameters
         try:
-            job_progress = self._get_job_progress(self.application_id)
-            time_progress = self._get_time_progress(self.application_id)
+           # job_progress = self._get_job_progress(self.application_id)
+           # time_progress = self._get_time_progress(self.application_id)
 
             self.logger.log("Getting progress error")
             self.last_action = "getting progress error"
@@ -79,7 +94,14 @@ class Generic_Alarm:
                 self.application_id)
 
             action = "Getting metrics"
-            self.table_logger.log(self.application_id, "Progress-Error", "KVM-IO", self.cap, '--', progress_error, action)
+#           self.table_logger.log(self.application_id, "Progress-Error", "KVM-IO", self.cap, '--', progress_error, action)
+
+            current_cap = {}
+            current_cap['name'] = ('application-progress.current_cap')
+            current_cap['value'] = self.cap
+            current_cap['timestamp'] = time.time() * 1000
+            current_cap['dimensions'] = self.dimensions
+            if self.cap != -1: self.monasca.send_metrics([current_cap])
 
             self.logger.log(
                 "Progress error: %.2f" % (progress_error))
@@ -123,8 +145,8 @@ class Generic_Alarm:
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
 
             action = "Scaling down"
-            job_progress = self._get_job_progress(self.application_id)
-            time_progress = self._get_time_progress(self.application_id)
+           #job_progress = self._get_job_progress(self.application_id)
+           #time_progress = self._get_time_progress(self.application_id)
 
             self.table_logger.log(self.application_id, "Progress-Error", "KVM-IO", cap, new_cap, progress_error, action)
 
@@ -136,10 +158,10 @@ class Generic_Alarm:
             self.monasca.send_metrics([previous_cap])
 
             current_cap = {}
-            previous_cap['name'] = ('application-progress.current_cap')
-            previous_cap['value'] = new_cap
-            previous_cap['timestamp'] = time.time() * 1000
-            previous_cap['dimensions'] = self.dimensions
+            current_cap['name'] = ('application-progress.current_cap')
+            current_cap['value'] = new_cap
+            current_cap['timestamp'] = time.time() * 1000
+            current_cap['dimensions'] = self.dimensions
             self.monasca.send_metrics([current_cap])
 
             # Currently, we use the same cap for all the vms
@@ -170,10 +192,24 @@ class Generic_Alarm:
             self.last_action = "Scaling from %d to %d" % (cap, new_cap)
 
             action = "Scaling up"
-            job_progress = self._get_job_progress(self.application_id)
-            time_progress = self._get_time_progress(self.application_id)
+           #job_progress = self._get_job_progress(self.application_id)
+           #time_progress = self._get_time_progress(self.application_id)
 
             self.table_logger.log(self.application_id, "Progress-Error", "KVM-IO", cap, new_cap, progress_error, action)
+
+            previous_cap = {}
+            previous_cap['name'] = ('application-progress.previous_cap')
+            previous_cap['value'] = cap
+            previous_cap['timestamp'] = time.time() * 1000
+            previous_cap['dimensions'] = self.dimensions
+            self.monasca.send_metrics([previous_cap])
+
+            current_cap = {}
+            current_cap['name'] = ('application-progress.current_cap')
+            current_cap['value'] = new_cap
+            current_cap['timestamp'] = time.time() * 1000
+            current_cap['dimensions'] = self.dimensions
+            self.monasca.send_metrics([current_cap])
 
             # Currently, we use the same cap for all the vms
             cap_instances = {instance: new_cap for instance in instances}
