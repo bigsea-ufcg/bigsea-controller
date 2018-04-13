@@ -26,6 +26,7 @@ from service.api.actuator.plugins.service_actuator import Service_Actuator
 from service.api.actuator.plugins.service_instance_locator import Service_Instance_Locator
 from service.api.actuator.plugins.kvm_io_actuator import KVM_IO_Actuator
 from service.api.actuator.plugins.kvm_upv import KVM_Actuator_UPV
+from service.api.actuator.plugins.k8s_replicas import K8s_Actuator
 
 
 # TODO: documentation
@@ -35,13 +36,13 @@ class Actuator_Builder:
         config = ConfigParser.RawConfigParser()
         config.read("controller.cfg")
 
-        authorization_url = config.get("authorization", "authorization_url")
-        bigsea_username = parameters["bigsea_username"]
-        bigsea_password = parameters["bigsea_password"]
+        # authorization_url = config.get("authorization", "authorization_url")
+        # bigsea_username = parameters["bigsea_username"]
+        # bigsea_password = parameters["bigsea_password"]
 
-        authorization_data = dict(authorization_url=authorization_url,
-                                  bigsea_username=bigsea_username,
-                                  bigsea_password=bigsea_password)
+        # authorization_data = dict(authorization_url=authorization_url,
+        #                           bigsea_username=bigsea_username,
+        #                           bigsea_password=bigsea_password)
 
         if name == "kvm":
             compute_nodes_str = config.get("actuator", "compute_nodes")
@@ -113,6 +114,14 @@ class Actuator_Builder:
             bs_reference = config.getint("actuator", "bs_reference")
 
             return KVM_Actuator_UPV(iops_reference, bs_reference)
+
+        elif name == "k8s_replicas":
+            k8s_manifest = config.get("actuator", "k8s_manifest")
+
+            return K8s_Actuator(parameters['app_id'], k8s_manifest)
+
+
+
 
         elif name == "nop":
             return Nop_Actuator()

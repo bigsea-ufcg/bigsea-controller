@@ -29,6 +29,8 @@ from service.api.controller.plugins.proportional_derivative.controller import (
 )
 from service.api.controller.plugins.pid.controller import PIDController
 
+from service.api.controller.plugins.kubejobs.controller import Kubejobs_Controller
+
 
 class Controller_Builder:
 
@@ -73,6 +75,8 @@ class Controller_Builder:
             return PIDController(application_id, parameters)
         elif name == "progress-tendency":
             return Tendency_Aware_Proportional_Controller(application_id, parameters)
+        elif name == "kubejobs":
+            return Kubejobs_Controller(application_id, parameters)
         else:
             # FIXME: exception type
             raise Exception("Unknown controller type")
