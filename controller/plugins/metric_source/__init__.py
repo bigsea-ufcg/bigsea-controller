@@ -18,6 +18,21 @@ from service.api.controller.plugins.nop.nop_metric_source import Nop_Metric_Sour
 from service.api.controller.plugins.spark.spark_metric_source import Spark_Metric_Source
 from service.api.controller.plugins.os_generic.os_generic_metric_source import OS_Generic_Metric_Source
 
+from abc import abstractmethod
+from abc import ABCMeta
+
+
+class Metric_Source:
+    __metaclass__ = ABCMeta
+
+    '''
+        Returns the most recent measured value of the metric "metric_name", using the given options
+        as filter parameters
+    '''
+    @abstractmethod
+    def get_most_recent_value(self, metric_name, options):
+        pass
+
 
 class Metric_Source_Builder:
 

@@ -15,17 +15,20 @@
 
 import ConfigParser
 
-from service.api.actuator.plugins.instance_locator_tunnel import Instance_Locator_Tunnel
-from service.api.actuator.plugins.remote_KVM_tunnel import Remote_KVM_Tunnel
-from utils.ssh_utils import SSH_Utils
-from service.api.actuator.plugins.kvm_actuator import KVM_Actuator
-from service.api.actuator.plugins.instance_locator import Instance_Locator
-from service.api.actuator.plugins.remote_kvm import Remote_KVM
-from service.api.actuator.plugins.nop_actuator import Nop_Actuator
-from service.api.actuator.plugins.service_actuator import Service_Actuator
-from service.api.actuator.plugins.service_instance_locator import Service_Instance_Locator
-from service.api.actuator.plugins.kvm_io_actuator import KVM_IO_Actuator
-from service.api.actuator.plugins.kvm_upv import KVM_Actuator_UPV
+from controller.utils.ssh_utils import SSH_Utils
+from controller.plugins.actuator.instance_locator_tunnel.plugin import Instance_Locator_Tunnel
+from controller.plugins.actuator.remote_KVM_tunnel.plugin import Remote_KVM_Tunnel
+from controller.plugins.actuator.kvm_actuator.plugin import KVM_Actuator
+from controller.plugins.actuator.instance_locator.plugin import Instance_Locator
+from controller.plugins.actuator.remote_kvm.plugin import Remote_KVM
+from controller.plugins.actuator.nop_actuator.plugin import Nop_Actuator
+from controller.plugins.actuator.service_actuator.plugin import Service_Actuator
+from controller.plugins.actuator.service_instance_locator.plugin import Service_Instance_Locator
+from controller.plugins.actuator.kvm_io_actuator.plugin import KVM_IO_Actuator
+from controller.plugins.actuator.kvm_upv.plugin import KVM_Actuator_UPV
+
+from abc.plugin import abstractmethod
+from abc.plugin import ABCMeta
 
 
 # TODO: documentation
@@ -127,3 +130,44 @@ class Actuator_Builder:
         else:
             # FIXME: review this exception type
             raise Exception("Unknown actuator type")
+
+
+'''
+The Actuator is the component responsible for connecting to the underlying infrastructure and
+triggering the commands or API calls that allocate or deallocate resources, based on other
+component's (normally the Controller) requests.
+'''
+
+
+class Actuator:
+    __metaclass__ = ABCMeta
+
+    '''
+        Sets the amount of allocated resources to the given instances, using the given values
+        of caps. This method expects a dictionary of format:
+
+        {
+            "instance_id_1":cap_value_1,
+            "instance_id_2":cap_value_2
+        }
+
+        Normally used when executing an application.
+    '''
+    @abstractmethod
+    def adjust_resources(self, vm_data):
+        pass
+
+    '''
+        Returns a number which represents the amount of allocated resources to the given instance
+    '''
+    @abstractmethod
+    def get_allocated_resources(self, vm_id):
+        pass
+
+    '''
+        Returns a number which represents the amount of allocated resources to the given cluster
+    '''
+    @abstractmethod
+    def get_allocated_resources_to_cluster(self, vms_ids):
+        pass
+

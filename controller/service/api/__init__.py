@@ -1,4 +1,4 @@
-# Copyright (c) 2017 LSD - UFCG.
+# Copyright (c) 2017 UFCG-LSD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod
-from abc import ABCMeta
+import ConfigParser
+import os
+import sys
 
 
-class Metric_Source:
-    __metaclass__ = ABCMeta
+# Conf reading
+config = ConfigParser.RawConfigParser()
+config.read('./controller.cfg')
 
-    '''
-        Returns the most recent measured value of the metric "metric_name", using the given options
-        as filter parameters
-    '''
-    @abstractmethod
-    def get_most_recent_value(self, metric_name, options):
-        pass
+host = config.get("flask", "host")
+port = config.getint("flask", "port")

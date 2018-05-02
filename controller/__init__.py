@@ -1,4 +1,4 @@
-# Copyright (c) 2017 LSD - UFCG.
+# Copyright (c) 2017 UFCG-LSD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,8 +12,3 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-#script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-#export PYTHONPATH="$PYTHONPATH:$script_dir/controller"
-
-python controller/cli/main.py
