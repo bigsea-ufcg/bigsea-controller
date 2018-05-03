@@ -22,31 +22,3 @@ def main():
     app = Flask(__name__)
     app.register_blueprint(rest)
     app.run(host='0.0.0.0', port=api.port, debug=True)
-
-######################
-#from controller.api.v10 import app
-#import ConfigParser
-#import utils.logger as logging
-#
-#
-#def main():
-#    config = ConfigParser.RawConfigParser()
-#    config.read("controller.cfg")
-#
-#    host = config.get("flask", "host")
-#    port = config.getint("flask", "port")
-#
-#    enable_logging = config.get("logging", "enable")
-#    logging_level = config.get("logging", "level")
-#
-#    if enable_logging == "True":
-#	logging.enable()
-#	logging.configure_logging(logging_level)
-#    else:
-#	logging.disable()
-#
-#    app.run(host, port, debug=True)
-#
-#
-#if __name__ == "__main__":
-#    main()

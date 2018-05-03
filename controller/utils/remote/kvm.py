@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: Documentation
+# TODO: documentation
 
 
-class Remote_KVM_Tunnel:
+class RemoteKVM:
 
     def __init__(self, ssh_utils, compute_nodes_key, iops_reference=1000, bs_reference=1000000):
         self.ssh_utils = ssh_utils
@@ -32,12 +32,11 @@ class Remote_KVM_Tunnel:
             raise Exception("Invalid cap value")
 
         command = "virsh schedinfo %s" \
-            " --set vcpu_quota=$(( %s * `virsh schedinfo %s | awk 'FNR == 3 {print $3}'`/100 ))" \
-            " > /dev/null" % (vm_id, cap, vm_id)
+                  " --set vcpu_quota=$(( %s * `virsh schedinfo %s | awk 'FNR == 3 {print $3}'`/100 ))" \
+                  " > /dev/null" % (vm_id, cap, vm_id)
 
         # TODO: check errors
-        self.ssh_utils.run_command_tunnel(
-            command, "root", host_ip, self.compute_nodes_key)
+        self.ssh_utils.run_command(command, "root", host_ip, self.compute_nodes_key)
 
     def change_io_quota(self, host_ip, vm_id, cap):
         if cap < 0 or cap > 100:
@@ -48,23 +47,23 @@ class Remote_KVM_Tunnel:
         command_bs_quota = (cap * self.bs_reference) / 100
 
         command_set_io_quota = "virsh blkdeviotune %s" \
-            " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
-            " --current --total_iops_sec %s --total_bytes_sec %s" % (vm_id, vm_id,
-                                                                     command_iops_quota, command_bs_quota)
+                               " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
+                               " --current --total_iops_sec %s --total_bytes_sec %s" % (vm_id, vm_id,
+                                                                                        command_iops_quota,
+                                                                                        command_bs_quota)
 
-        self.ssh_utils.run_command_tunnel(command_set_io_quota, "root", host_ip,
-                                          self.compute_nodes_key)
+        self.ssh_utils.run_command(command_set_io_quota, "root", host_ip, self.compute_nodes_key)
 
     # TODO: Change this method name to get_vcpu_quota
     def get_allocated_resources(self, host_ip, vm_id):
         # TODO: check ip value
         # TODO: check id value
         command = "virsh schedinfo %s" \
-            " | awk '{if(NR==3){period=$3} if(NR==4){print 100*$3/period}}'" % (vm_id)
+                  " | awk '{if(NR==3){period=$3} if(NR==4){print 100*$3/period}}'" % (vm_id)
 
         # TODO: check errors
-        ssh_result = self.ssh_utils.run_and_get_result_tunnel(command, "root", host_ip,
-                                                              self.compute_nodes_key)
+        ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip,
+                                                       self.compute_nodes_key)
 
         try:
             cap = int(ssh_result)
@@ -81,11 +80,11 @@ class Remote_KVM_Tunnel:
 
     def get_io_quota(self, host_ip, vm_id):
         command = "virsh blkdeviotune %s" \
-            " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
-            " | grep total_iops_sec: | awk '{print $2}'" % (vm_id, vm_id)
+                  " \"`virsh domblklist %s | awk 'FNR == 3 {print $1}'`\"" \
+                  " | grep total_iops_sec: | awk '{print $2}'" % (vm_id, vm_id)
 
-        ssh_result = self.ssh_utils.run_and_get_result_tunnel(command, "root", host_ip,
-                                                              self.compute_nodes_key)
+        ssh_result = self.ssh_utils.run_and_get_result(command, "root", host_ip,
+                                                       self.compute_nodes_key)
 
         try:
             quota = int(ssh_result)

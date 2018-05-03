@@ -14,29 +14,65 @@
 # limitations under the License.
 
 from flask import request
-import pdb; pdb.set_trace()
+from controller.plugins.actuator.builder import ActuatorBuilder
+from controller.plugins.controller.builder import ControllerBuilder
+
+
+API_LOG = Log("APIv10", "APIv10.log")
+
+scaled_apps = {}
+
+controller_builder = ControllerBuilder()
+actuator_builder = ActuatorBuilder()
 
 
 def setup_environment(data):
     data = request.json
 
-    plugin_name = data["actuator"]
-    actuator = Actuator_Builder().get_actuator(plugin_name, data)
+    plugin = data["actuator"]
+    actuator = actuator_builder.get_actuator(plugin, data)
 
-    logger.log("%s-Preparing environment for instances %s" %
+    API_LOG.log("%s-Preparing environment for instances %s" %
 	       (time.strftime("%H:%M:%S"), str(data)))
 
     try:
 	actuator.adjust_resources(data['instances_cap'])
     except Exception as e:
-	logger.log(str(e))
+	API_LOG.log(str(e))
 
     return "prepared_environment"
 
 
-def start_scaling(data, app_id):
-    return "ok"
+def start_scaling(app_id, data):
+    API_LOG.log("Adding application id: %s" % (app_id))
+
+    plugin = data["scaler_plugin"]
+    controller = controller_builder.get_controller(plugin, app_id, data)
+    executor = threading.Thread(
+                            target=controller.start_application_scaling)
+
+    executor.start()
+    scaled_apps[app_id] = controller
 
 
 def stop_scaling(app_id):
-    return "ok"
+    if app_id in scaled_apps:
+        API_LOG.log("Removing application id: %s" % (app_id))
+
+        executor = scaled_apps[app_id]
+        executor.stop_application_scaling()
+        scaled_apps.pop(app_id)
+
+    else:
+        API_LOG.log("Application %s not found" % (app_id))
+
+
+def controller_status():
+    status = "Status: OK\n"
+    status += "Monitoring applications:\n"
+    for app_id in scaled_apps:
+        status += app_id + "\n"
+        status += "Last action:" + scaled_apps[app_id].status()
+        status += "\n"
+
+    return status

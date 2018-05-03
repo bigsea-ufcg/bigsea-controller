@@ -1,4 +1,4 @@
-# Copyright (c) 2017 LSD - UFCG.
+# Copyright (c) 2017 UFCG-LSD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,39 +12,3 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from service.api.controller.plugins.monasca.monasca_metric_source import Monasca_Metric_Source
-from service.api.controller.plugins.nop.nop_metric_source import Nop_Metric_Source
-from service.api.controller.plugins.spark.spark_metric_source import Spark_Metric_Source
-from service.api.controller.plugins.os_generic.os_generic_metric_source import OS_Generic_Metric_Source
-
-from abc import abstractmethod
-from abc import ABCMeta
-
-
-class Metric_Source:
-    __metaclass__ = ABCMeta
-
-    '''
-        Returns the most recent measured value of the metric "metric_name", using the given options
-        as filter parameters
-    '''
-    @abstractmethod
-    def get_most_recent_value(self, metric_name, options):
-        pass
-
-
-class Metric_Source_Builder:
-
-    def get_metric_source(self, name, parameters):
-        if name == "monasca":
-            return Monasca_Metric_Source(parameters)
-        elif name == "nop":
-            return Nop_Metric_Source()
-        elif name == "spark":
-            return Spark_Metric_Source(parameters)
-        elif name == "os-generic":
-            return OS_Generic_Metric_Source(parameters)
-        else:
-            # FIXME: exception type
-            raise Exception("Unknown metric source type")
