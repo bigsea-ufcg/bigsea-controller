@@ -19,14 +19,15 @@ import datetime
 # TODO: documentation
 
 
-class Basic_Alarm:
+class BasicAlarm:
 
     # TODO: Think about these constants placements
     PROGRESS_METRIC_NAME = "spark.job_progress"
     ELAPSED_TIME_METRIC_NAME = 'spark.elapsed_time'
 
-    def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap,
-                 actuation_size, metric_rounding):
+    def __init__(self, actuator, metric_source, trigger_down, trigger_up,
+                 min_cap, max_cap, actuation_size, metric_rounding):
+
         # TODO: Check parameters
         self.metric_source = metric_source
         self.actuator = actuator
@@ -42,28 +43,38 @@ class Basic_Alarm:
 
         self.last_time_progress_timestamp = datetime.datetime.strptime(
             "0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
+
         self.last_job_progress_timestamp = datetime.datetime.strptime(
             "0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ')
 
     def get_job_progress(self, application_id):
-        job_progress_measurement = self.metric_source.get_most_recent_value(Basic_Alarm.PROGRESS_METRIC_NAME,
-                                                                            {"application_id": application_id})
+        job_progress_measurement = self.metric_source.get_most_recent_value(
+                                       Basic_Alarm.PROGRESS_METRIC_NAME,
+                                       {"application_id": application_id})
+
         job_progress_timestamp = job_progress_measurement[0]
         job_progress = job_progress_measurement[1]
         job_progress = round(job_progress, self.metric_rounding)
+
         return job_progress_timestamp, job_progress
 
     def get_time_progress(self, application_id):
-        time_progress_measurement = self.metric_source.get_most_recent_value(Basic_Alarm.ELAPSED_TIME_METRIC_NAME,
-                                                                             {"application_id": application_id})
+        time_progress_measurement = self.metric_source.get_most_recent_value(
+                                        Basic_Alarm.ELAPSED_TIME_METRIC_NAME,
+                                        {"application_id": application_id})
+
         time_progress_timestamp = time_progress_measurement[0]
         time_progress = time_progress_measurement[1]
         time_progress = round(time_progress, self.metric_rounding)
+
         return time_progress_timestamp, time_progress
 
-    def check_measurements_are_new(self, job_progress_timestamp, time_progress_timestamp):
-        return self.last_job_progress_timestamp < job_progress_timestamp and \
-            self.last_time_progress_timestamp < time_progress_timestamp
+    def check_measurements_are_new(self, job_progress_timestamp,
+                                   time_progress_timestamp):
+
+        return (self.last_job_progress_timestamp < job_progress_timestamp
+                and
+                self.last_time_progress_timestamp < time_progress_timestamp)
 
     def check_application_state(self, application_id, instances):
         # TODO: Check parameters
@@ -76,11 +87,15 @@ class Basic_Alarm:
             time_progress_timestamp, time_progress = self.get_time_progress(
                 application_id)
 
-            self.logger.log("Progress-[%s]-%f|Time progress-[%s]-%f" % (str(job_progress_timestamp),
-                                                                        job_progress, str(time_progress_timestamp),
-                                                                        time_progress))
+            self.logger.log("Progress-[%s]-%f|Time progress-[%s]-%f" %
+                           (str(job_progress_timestamp),
+                            job_progress,
+                            str(time_progress_timestamp),
+                            time_progress))
 
-            if self.check_measurements_are_new(job_progress_timestamp, time_progress_timestamp):
+            if self.check_measurements_are_new(job_progress_timestamp,
+                                               time_progress_timestamp):
+
                 diff = job_progress - time_progress
 
                 self.scale_down(diff, instances)
@@ -88,8 +103,10 @@ class Basic_Alarm:
 
                 self.last_job_progress_timestamp = job_progress_timestamp
                 self.last_time_progress_timestamp = time_progress_timestamp
+
             else:
                 self.logger.log("Could not acquire more recent metrics")
+
         except Exception:
             # TODO: Check exception type
             self.logger.log("Could not get metrics")

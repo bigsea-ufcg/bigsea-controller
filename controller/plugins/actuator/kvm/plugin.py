@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from service.api.actuator.actuator import Actuator
+from controller.plugins.actuator.base import Actuator
 from service.exceptions.kvm_exceptions import InstanceNotFoundException
 from utils.authorizer import Authorizer
 from service.exceptions.infra_exceptions import AuthorizationFailedException
@@ -21,7 +21,7 @@ from service.exceptions.infra_exceptions import AuthorizationFailedException
 # TODO: documentation
 
 
-class KVM_Actuator(Actuator):
+class KVMActuator(Actuator):
 
     def __init__(self, instance_locator, remote_kvm, authorization_data, default_io_cap):
         self.instance_locator = instance_locator

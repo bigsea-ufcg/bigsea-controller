@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from service.api.actuator.actuator import Actuator
+from controller.plugins.actuator.base import Actuator
 import requests
 import json
 
 
-class Service_Actuator(Actuator):
+class ServiceActuator(Actuator):
 
     def __init__(self, actuator_port, instance_locator):
         self.instance_locator = instance_locator

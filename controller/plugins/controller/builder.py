@@ -17,7 +17,7 @@ import ConfigParser
 
 from service.api.controller.plugins.basic.controller import Basic_Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.actuator.actuator_builder import Actuator_Builder
+from controller.plugins.actuator.base_builder import Actuator_Builder
 from service.api.controller.plugins.single_application_controller import Single_Application_Controller
 from service.api.controller.plugins.generic.controller import Generic_Controller
 from service.api.controller.plugins.tendency.controller import (
@@ -58,26 +58,41 @@ class ControllerBuilder:
             actuation_size = config.getfloat("scaling", "actuation_size")
             metric_rounding = config.getint("scaling", "metric_rounding")
 
-            parameters = {"check_interval": check_interval, "trigger_down": trigger_down,
-                          "trigger_up": trigger_up, "min_cap": min_cap, "max_cap": max_cap,
-                          "actuation_size": actuation_size, "metric_rounding": metric_rounding}
+            parameters = {"check_interval": check_interval,
+                          "trigger_down": trigger_down,
+                          "trigger_up": trigger_up,
+                          "min_cap": min_cap,
+                          "max_cap": max_cap,
+                          "actuation_size": actuation_size,
+                          "metric_rounding": metric_rounding}
 
-            metric_source = Metric_Source_Builder().get_metric_source(metric_source_type)
+            metric_source = Metric_Source_Builder().get_metric_source(
+                                metric_source_type)
+
             actuator = Actuator_Builder().get_actuator(actuator_type)
 
             return Basic_Controller(metric_source, actuator, parameters)
+
         elif name == "single":
             return Single_Application_Controller(application_id, parameters)
+
         elif name == "progress-error":
             return Generic_Controller(application_id, parameters)
+
         elif name == "proportional":
             return Proportional_Controller(application_id, parameters)
+
         elif name == "proportional_derivative":
-            return ProportionalDerivativeController(application_id, parameters)
+            return ProportionalDerivativeController(application_id,
+                                                    parameters)
+
         elif name == "pid":
             return PIDController(application_id, parameters)
+
         elif name == "progress-tendency":
-            return Tendency_Aware_Proportional_Controller(application_id, parameters)
+            return Tendency_Aware_Proportional_Controller(application_id,
+                                                          parameters)
+
         else:
             # FIXME: exception type
             raise Exception("Unknown controller type")

@@ -23,7 +23,7 @@ from utils.logger import Log, configure_logging
 
 # FIXME: This class does not work with the current scaler format.
 # It should be removed in the future.
-class Basic_Controller(Controller):
+class BasicController(Controller):
 
     def __init__(self, metric_source, actuator, parameters):
         # Set up logging
@@ -42,14 +42,17 @@ class Basic_Controller(Controller):
 
         # Start alarm
         self.alarm = Basic_Alarm(actuator, metric_source, trigger_down,
-                                 trigger_up, min_cap, max_cap, actuation_size, metric_rounding)
+                                 trigger_up, min_cap, max_cap, actuation_size,
+                                 metric_rounding)
 
         # Start up controller thread
         # Create lock to access application list
         self.applications_lock = threading.RLock()
         self.applications = {}
         self.controller = _Basic_Controller_Thread(
-            self.applications, self.applications_lock, self.alarm, check_interval)
+            self.applications, self.applications_lock, self.alarm,
+            check_interval)
+
         self.controller_thread = threading.Thread(target=self.controller.start)
         self.controller_thread.start()
 
@@ -104,6 +107,7 @@ class _Basic_Controller_Thread():
 
                     self.logger.log("Checking application:%s|instances:%s" % (
                         application_id, instances))
+
                     self.alarm.check_application_state(
                         application_id, instances)
 

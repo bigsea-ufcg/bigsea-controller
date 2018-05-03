@@ -31,7 +31,7 @@ class Metric_Source_Builder:
             return Nop_Metric_Source()
         elif name == "spark":
             return Spark_Metric_Source(parameters)
-        elif name == "os-generic":
+        elif name == "openstack_generic":
             return OS_Generic_Metric_Source(parameters)
         else:
             # FIXME: exception type

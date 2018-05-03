@@ -18,7 +18,7 @@ from utils.logger import ScalingLog
 import threading
 import time
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.actuator.actuator_builder import Actuator_Builder
+from controller.plugins.actuator.base_builder import Actuator_Builder
 from service.api.controller.plugins.proportional.alarm import Proportional_Alarm
 from service.exceptions.monasca_exceptions import No_Metrics_Exception
 

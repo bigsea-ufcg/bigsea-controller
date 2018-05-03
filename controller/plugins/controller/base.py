@@ -17,7 +17,7 @@ import ConfigParser
 
 from service.api.controller.plugins.basic.controller import Basic_Controller
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.actuator.actuator_builder import Actuator_Builder
+from controller.plugins.actuator.base_builder import Actuator_Builder
 from service.api.controller.plugins.single_application_controller import Single_Application_Controller
 from service.api.controller.plugins.generic.controller import Generic_Controller
 from service.api.controller.plugins.tendency.controller import (

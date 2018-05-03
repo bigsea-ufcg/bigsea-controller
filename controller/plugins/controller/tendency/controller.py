@@ -16,7 +16,7 @@
 from service.api.controller.controller import Controller
 from utils.logger import Log, configure_logging
 from service.api.controller.metric_source_builder import Metric_Source_Builder
-from service.api.actuator.actuator_builder import Actuator_Builder
+from controller.plugins.actuator.base_builder import Actuator_Builder
 import threading
 import time
 from service.api.controller.plugins.tendency.alarm import Tendency_Aware_Proportional_Alarm

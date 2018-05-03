@@ -1,4 +1,4 @@
-# Copyright (c) 2017 LSD - UFCG.
+# Copyright (c) 2017 UFCG-LSD.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,20 +12,3 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from controller.plugins.actuator.base import Actuator
-
-
-class NopActuator(Actuator):
-
-    def prepare_environment(self, vm_data):
-        pass
-
-    def adjust_resources(self, vm_data):
-        pass
-
-    def get_allocated_resources(self, vm_id):
-        return 100
-
-    def get_allocated_resources_to_cluster(self, vms_ids):
-        return 100

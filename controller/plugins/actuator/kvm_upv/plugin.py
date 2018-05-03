@@ -1,4 +1,4 @@
-from service.api.actuator.actuator import Actuator
+from controller.plugins.actuator.base import Actuator
 from service.exceptions.kvm_exceptions import InstanceNotFoundException
 
 import ConfigParser
@@ -8,7 +8,7 @@ import paramiko
 # TODO: documentation
 
 
-class KVM_Actuator_UPV(Actuator):
+class KVMUPVActuator(Actuator):
 
     def __init__(self, iops_reference, bs_reference):
         self.conn = paramiko.SSHClient()
