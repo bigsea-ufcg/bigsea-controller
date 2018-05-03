@@ -16,9 +16,9 @@
 import threading
 import time
 
-from service.api.controller.plugins.basic.alarm import Basic_Alarm
-from service.api.controller.controller import Controller
-from utils.logger import Log, configure_logging
+from controller.plugins.controller.basic.alarm import BasicAlarm
+from controller.plugins.controller.base import Controller
+from controller.utils.logger import Log, configure_logging
 
 
 # FIXME: This class does not work with the current scaler format.
@@ -49,7 +49,7 @@ class BasicController(Controller):
         # Create lock to access application list
         self.applications_lock = threading.RLock()
         self.applications = {}
-        self.controller = _Basic_Controller_Thread(
+        self.controller = _BasicControllerThread(
             self.applications, self.applications_lock, self.alarm,
             check_interval)
 
@@ -78,7 +78,7 @@ class BasicController(Controller):
         return ""
 
 
-class _Basic_Controller_Thread():
+class _BasicControllerThread():
 
     def __init__(self, applications, applications_lock, alarm, check_interval):
         self.logger = Log("basic.controller_thread.log", "controller.log")

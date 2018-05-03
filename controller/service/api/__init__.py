@@ -24,3 +24,21 @@ config.read('./controller.cfg')
 
 host = config.get("flask", "host")
 port = config.getint("flask", "port")
+
+monasca_endpoint = config.get('monasca', 'monasca_endpoint')
+monasca_username = config.get('monasca', 'username')
+monasca_password = config.get('monasca', 'password')
+monasca_auth_url = config.get('monasca', 'auth_url')
+monasca_project_name = config.get('monasca', 'project_name')
+monasca_api_version = config.get('monasca', 'api_version')
+
+compute_nodes_str = config.get("actuator", "compute_nodes")
+compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
+
+iops_reference = config.getint("actuator", "iops_reference")
+bs_reference = config.getint("actuator", "bs_reference")
+default_io_cap = config.getint("actuator", "default_io_cap")
+tunelling = config.get("actuator", "tunelling")
+
+ports_str = config.get("actuator", "tunnel_ports")
+actuator_port = config.get("actuator", "actuator_port")

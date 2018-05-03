@@ -16,7 +16,7 @@
 import paramiko
 
 
-class SSH_Utils(object):
+class SSHUtils(object):
 
     def __init__(self, hosts_ports={}):
         self.hosts_ports = hosts_ports

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from utils.logger import configure_logging, Log
+from controller.utils.logger import configure_logging, Log
 import datetime
 
 # TODO: documentation

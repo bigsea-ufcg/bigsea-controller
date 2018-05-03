@@ -14,5 +14,5 @@
 # limitations under the License.
 
 
-class No_Metrics_Exception(Exception):
+class MetricNotFoundException(Exception):
     pass

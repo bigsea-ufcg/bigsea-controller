@@ -17,9 +17,10 @@ import string
 import six
 import uuid
 
+
 class Forbidden(Exception):
     code = "FORBIDDEN"
-    message = ("You are not authorized to complete this action")
+    message = ("This action is forbidden")
 
 
 class UnauthorizedException(Exception):
@@ -29,13 +30,9 @@ class UnauthorizedException(Exception):
 
 class BadRequestException(Exception):
     code = "BAD_REQUEST"
-    message = ("Malformed message body")
+    message = ("Bad request message body")
 
 
 class MalformedRequestBody(Exception):
     code = "MALFORMED_REQUEST_BODY"
-    message_template = ("Malformed message body: %(reason)s")
-
-    def __init__(self, reason):
-        formatted_message = self.message_template % {"reason": reason}
-        super(MalformedRequestBody, self).__init__(formatted_message)
+    message_template = ("Malformed message body")

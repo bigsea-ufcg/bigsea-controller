@@ -14,9 +14,9 @@
 # limitations under the License.
 
 from controller.plugins.actuator.base import Actuator
-from service.exceptions.kvm_exceptions import InstanceNotFoundException
-from utils.authorizer import Authorizer
-from service.exceptions.infra_exceptions import AuthorizationFailedException
+from controller.exceptions.kvm import InstanceNotFoundException
+from controller.exceptions.infra import AuthorizationFailedException
+from controller.utils.authorizer import Authorizer
 
 # TODO: documentation
 

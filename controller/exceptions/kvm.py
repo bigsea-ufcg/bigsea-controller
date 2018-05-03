@@ -13,17 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from abc import abstractmethod
-from abc import ABCMeta
 
-
-class MetricSource:
-    __metaclass__ = ABCMeta
-
-    '''
-        Returns the most recent measured value of the metric "metric_name", using the given options
-        as filter parameters
-    '''
-    @abstractmethod
-    def get_most_recent_value(self, metric_name, options):
-        pass
+class InstanceNotFoundException(Exception):
+    def __init__(self, instance_id=None, message=None):
+        self.instance_id = instance_id
+        self.message = message

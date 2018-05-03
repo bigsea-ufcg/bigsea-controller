@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from utils.logger import Log, configure_logging
+from controller.utils.logger import Log, configure_logging
 import datetime
 import time
 
 
-class Tendency_Aware_Proportional_Alarm:
+class TendencyAwareProportionalAlarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
 
@@ -155,7 +155,7 @@ class Tendency_Aware_Proportional_Alarm:
 
     def _get_progress_error(self, application_id):
         progress_error_measurement = \
-            self.metric_source.get_most_recent_value(Tendency_Aware_Proportional_Alarm.ERROR_METRIC_NAME,
+            self.metric_source.get_most_recent_value(TendencyAwareProportionalAlarm.ERROR_METRIC_NAME,
                                                      {"application_id": application_id})
         progress_error_timestamp = progress_error_measurement[0]
         progress_error = progress_error_measurement[1]

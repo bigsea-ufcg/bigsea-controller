@@ -13,23 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from service.api.controller.controller import Controller
-from utils.logger import ScalingLog
 import threading
-from service.api.controller.metric_source_builder import Metric_Source_Builder
-from controller.plugins.actuator.base_builder import Actuator_Builder
-from service.api.controller.plugins.proportional_derivative.alarm import (
-    ProportionalDerivativeAlarm
-)
-from service.exceptions.monasca_exceptions import No_Metrics_Exception
 import time
 
+from controller.utils.logger import ScalingLog
+from controller.plugins.actuator.builder import ActuatorBuilder
+from controller.plugins.metric_source.builder import MetricSourceBuilder
+from controller.plugins.controller.base import Controller
+from controller.plugins.controller.proportional.alarm import ProportionalAlarm
+from controller.exceptions.monasca import MetricNotFoundException
 
-class ProportionalDerivativeController(Controller):
+
+class ProportionalController(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = ScalingLog("proportional_derivative.controller.log", "controller.log",
-                                 application_id)
+        self.logger = ScalingLog(
+            "proportional.controller.log", "controller.log", application_id)
 
         scaling_parameters = parameters["scaling_parameters"]
 
@@ -53,14 +52,14 @@ class ProportionalDerivativeController(Controller):
         self.running_lock = threading.RLock()
 
         # Gets a new metric source plugin using the given name
-        metric_source = Metric_Source_Builder().get_metric_source(
+        metric_source = MetricSourceBuilder().get_metric_source(
             self.metric_source_type, parameters)
         # Gets a new actuator plugin using the given name
-        actuator = Actuator_Builder().get_actuator(self.actuator_type, parameters)
+        actuator = ActuatorBuilder().get_actuator(self.actuator_type, parameters)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
-        self.alarm = ProportionalDerivativeAlarm(actuator, metric_source, self.trigger_down,
-                                                 self.trigger_up, self.min_cap, self.max_cap, self.metric_rounding,
-                                                 self.heuristic_options, application_id, self.instances)
+        self.alarm = ProportionalAlarm(actuator, metric_source, self.trigger_down, self.trigger_up,
+                                        self.min_cap, self.max_cap, self.metric_rounding, self.heuristic_options,
+                                        self.application_id, self.instances)
 
     def start_application_scaling(self):
         run = True
@@ -72,7 +71,7 @@ class ProportionalDerivativeController(Controller):
             # Call the alarm to check the application
             try:
                 self.alarm.check_application_state()
-            except No_Metrics_Exception:
+            except MetricNotFoundException:
                 self.logger.log("No metrics available")
             except Exception as e:
                 self.logger.log(str(e))

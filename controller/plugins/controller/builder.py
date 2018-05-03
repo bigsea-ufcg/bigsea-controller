@@ -13,26 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ConfigParser
-
-from service.api.controller.plugins.basic.controller import Basic_Controller
-from service.api.controller.metric_source_builder import Metric_Source_Builder
-from controller.plugins.actuator.base_builder import Actuator_Builder
-from service.api.controller.plugins.single_application_controller import Single_Application_Controller
-from service.api.controller.plugins.generic.controller import Generic_Controller
-from service.api.controller.plugins.tendency.controller import (
-    Tendency_Aware_Proportional_Controller
+from controller.plugins.controller.basic.plugin import BasicController
+from controller.plugins.controller.generic.plugin import GenericController
+from controller.plugins.controller.pid.plugin import PIDController
+from controller.plugins.controller.single.plugin import (
+    SingleApplicationController
 )
-from service.api.controller.plugins.proportional.controller import Proportional_Controller
-from service.api.controller.plugins.proportional_derivative.controller import (
+from controller.plugins.controller.proportional.plugin import (
+    ProportionalController
+)
+from controller.plugins.controller.tendency.plugin import (
+    TendencyAwareProportionalController
+)
+from controller.plugins.controller.proportional_derivative.plugin import (
     ProportionalDerivativeController
 )
-from service.api.controller.plugins.pid.controller import PIDController
-from abc import ABCMeta
-from abc import abstractmethod
-from service.api.controller.controller_builder import ControllerBuilder
-import threading
-from utils.logger import Log, configure_logging
+from controller.plugins.metric_source.builder import MetricSourceBuilder
+from controller.plugins.actuator.builder import ActuatorBuilder
 
 
 class ControllerBuilder:
@@ -42,45 +39,24 @@ class ControllerBuilder:
 
     def get_controller(self, name, application_id, parameters):
         if name == "basic":
-            config = ConfigParser.RawConfigParser()
-            config.read("controller.cfg")
+            metric_source_type = parameters["policy"]["metric_source"]
+            actuator_type = parameters["policy"]["actuator"]
 
-            # Read scaling policy
-            metric_source_type = config.get("policy", "metric_source")
-            actuator_type = config.get("policy", "actuator")
-
-            # Read configuration
-            check_interval = config.getfloat("scaling", "check_interval")
-            trigger_down = config.getfloat("scaling", "trigger_down")
-            trigger_up = config.getfloat("scaling", "trigger_up")
-            min_cap = config.getfloat("scaling", "min_cap")
-            max_cap = config.getfloat("scaling", "max_cap")
-            actuation_size = config.getfloat("scaling", "actuation_size")
-            metric_rounding = config.getint("scaling", "metric_rounding")
-
-            parameters = {"check_interval": check_interval,
-                          "trigger_down": trigger_down,
-                          "trigger_up": trigger_up,
-                          "min_cap": min_cap,
-                          "max_cap": max_cap,
-                          "actuation_size": actuation_size,
-                          "metric_rounding": metric_rounding}
-
-            metric_source = Metric_Source_Builder().get_metric_source(
+            metric_source = MetricSourceBuilder().get_metric_source(
                                 metric_source_type)
 
-            actuator = Actuator_Builder().get_actuator(actuator_type)
+            actuator = ActuatorBuilder().get_actuator(actuator_type)
 
-            return Basic_Controller(metric_source, actuator, parameters)
+            return BasicController(metric_source, actuator, parameters)
 
         elif name == "single":
-            return Single_Application_Controller(application_id, parameters)
+            return SingleApplicationController(application_id, parameters)
 
-        elif name == "progress-error":
-            return Generic_Controller(application_id, parameters)
+        elif name == "progress_error":
+            return GenericController(application_id, parameters)
 
         elif name == "proportional":
-            return Proportional_Controller(application_id, parameters)
+            return ProportionalController(application_id, parameters)
 
         elif name == "proportional_derivative":
             return ProportionalDerivativeController(application_id,
@@ -89,8 +65,8 @@ class ControllerBuilder:
         elif name == "pid":
             return PIDController(application_id, parameters)
 
-        elif name == "progress-tendency":
-            return Tendency_Aware_Proportional_Controller(application_id,
+        elif name == "progress_tendency":
+            return TendencyAwareProportionalController(application_id,
                                                           parameters)
 
         else:

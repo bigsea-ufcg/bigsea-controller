@@ -16,6 +16,7 @@
 import logging
 from datetime import datetime
 
+
 global_enabled = False
 
 
@@ -56,8 +57,9 @@ def disable():
 
 
 def configure_logging(logging_level="INFO"):
-    levels = {"CRITICAL": logging.CRITICAL, "DEBUG": logging.DEBUG, "ERROR": logging.ERROR,
-              "FATAL": logging.FATAL, "INFO": logging.INFO, "NOTSET": logging.NOTSET,
+    levels = {"CRITICAL": logging.CRITICAL, "DEBUG": logging.DEBUG,
+              "ERROR": logging.ERROR, "FATAL": logging.FATAL,
+              "INFO": logging.INFO, "NOTSET": logging.NOTSET,
               "WARN": logging.WARN, "WARNING": logging.WARNING
               }
 

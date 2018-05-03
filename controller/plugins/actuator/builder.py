@@ -15,7 +15,7 @@
 
 import ConfigParser
 
-from controller.utils import ssh
+from controller.utils.ssh import SSHUtils
 from controller.service import api
 
 from controller.plugins.actuator.kvm.plugin import KVMActuator
@@ -34,40 +34,36 @@ from controller.utils.remote.kvm_tunnel import RemoteKVMTunnel
 
 class ActuatorBuilder:
     def get_actuator(self, name, parameters):
-        config = ConfigParser.RawConfigParser()
-        config.read("controller.cfg")
-
         if name == "kvm":
-            compute_nodes_str = config.get("actuator", "compute_nodes")
-            compute_nodes_keypair = config.get("actuator",
-                                               "keypair_compute_nodes")
+            compute_nodes_str = api.compute_nodes_str
+            compute_nodes_keypair = api.compute_nodes_keypair
 
-            iops_reference = config.getint("actuator", "iops_reference")
-            bs_reference = config.getint("actuator", "bs_reference")
-            default_io_cap = config.getint("actuator", "default_io_cap")
-            tunelling = config.get("actuator", "tunelling")
+            iops_reference = api.iops_reference
+            bs_reference = api.bs_reference
+            default_io_cap = api.default_io_cap
+            tunelling = api.tunelling
 
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
 
             if tunelling == "True": 
-                instance_locator = InstanceLocator(SSH_Utils({}),
+                instance_locator = InstanceLocator(SSHUtils({}),
                                        compute_nodes, compute_nodes_keypair)
 
-                remote_kvm = RemoteKVM(SSH_Utils({}), compute_nodes_keypair,
+                remote_kvm = RemoteKVM(SSHUtils({}), compute_nodes_keypair,
                                         iops_reference, bs_reference)
 
             else:
-                ports_str = config.get("actuator", "tunnel_ports")
+                ports_str = api.ports_str
                 ports = [x.strip() for x in ports_str.split(",")]
 
                 hosts_ports = {compute_nodes[i]: ports[i]
                                for i in xrange(len(ports))}
 
                 instance_locator = InstanceTunnelLocator(
-                                       SSH_Utils(hosts_ports), compute_nodes,
+                                       SSHUtils(hosts_ports), compute_nodes,
 	            			   compute_nodes_keypair)
 
-                remote_kvm = RemoteKVMTunnel(SSH_Utils(hosts_ports),
+                remote_kvm = RemoteKVMTunnel(SSHUtils(hosts_ports),
                                                compute_nodes_keypair,
                                                iops_reference, bs_reference)
 
@@ -75,35 +71,36 @@ class ActuatorBuilder:
                                authorization_data, default_io_cap)
 
         elif name == "kvm_io":
-            compute_nodes_str = config.get("actuator", "compute_nodes")
-            compute_nodes_keypair = config.get("actuator",
-                                               "keypair_compute_nodes")
+            compute_nodes_str = api.compute_nodes_str
+            compute_nodes_keypair = api.compute_nodes_keypair
 
-            iops_reference = config.getint("actuator", "iops_reference")
-            bs_reference = config.getint("actuator", "bs_reference")
-            tunelling = config.get("actuator", "tunelling")
+            iops_reference = api.iops_reference
+            bs_reference = api.bs_reference
+            default_io_cap = api.default_io_cap
+            tunelling = api.tunelling
+
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
 
             if tunelling == "True":
-                instance_locator = InstanceLocator(SSH_Utils({}),
+                instance_locator = InstanceLocator(SSHUtils({}),
                                                     compute_nodes,
                                                     compute_nodes_keypair)
      
-                remote_kvm = RemoteKVM(SSH_Utils({}), compute_nodes_keypair,
+                remote_kvm = RemoteKVM(SSHUtils({}), compute_nodes_keypair,
                                         iops_reference, bs_reference)
 
             else:
-                ports_str = config.get("actuator", "tunnel_ports")
+                ports_str = api.ports_str
                 ports = [x.strip() for x in ports_str.split(",")]
 
                 hosts_ports = {compute_nodes[i]: ports[i]
                                for i in xrange(len(ports))}
 
                 instance_locator = InstanceTunnelLocator(
-                                       SSH_Utils(hosts_ports),
+                                       SSHUtils(hosts_ports),
                                        compute_nodes, compute_nodes_keypair)
 
-                remote_kvm = RemoteKVMTunnel(SSH_Utils(hosts_ports),
+                remote_kvm = RemoteKVMTunnel(SSHUtils(hosts_ports),
                                                compute_nodes_keypair,
                                                iops_reference, bs_reference)
 
@@ -112,15 +109,15 @@ class ActuatorBuilder:
                                    authorization_data)
 
         elif name == "kvm_upv":
-            iops_reference = config.getint("actuator", "iops_reference")
-            bs_reference = config.getint("actuator", "bs_reference")
+            iops_reference = api.iops_reference
+            bs_reference = api.bs_reference
 
             return KVMUPVActuator(iops_reference, bs_reference)
 
         elif name == "service":
-            actuator_port = config.get("actuator", "actuator_port")
+            actuator_port = api.actuator_port
 
-            compute_nodes_str = config.get("actuator", "compute_nodes")
+            compute_nodes_str = api.compute_nodes_str
             compute_nodes = [x.strip() for x in compute_nodes_str.split(",")]
 
             instance_locator = ServiceInstanceLocator(compute_nodes,

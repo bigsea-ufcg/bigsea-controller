@@ -13,26 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from service.api.controller.plugins.monasca.monasca_metric_source import Monasca_Metric_Source
-from service.api.controller.plugins.nop.nop_metric_source import Nop_Metric_Source
-from service.api.controller.plugins.spark.spark_metric_source import Spark_Metric_Source
-from service.api.controller.plugins.os_generic.os_generic_metric_source import OS_Generic_Metric_Source
+from controller.plugins.metric_source.monasca.plugin import MonascaMetricSource
+from controller.plugins.metric_source.nop.plugin import NopMetricSource
+from controller.plugins.metric_source.spark.plugin import SparkMetricSource
+from controller.plugins.metric_source.openstack_generic.plugin import (
+    OpenstackGenericMetricSource
+)
 
-from abc import abstractmethod
-from abc import ABCMeta
 
-
-class Metric_Source_Builder:
-
+class MetricSourceBuilder:
     def get_metric_source(self, name, parameters):
         if name == "monasca":
-            return Monasca_Metric_Source(parameters)
+            return MonascaMetricSource(parameters)
+
         elif name == "nop":
-            return Nop_Metric_Source()
+            return NopMetricSource()
+
         elif name == "spark":
-            return Spark_Metric_Source(parameters)
+            return SparkMetricSource(parameters)
+
         elif name == "openstack_generic":
-            return OS_Generic_Metric_Source(parameters)
+            return OpenstackGenericMetricSource(parameters)
+
         else:
             # FIXME: exception type
             raise Exception("Unknown metric source type")

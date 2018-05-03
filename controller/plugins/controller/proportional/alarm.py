@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from utils.logger import ScalingLog
+from controller.utils.logger import ScalingLog
 import datetime
 import time
 
 
-class Proportional_Alarm:
+class ProportionalAlarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
 

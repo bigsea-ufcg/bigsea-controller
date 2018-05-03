@@ -20,7 +20,7 @@ import sys
 
 from monascaclient import client as monclient
 from keystoneclient.v2_0 import Client as KSClient
-from monitor.service import api
+from controller.service import api
 
 
 class MonascaMonitor:

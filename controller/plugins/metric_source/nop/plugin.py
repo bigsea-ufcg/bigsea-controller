@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 
-class InstanceNotFoundException(Exception):
 
-    def __init__(self, instance_id=None, message=None):
-        self.instance_id = instance_id
-        self.message = message
+class NopMetricSource:
+
+    def get_most_recent_value(self, metric_name, options):
+        return datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ'), 0

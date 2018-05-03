@@ -22,6 +22,7 @@ from controller import exceptions as ex
 from controller.utils import serializer as u_serializer
 from controller.utils.logger import *
 
+
 LOG = Log("UtilsAPI", "utilsapi.log")
 
 

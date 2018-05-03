@@ -13,14 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from service.api.controller.metric_source import Metric_Source
-from utils.logger import Log, configure_logging
-from utils.ssh_utils import SSH_Utils
+from controller.plugins.metric_source.base import MetricSource
+from controller.utils.logger import Log, configure_logging
+from controller.utils.ssh import SSHUtils
+
 import time
 import datetime
 
 
-class OS_Generic_Metric_Source(Metric_Source):
+class OpenstackGenericMetricSource(MetricSource):
 
     def __init__(self, parameters):
         self.keypair_path = parameters['keypair_path']
@@ -62,7 +63,7 @@ class OS_Generic_Metric_Source(Metric_Source):
 
     def _monitoring_application(self):
         try:
-            result = SSH_Utils().run_and_get_result("sudo tail -1 %s" % self.log_path,
+            result = SSHUtils().run_and_get_result("sudo tail -1 %s" % self.log_path,
                                                     self.host_username, self.host_ip,
                                                     self.keypair_path)
             timestamp = datetime.datetime.fromtimestamp(time.time())

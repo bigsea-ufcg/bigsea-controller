@@ -20,7 +20,7 @@ import tzlocal
 import pytz
 
 
-class Spark_Metric_Source:
+class SparkMetricSource:
 
     def __init__(self, parameters):
         self.parameters = parameters

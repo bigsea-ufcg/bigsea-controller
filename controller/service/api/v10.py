@@ -16,6 +16,7 @@
 from flask import request
 from controller.plugins.actuator.builder import ActuatorBuilder
 from controller.plugins.controller.builder import ControllerBuilder
+from controller.utils.logger import Log
 
 
 API_LOG = Log("APIv10", "APIv10.log")

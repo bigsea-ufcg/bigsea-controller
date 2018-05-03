@@ -13,21 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from service.api.controller.controller import Controller
-from utils.logger import ScalingLog
 import threading
-from service.api.controller.metric_source_builder import Metric_Source_Builder
-from controller.plugins.actuator.base_builder import Actuator_Builder
-from service.exceptions.monasca_exceptions import No_Metrics_Exception
 import time
-from service.api.controller.plugins.pid.alarm import PIDAlarm
+
+from controller.plugins.actuator.builder import ActuatorBuilder
+from controller.plugins.metric_source.builder import MetricSourceBuilder
+from controller.plugins.controller.base import Controller
+from controller.plugins.controller.generic.alarm import GenericAlarm
+from controller.utils.logger import ScalingLog
+
+# This class dictates the pace of the scaling process. It controls when GenericAlarm
+# is called to check application state and when is necessary to wait.
 
 
-class PIDController(Controller):
+class GenericController(Controller):
 
     def __init__(self, application_id, parameters):
-        self.logger = ScalingLog("pid.controller.log", "controller.log",
-                                 application_id)
+        self.logger = ScalingLog(
+            "diff.controller.log", "controller.log", application_id)
 
         scaling_parameters = parameters["scaling_parameters"]
 
@@ -39,39 +42,36 @@ class PIDController(Controller):
         self.trigger_up = scaling_parameters["trigger_up"]
         self.min_cap = scaling_parameters["min_cap"]
         self.max_cap = scaling_parameters["max_cap"]
+        self.actuation_size = scaling_parameters["actuation_size"]
         self.metric_rounding = scaling_parameters["metric_rounding"]
         # The actuator plugin name
         self.actuator_type = scaling_parameters["actuator"]
         # The metric source plugin name
         self.metric_source_type = scaling_parameters["metric_source"]
-        self.heuristic_options = scaling_parameters["heuristic_options"]
 
         # We use a lock here to prevent race conditions when stopping the controller
         self.running = True
         self.running_lock = threading.RLock()
 
         # Gets a new metric source plugin using the given name
-        metric_source = Metric_Source_Builder().get_metric_source(self.metric_source_type, parameters)
+        metric_source = MetricSourceBuilder().get_metric_source(
+            self.metric_source_type, parameters)
         # Gets a new actuator plugin using the given name
-        actuator = Actuator_Builder().get_actuator(self.actuator_type, parameters)
+        actuator = ActuatorBuilder().get_actuator(self.actuator_type, parameters)
         # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
-        self.alarm = PIDAlarm(actuator, metric_source, self.trigger_down,
-                              self.trigger_up, self.min_cap, self.max_cap, self.metric_rounding,
-                              self.heuristic_options, application_id, self.instances)
+        self.alarm = GenericAlarm(actuator, metric_source, self.trigger_down, self.trigger_up,
+                                   self.min_cap, self.max_cap, self.actuation_size, self.metric_rounding,
+                                   application_id, self.instances)
 
     def start_application_scaling(self):
         run = True
 
         while run:
-            self.logger.log("Monitoring application: %s" % (self.application_id))
+            self.logger.log("Monitoring application: %s" %
+                            (self.application_id))
 
             # Call the alarm to check the application
-            try:
-                self.alarm.check_application_state()
-            except No_Metrics_Exception:
-                self.logger.log("No metrics available")
-            except Exception as e:
-                self.logger.log(str(e))
+            self.alarm.check_application_state()
 
             # Wait some time
             time.sleep(float(self.check_interval))

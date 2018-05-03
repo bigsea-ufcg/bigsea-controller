@@ -13,10 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from controller.utils.monasca.monitor import MonascaMonitor
+from controller.plugins.metric_source.base import MetricSource
 import datetime
 
 
-class Nop_Metric_Source:
+class MonascaMetricSource(MetricSource):
+    def __init__(self, parameters):
+        self.monasca = MonascaMonitor()
+        self.parameters = parameters
 
     def get_most_recent_value(self, metric_name, options):
-        return datetime.datetime.strptime("0001-01-01T00:00:00.0Z", '%Y-%m-%dT%H:%M:%S.%fZ'), 0
+        dimensions = {"application_id": options["application_id"]}
+        measurement = self.monasca.last_measurement(metric_name, dimensions)
+        timestamp = datetime.datetime.strptime(
+            measurement[0], '%Y-%m-%dT%H:%M:%S.%fZ')
+        value = measurement[1]
+        return timestamp, 100 * value

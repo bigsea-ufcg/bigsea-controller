@@ -13,25 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ConfigParser
-
-from controller.plugins.actuator import (
-    remote_kvm_tunnel.plugin.RemoteKvmTunnel,
-    remote_kvm.plugin.RemoteKvm,
-    kvm_actuator.plugin.KVM_Actuator,
-    kvm_io_actuator.plugin.KvmIoActuator,
-    kvm_upv.plugin.KvmActuatorUpv,
-    instance_locator_tunnel.plugin.InstanceLocatorTunnel,
-    instance_locator.plugin.InstanceLocator,
-    service_actuator.plugin.ServiceActuator,
-    service_instance_locator.plugin.ServiceInstanceLocator,
-    nop_actuator.plugin.NopActuator
-)
-
-from controller.utils import ssh
-
-from abc.plugin import abstractmethod
-from abc.plugin import ABCMeta
+from abc import abstractmethod
+from abc import ABCMeta
 
 
 '''

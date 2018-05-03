@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from flask import Flask
+
 from controller.api.v10 import rest
 from controller.service import api
 

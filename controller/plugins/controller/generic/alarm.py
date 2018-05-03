@@ -13,14 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from utils.logger import ScalingLog
+from controller.utils.logger import ScalingLog
 import datetime
 import time
 
+
 # This class contains the logic used to adjust the amount of resources allocated to applications
-
-
-class Generic_Alarm:
+class GenericAlarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
 
@@ -141,7 +140,7 @@ class Generic_Alarm:
             self.cap = new_cap
 
     def _get_progress_error(self, application_id):
-        progress_error_measurement = self.metric_source.get_most_recent_value(Generic_Alarm.ERROR_METRIC_NAME,
+        progress_error_measurement = self.metric_source.get_most_recent_value(GenericAlarm.ERROR_METRIC_NAME,
                                                                               {"application_id": application_id})
         progress_error_timestamp = progress_error_measurement[0]
         progress_error = progress_error_measurement[1]

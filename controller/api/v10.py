@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from controller.utils.logger import Log
-from controller.utils.logger import configure_logging
 from flask import request
-from controller.service.api import v10 as api
+
 from controller.utils import api as u
+from controller.utils.logger import Log
+from controller.service.api import v10 as api
 
 
 rest = u.Rest('v10', __name__)
@@ -50,4 +50,14 @@ def start_scaling(data, app_id):
 """
 @rest.put('/scaling/<app_id>/stop')
 def stop_scaling(data, app_id):
-    return u.render(api.stop_scaling(data))
+    return u.render(api.stop_scaling(app_id))
+
+
+""" Controller status
+
+    Normal response codes: 202
+    Error response codes: 400
+"""
+@rest.get('/scaling')
+def controller_status():
+    return u.render(api.controller_status())
