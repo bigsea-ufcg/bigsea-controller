@@ -1,4 +1,5 @@
 .tox
+Controller.egg-info/
 .project
 /.pydevproject
 *.log
