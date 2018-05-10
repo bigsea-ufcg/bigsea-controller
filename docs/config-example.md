@@ -1,3 +1,7 @@
+# Config example
+
+## controller.cfg: 
+```
 # Logging configuration
 [logging]
 # Enable logging?
@@ -56,3 +60,4 @@ project_name = <monasca_project_name>
 auth_url = http://<ip>:<port>/v3/
 # Monasca API version.
 api_version = 2_0
+```

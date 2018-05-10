@@ -1,12 +1,15 @@
 # BIGSEA Asperathos - Controller
 
 ## Overview
-The Controller service is responsible for managing the applications performance, adjusting the amount of resources allocated to the virtual infrastructure where the applications run, in order to ensure application’s QoS goals.
+The Controller is responsible for adjusting the amount of resources allocated to the virtual infrastructure where the applications run, in order to guarantee application’s QoS.
 
-To more details about Controller, see [architecture.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/architecture.md)
+To more info, see [details.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/details.md)
 
-## How does it works
-This service includes the *Actuator*, *Controller* and *Metric Source* components. The Controller, based on metrics such as application progress and CPU usage, decides the amount of resources to allocate to the applications. The Actuator is responsible for connecting to the underlying infrastructure (such as a Mesos or an OpenStack Sahara platform) and triggering the commands or API calls that allocate or deallocate resources, based on the Controller’s requests. The Metric Source plugin is responsible for getting application metrics from a metric source, such as Monasca, and returning them to the Controller.
+## How does it works?
+The complete Controller services makes use of three plugins: *Actuator*, *Controller* and *Metric Source*.
+The **Controller**, based on metrics such as application progress and CPU usage, decides the amount of resources to allocate to the applications.
+The **Actuator** is responsible for connecting to the underlying infrastructure (such as a Mesos or an OpenStack Sahara platform) and triggering the commands or API calls that allocate or deallocate resources, based on the Controller’s requests.
+The **Metric Source** plugin is responsible for getting application metrics from a metric source, such as Monasca, and returning them to the Controller.
 
 ## How to develop a plugin
 See [plugin-development.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugin-development.md).
@@ -22,11 +25,11 @@ To **apt** distros, you can use [pre-install.sh](https://github.com/bigsea-ufcg/
 First of all, install **git**. After, you just need to clone the [Controller repository](https://github.com/bigsea-ufcg/bigsea-controller.git) in your machine.
 
 ### Configuration
-A configuration file is required to run the Controller. Edit and fill your controller.cfg in the root of Controller directory. Make sure you have fill up all fields before run.
+A configuration file is required to run the Controller. **Edit and fill your controller.cfg in the root of Controller directory.** Make sure you have fill up all fields before run.
 You can find a template in [config-example.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/config-example.md). 
 
 ### Run
-In the Controller directory, start the service using tox command:
+In the Controller root directory, start the service using tox command:
 ```
 $ tox -e venv -- controller
 ```
@@ -36,14 +39,14 @@ Endpoints is avaliable on [restapi-endpoints.md](https://github.com/bigsea-ufcg/
 
 ## Avaliable plugins
 ### Controller
-* [Progress error](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/progress-error.md)
-* [Proportional](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/proportional-controller.md)
-* [Proportional derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/proportional-derivative-controller.md)
-* [Proportional integrative derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/pid-controller.md)
+* [Progress error](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/progress-error.md)
+* [Proportional](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/proportional-controller.md)
+* [Proportional derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/proportional-derivative-controller.md)
+* [Proportional integrative derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/pid-controller.md)
 
 ### Actuator
-* [KVM](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/kvm-actuator.md)
-* [KVM I/O](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/kvm-io-actuator.md)
+* [KVM](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/kvm-actuator.md)
+* [KVM I/O](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/kvm-io-actuator.md)
 
 ### Metric source
-* [Monasca](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/monasca-metric-source.md)
+* [Monasca](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/monasca-metric-source.md)
