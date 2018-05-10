@@ -11,7 +11,7 @@ The **Controller**, based on metrics such as application progress and CPU usage,
 The **Actuator** is responsible for connecting to the underlying infrastructure (such as a Mesos or an OpenStack Sahara platform) and triggering the commands or API calls that allocate or deallocate resources, based on the Controller’s requests.
 The **Metric Source** plugin is responsible for getting application metrics from a metric source, such as Monasca, and returning them to the Controller.
 
-## How to develop a plugin
+## How to develop a plugin?
 See [plugin-development.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugin-development.md).
 
 ## Requirements
