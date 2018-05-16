@@ -26,40 +26,42 @@ from controller.exceptions.monasca import MetricNotFoundException
 
 class ProportionalController(Controller):
 
-    def __init__(self, application_id, parameters):
+    def __init__(self, application_id, plugin_info):
         self.logger = ScalingLog(
             "proportional.controller.log", "controller.log", application_id)
 
-        scaling_parameters = parameters["scaling_parameters"]
-
         self.application_id = application_id
-        # read scaling parameters
-        self.instances = scaling_parameters["instances"]
-        self.check_interval = scaling_parameters["check_interval"]
-        self.trigger_down = scaling_parameters["trigger_down"]
-        self.trigger_up = scaling_parameters["trigger_up"]
-        self.min_cap = scaling_parameters["min_cap"]
-        self.max_cap = scaling_parameters["max_cap"]
-        self.metric_rounding = scaling_parameters["metric_rounding"]
-        # The actuator plugin name
-        self.actuator_type = scaling_parameters["actuator"]
-        # The metric source plugin name
-        self.metric_source_type = scaling_parameters["metric_source"]
-        self.heuristic_options = scaling_parameters["heuristic_options"]
+        self.instances = plugin_info["instances"]
+        self.check_interval = plugin_info["check_interval"]
+        self.trigger_down = plugin_info["trigger_down"]
+        self.trigger_up = plugin_info["trigger_up"]
+        self.min_cap = plugin_info["min_cap"]
+        self.max_cap = plugin_info["max_cap"]
+        self.metric_rounding = plugin_info["metric_rounding"]
+        self.actuator_type = plugin_info["actuator"]
+        self.metric_source_type = plugin_info["metric_source"]
+        self.heuristic_options = plugin_info["heuristic_options"]
 
-        # We use a lock here to prevent race conditions when stopping the controller
+        # We use a lock here to prevent race conditions when stop the controller
         self.running = True
         self.running_lock = threading.RLock()
 
         # Gets a new metric source plugin using the given name
         metric_source = MetricSourceBuilder().get_metric_source(
-            self.metric_source_type, parameters)
+            self.metric_source_type, plugin_info)
+
         # Gets a new actuator plugin using the given name
-        actuator = ActuatorBuilder().get_actuator(self.actuator_type, parameters)
-        # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
-        self.alarm = ProportionalAlarm(actuator, metric_source, self.trigger_down, self.trigger_up,
-                                        self.min_cap, self.max_cap, self.metric_rounding, self.heuristic_options,
-                                        self.application_id, self.instances)
+        actuator = ActuatorBuilder().get_actuator(self.actuator_type,
+                                                  plugin_info)
+
+        """ The alarm here is responsible for deciding whether to scale up or
+            down or even do nothing """
+        self.alarm = ProportionalAlarm(actuator, metric_source,
+                                       self.trigger_down, self.trigger_up,
+                                       self.min_cap, self.max_cap,
+                                       self.metric_rounding,
+                                       self.heuristic_options,
+                                       self.application_id, self.instances)
 
     def start_application_scaling(self):
         run = True

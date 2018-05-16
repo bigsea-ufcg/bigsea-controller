@@ -25,6 +25,8 @@ config.read('./controller.cfg')
 host = config.get("flask", "host")
 port = config.getint("flask", "port")
 
+authorization_url = config.get("authorization", "authorization_url")
+
 monasca_endpoint = config.get('monasca', 'monasca_endpoint')
 monasca_username = config.get('monasca', 'username')
 monasca_password = config.get('monasca', 'password')

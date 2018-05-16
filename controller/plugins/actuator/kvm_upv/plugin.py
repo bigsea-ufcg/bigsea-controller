@@ -20,9 +20,6 @@ import ConfigParser
 import paramiko
 
 
-# TODO: documentation
-
-
 class KVMUPVActuator(Actuator):
 
     def __init__(self, iops_reference, bs_reference):
@@ -33,14 +30,16 @@ class KVMUPVActuator(Actuator):
         self.one_user = self.config.get("actuator", "one_username")
         self.one_password = self.config.get("actuator", "one_password")
         self.one_url = self.config.get("actuator", "one_url")
-        self.compute_nodes_frontend = self.config.get("actuator", "compute_nodes_frontend")
+        self.compute_nodes_frontend = self.config.get("actuator",
+                                                      "compute_nodes_frontend")
         self.iops_reference = iops_reference
         self.bs_reference = bs_reference
 
     def _connect(self):
-        self.conn.connect(hostname=self.config.get("actuator", "access_ip"),
-                          username=self.config.get("actuator", "access_username"),
-                          password=self.config.get("actuator", "access_password"))
+        self.conn.connect(
+            hostname=self.config.get("actuator", "access_ip"),
+            username=self.config.get("actuator", "access_username"),
+            password=self.config.get("actuator", "access_password"))
 
     # TODO: validation
     def prepare_environment(self, vm_data):
@@ -76,15 +75,20 @@ class KVMUPVActuator(Actuator):
 
         # List all the vms to get the ONE id and map with the KVM id
         virsh_list = "virsh list"
-        command = ("ssh root@%s \'ssh %s \"%s\"\'" % (self.compute_nodes_frontend, host, virsh_list))
+        command = ("ssh root@%s \'ssh %s \"%s\"\'"
+                   % (self.compute_nodes_frontend,
+                      host,
+                      virsh_list))
+
         stdin, stdout, stderr = self.conn.exec_command(command)
 
         vm_list = stdout.read().split("\n")
         virsh_id = self._extract_id(vm_list, vm_id)
-        virsh_schedinfo = (("virsh schedinfo %s | grep vcpu_quota " % (virsh_id)) +
-                            "| awk \'{print $3}\'")
+        virsh_schedinfo = (("virsh schedinfo %s | grep vcpu_quota "
+                            % (virsh_id)) + "| awk \'{print $3}\'")
 
-        command = ("ssh root@%s \'ssh %s \'%s\'\'" % (self.compute_nodes_frontend, host, virsh_schedinfo))
+        command = ("ssh root@%s \'ssh %s \'%s\'\'"
+                   % (self.compute_nodes_frontend, host, virsh_schedinfo))
 
         stdin, stdout, stderr = self.conn.exec_command(command)
 
@@ -111,7 +115,8 @@ class KVMUPVActuator(Actuator):
     def _change_vcpu_quota(self, host, vm_id, cap):
         # ssh for the actual host
         virsh_list = "virsh list"
-        command = ("ssh root@%s \'ssh %s \"%s\"\'" % (self.compute_nodes_frontend, host, virsh_list))
+        command = ("ssh root@%s \'ssh %s \"%s\"\'"
+                   % (self.compute_nodes_frontend, host, virsh_list))
 
         # List all the vms to get the ONE id and map with the KVM id
         stdin, stdout, stderr = self.conn.exec_command(command)
@@ -119,13 +124,17 @@ class KVMUPVActuator(Actuator):
         virsh_id = self._extract_id(vm_list, vm_id)
 
         virsh_cap = "virsh schedinfo %s | awk 'FNR == 3 {print $3}'" % virsh_id
-        command = ("ssh root@%s \'ssh %s \'%s\'\'" % (self.compute_nodes_frontend, host, virsh_cap))
+        command = ("ssh root@%s \'ssh %s \'%s\'\'"
+                   % (self.compute_nodes_frontend, host, virsh_cap))
+
         stdin, stdout, stderr = self.conn.exec_command(command)
 
         virsh_schedinfo = (("virsh schedinfo %s" % virsh_id) +
-                           (" --set vcpu_quota=$(( %s * 1000 ))" % (cap)) + " > /dev/null")
+                           (" --set vcpu_quota=$(( %s * 1000 ))" % (cap)) +
+                            " > /dev/null")
 
-        command = ("ssh root@%s \'ssh %s \'%s\'\'" % (self.compute_nodes_frontend, host, virsh_schedinfo))
+        command = ("ssh root@%s \'ssh %s \'%s\'\'"
+                   % (self.compute_nodes_frontend, host, virsh_schedinfo))
 
         print "_change_vcpu_quota: id: %s - cap: %s" % (vm_id, cap * 1000)
 
@@ -134,7 +143,8 @@ class KVMUPVActuator(Actuator):
 
     def _change_io_quota(self, host, vm_id, cap):
         virsh_list = "virsh list"
-        command = ("ssh root@%s \'ssh %s \"%s\"\'" % (self.compute_nodes_frontend, host, virsh_list))
+        command = ("ssh root@%s \'ssh %s \"%s\"\'"
+                   % (self.compute_nodes_frontend, host, virsh_list))
 
         # List all the vms to get the ONE id and map with the KVM id
         stdin, stdout, stderr = self.conn.exec_command(command)
@@ -142,24 +152,33 @@ class KVMUPVActuator(Actuator):
         virsh_id = self._extract_id(vm_list, vm_id)
 
         # Get device to set cap
-        command_get_block_device = "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (virsh_id)
-        command = ("ssh root@%s \'ssh %s \'%s\'\'" % (self.compute_nodes_frontend, host, command_get_block_device))
+        command_get_block_device = (
+            "virsh domblklist %s | awk 'FNR == 3 {print $1}'" % (virsh_id)
+        )
+
+        command = ("ssh root@%s \'ssh %s \'%s\'\'"
+                   % (self.compute_nodes_frontend,
+                      host,
+                      command_get_block_device))
+
         stdin, stdout, stderr = self.conn.exec_command(command)
         block_device = stdout.read().strip()
 
         command_iops_quota = (cap * self.iops_reference) / 100
         command_bs_quota = (cap * self.bs_reference) / 100
 
-        command_set_io_quota = "virsh blkdeviotune %s %s "\
-                               "--current --total_iops_sec %s "\
-                               "--total_bytes_sec %s" % (virsh_id, block_device,
-                                                         command_iops_quota,
-                                                         command_bs_quota)
-        command = ("ssh root@%s \'ssh %s \'%s\'\'" % (self.compute_nodes_frontend, host, command_set_io_quota))
+        command_set_io_quota = ("virsh blkdeviotune %s %s "\
+                                "--current --total_iops_sec %s "\
+                                "--total_bytes_sec %s"
+                                % (virsh_id, block_device,
+                                   command_iops_quota,
+                                   command_bs_quota))
 
-        print "_change_io_quota: id: %s - iops: %s - bs: %s" % (virsh_id,
-                                                                str(command_iops_quota),
-                                                                str(command_bs_quota))
+        command = ("ssh root@%s \'ssh %s \'%s\'\'" 
+                   % (self.compute_nodes_frontend, host, command_set_io_quota))
+
+        print ("_change_io_quota: id: %s - iops: %s - bs: %s"
+               % (virsh_id, str(command_iops_quota), str(command_bs_quota)))
 
         # Set I/O cap
         self.conn.exec_command(command)
@@ -167,7 +186,9 @@ class KVMUPVActuator(Actuator):
     def _find_host(self, vm_id):
         list_vms = ("onevm show %s --user %s " +
                     "--password %s --endpoint %s") % (vm_id, self.one_user,
-                                                      self.one_password, self.one_url)
+                                                      self.one_password,
+                                                      self.one_url)
+
         stdin, stdout, stderr = self.conn.exec_command(list_vms)
 
         for line in stdout.read().split('\n'):

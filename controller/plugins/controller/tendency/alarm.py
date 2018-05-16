@@ -22,9 +22,9 @@ class TendencyAwareProportionalAlarm:
 
     ERROR_METRIC_NAME = "application-progress.error"
 
-    def __init__(self, actuator, metric_source, trigger_down, trigger_up, min_cap, max_cap,
-                 actuation_size, metric_rounding):
-        # TODO: Check parameters
+    def __init__(self, actuator, metric_source, trigger_down, trigger_up,
+                 min_cap, max_cap, actuation_size, metric_rounding):
+
         self.metric_source = metric_source
         self.actuator = actuator
         self.trigger_down = trigger_down
@@ -48,15 +48,14 @@ class TendencyAwareProportionalAlarm:
     def check_application_state(self, application_id, instances):
         """
             Checks the application progress by getting progress metrics from a
-            metric source, checks if the metrics are new and tries to modify the
-            amount of allocated resources if necessary.
+            metric source, checks if the metrics are new and tries to modify
+            the amount of allocated resources if necessary.
         """
 
-        # TODO: Check parameters
         self.logger.log("Getting progress error")
         self.last_action = "getting progress error"
-        # Get the progress error value and timestamp
 
+        # Get the progress error value and timestamp
         progress_error_timestamp, progress_error = self._get_progress_error(
             application_id)
         self.logger.log("Progress error-[%s]-%f" %
@@ -64,7 +63,8 @@ class TendencyAwareProportionalAlarm:
         self.last_action = "Progress error-[%s]-%f" % (
             str(progress_error_timestamp), progress_error)
 
-        # Check if the metric is new by comparing the timestamps of the current metric and most recent metric
+        """ Check if the metric is new by comparing the timestamps of the
+            current metric and most recent metric """
         if self._check_measurements_are_new(progress_error_timestamp):
             self._scale(progress_error, instances)
 
@@ -78,9 +78,11 @@ class TendencyAwareProportionalAlarm:
             self.logger.log("Could not acquire more recent metrics")
 
     def _scale(self, progress_error, instances):
-        # If the error is positive and its absolute value is too high, scale down
+
+        # If error is positive and its absolute value is too high, scale down
         if progress_error > 0 and progress_error >= self.trigger_down:
             self._scale_down(instances)
+
         # If the error is negative and its absolute value is too high, scale up
         elif progress_error < 0 and abs(progress_error) >= self.trigger_up:
             self._scale_up(instances)
@@ -155,8 +157,11 @@ class TendencyAwareProportionalAlarm:
 
     def _get_progress_error(self, application_id):
         progress_error_measurement = \
-            self.metric_source.get_most_recent_value(TendencyAwareProportionalAlarm.ERROR_METRIC_NAME,
-                                                     {"application_id": application_id})
+            self.metric_source.get_most_recent_value(
+                TendencyAwareProportionalAlarm.ERROR_METRIC_NAME,
+                {"application_id": application_id}
+            )
+
         progress_error_timestamp = progress_error_measurement[0]
         progress_error = progress_error_measurement[1]
         progress_error = round(progress_error, self.metric_rounding)

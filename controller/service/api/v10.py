@@ -17,6 +17,10 @@ from flask import request
 from controller.plugins.actuator.builder import ActuatorBuilder
 from controller.plugins.controller.builder import ControllerBuilder
 from controller.utils.logger import Log
+from controller.utils import authorizer
+from controller.service import api
+import time
+from threading import Thread
 
 
 API_LOG = Log("APIv10", "APIv10.log")
@@ -28,32 +32,57 @@ actuator_builder = ActuatorBuilder()
 
 
 def setup_environment(data):
-    data = request.json
+    if ('actuator_plugin' not in data or 'instances_cap' not in data
+    or 'username' not in data or 'password' not in data):
+        API_LOG.log("Missing parameters in request")
+        raise ex.BadRequestException()
 
-    plugin = data["actuator"]
-    actuator = actuator_builder.get_actuator(plugin, data)
+    username = data['username']
+    password = data['password']
 
-    API_LOG.log("%s-Preparing environment for instances %s" %
-	       (time.strftime("%H:%M:%S"), str(data)))
+    authorization = authorizer.get_authorization(api.authorization_url,
+                                                 username, password)
 
-    try:
-	actuator.adjust_resources(data['instances_cap'])
-    except Exception as e:
-	API_LOG.log(str(e))
+    if not authorization['success']:
+        API_LOG.log("Unauthorized request")
+        raise ex.UnauthorizedException()
 
-    return "prepared_environment"
+    else:
+        plugin = data['actuator_plugin']
+        instances_cap = data['instances_cap']
+     
+        actuator = actuator_builder.get_actuator(plugin)
+        try:
+            actuator.adjust_resources(instances_cap)
+        except Exception as e:
+            API_LOG.log(str(e))
 
 
 def start_scaling(app_id, data):
-    API_LOG.log("Adding application id: %s" % (app_id))
+    if ('plugin' not in data or 'plugin_info' not in data
+    or 'username' not in data or 'password' not in data):
+        API_LOG.log("Missing parameters in request")
+        raise ex.BadRequestException()
 
-    plugin = data["scaler_plugin"]
-    controller = controller_builder.get_controller(plugin, app_id, data)
-    executor = threading.Thread(
-                            target=controller.start_application_scaling)
+    username = data['username']
+    password = data['password']
 
-    executor.start()
-    scaled_apps[app_id] = controller
+    authorization = authorizer.get_authorization(api.authorization_url,
+                                                 username, password)
+
+    if not authorization['success']:
+        API_LOG.log("Unauthorized request")
+        raise ex.UnauthorizedException()
+
+    else:
+        plugin = data["plugin"]
+        plugin_info = data['plugin_info']
+
+        controller = controller_builder.get_controller(plugin, app_id, plugin_info)
+        executor = Thread(target=controller.start_application_scaling)
+
+        executor.start()
+        scaled_apps[app_id] = controller
 
 
 def stop_scaling(app_id):

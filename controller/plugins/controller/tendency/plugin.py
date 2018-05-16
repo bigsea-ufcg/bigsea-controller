@@ -27,45 +27,50 @@ from controller.plugins.controller.tendency.alarm import (
 
 class TendencyAwareProportionalController(Controller):
 
-    def __init__(self, application_id, parameters):
+    def __init__(self, application_id, plugin_info):
         self.logger = Log(
             "tendency.proportional.controller.log", "controller.log")
         configure_logging()
 
-        scaling_parameters = parameters["scaling_parameters"]
+        plugin_info = plugin_info["plugin_info"]
 
         self.application_id = application_id
-        # read scaling parameters
-        self.instances = scaling_parameters["instances"]
-        self.check_interval = scaling_parameters["check_interval"]
-        self.trigger_down = scaling_parameters["trigger_down"]
-        self.trigger_up = scaling_parameters["trigger_up"]
-        self.min_cap = scaling_parameters["min_cap"]
-        self.max_cap = scaling_parameters["max_cap"]
-        self.metric_rounding = scaling_parameters["metric_rounding"]
-        self.actuation_size = scaling_parameters["actuation_size"]
-        # The actuator plugin name
-        self.actuator_type = scaling_parameters["actuator"]
-        # The metric source plugin name
-        self.metric_source_type = scaling_parameters["metric_source"]
+        self.instances = plugin_info["instances"]
+        self.check_interval = plugin_info["check_interval"]
+        self.trigger_down = plugin_info["trigger_down"]
+        self.trigger_up = plugin_info["trigger_up"]
+        self.min_cap = plugin_info["min_cap"]
+        self.max_cap = plugin_info["max_cap"]
+        self.metric_rounding = plugin_info["metric_rounding"]
+        self.actuation_size = plugin_info["actuation_size"]
+        self.actuator_type = plugin_info["actuator"]
+        self.metric_source_type = plugin_info["metric_source"]
 
-        # We use a lock here to prevent race conditions when stopping the controller
         self.running = True
         self.running_lock = threading.RLock()
 
         # Gets a new metric source plugin using the given name
         metric_source = MetricSourceBuilder().get_metric_source(
-            self.metric_source_type, parameters)
+                            self.metric_source_type, plugin_info
+                        )
+
         # Gets a new actuator plugin using the given name
-        actuator = ActuatorBuilder().get_actuator(self.actuator_type, parameters)
-        # The alarm here is responsible for deciding whether to scale up or down, or even do nothing
-        self.alarm = TendencyAwareProportionalAlarm(actuator, metric_source, self.trigger_down,
-                                                       self.trigger_up, self.min_cap, self.max_cap,
-                                                       self.actuation_size, self.metric_rounding)
+        actuator = ActuatorBuilder().get_actuator(self.actuator_type,
+                                                  plugin_info)
+
+        """ The alarm here is responsible for deciding whether to scale up or
+            down, or even do nothing """
+        self.alarm = TendencyAwareProportionalAlarm(actuator, metric_source,
+                                                    self.trigger_down,
+                                                    self.trigger_up,
+                                                    self.min_cap,
+                                                    self.max_cap,
+                                                    self.actuation_size,
+                                                    self.metric_rounding)
 
     def start_application_scaling(self):
         run = True
-        # FIXME: add exception handling
+
         while run:
             self.logger.log("Monitoring application: %s" %
                             (self.application_id))

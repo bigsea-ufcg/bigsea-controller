@@ -18,7 +18,7 @@ import traceback
 import flask
 from werkzeug import datastructures
 
-from controller import exceptions as ex
+from controller.exceptions import api as ex
 from controller.utils import serializer as u_serializer
 from controller.utils.logger import *
 
@@ -79,8 +79,6 @@ class Rest(flask.Blueprint):
                 except ex.Forbidden as e:
                     return access_denied(e)
                 except ex.BadRequestException as e:
-                    return bad_request(e)
-                except ex.SaharaException as e:
                     return bad_request(e)
                 except Exception as e:
                     return internal_error(500, 'Internal Server Error', e)

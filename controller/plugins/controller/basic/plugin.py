@@ -25,25 +25,23 @@ from controller.utils.logger import Log, configure_logging
 # It should be removed in the future.
 class BasicController(Controller):
 
-    def __init__(self, metric_source, actuator, parameters):
+    def __init__(self, metric_source, actuator, plugin_info):
         # Set up logging
         self.logger = Log("basic.controller.log", "controller.log")
         configure_logging()
 
-        scaling_parameters = parameters["scaling_parameters"]
-
-        check_interval = scaling_parameters["check_interval"]
-        trigger_down = scaling_parameters["trigger_down"]
-        trigger_up = scaling_parameters["trigger_up"]
-        min_cap = scaling_parameters["min_cap"]
-        max_cap = scaling_parameters["max_cap"]
-        actuation_size = scaling_parameters["actuation_size"]
-        metric_rounding = scaling_parameters["metric_rounding"]
+        check_interval = plugin_info["check_interval"]
+        trigger_down = plugin_info["trigger_down"]
+        trigger_up = plugin_info["trigger_up"]
+        min_cap = plugin_info["min_cap"]
+        max_cap = plugin_info["max_cap"]
+        actuation_size = plugin_info["actuation_size"]
+        metric_rounding = plugin_info["metric_rounding"]
 
         # Start alarm
-        self.alarm = Basic_Alarm(actuator, metric_source, trigger_down,
-                                 trigger_up, min_cap, max_cap, actuation_size,
-                                 metric_rounding)
+        self.alarm = BasicAlarm(actuator, metric_source, trigger_down,
+                                trigger_up, min_cap, max_cap, actuation_size,
+                                metric_rounding)
 
         # Start up controller thread
         # Create lock to access application list
@@ -56,11 +54,11 @@ class BasicController(Controller):
         self.controller_thread = threading.Thread(target=self.controller.start)
         self.controller_thread.start()
 
-    def start_application_scaling(self, app_id, parameters):
+    def start_application_scaling(self, app_id, plugin_info):
         self.logger.log("Adding application id: %s" % (app_id))
         # Acquire lock and add application
         with self.applications_lock:
-            self.applications[app_id] = parameters
+            self.applications[app_id] = plugin_info
 
     def stop_application_scaling(self, app_id):
         #  Acquire lock and remove application

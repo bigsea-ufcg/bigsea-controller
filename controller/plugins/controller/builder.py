@@ -37,37 +37,37 @@ class ControllerBuilder:
     def __init__(self):
         pass
 
-    def get_controller(self, name, application_id, parameters):
+    def get_controller(self, name, app_id, plugin_info):
         if name == "basic":
-            metric_source_type = parameters["policy"]["metric_source"]
-            actuator_type = parameters["policy"]["actuator"]
+            metric_source_type = plugin_info["policy"]["metric_source"]
+            actuator_type = plugin_info["policy"]["actuator"]
 
             metric_source = MetricSourceBuilder().get_metric_source(
                                 metric_source_type)
 
             actuator = ActuatorBuilder().get_actuator(actuator_type)
 
-            return BasicController(metric_source, actuator, parameters)
+            return BasicController(metric_source, actuator, plugin_info)
 
         elif name == "single":
-            return SingleApplicationController(application_id, parameters)
+            return SingleApplicationController(app_id, plugin_info)
 
         elif name == "progress_error":
-            return GenericController(application_id, parameters)
+            return GenericController(app_id, plugin_info)
 
         elif name == "proportional":
-            return ProportionalController(application_id, parameters)
+            return ProportionalController(app_id, plugin_info)
 
         elif name == "proportional_derivative":
-            return ProportionalDerivativeController(application_id,
-                                                    parameters)
+            return ProportionalDerivativeController(app_id,
+                                                    plugin_info)
 
         elif name == "pid":
-            return PIDController(application_id, parameters)
+            return PIDController(app_id, plugin_info)
 
         elif name == "progress_tendency":
-            return TendencyAwareProportionalController(application_id,
-                                                          parameters)
+            return TendencyAwareProportionalController(app_id,
+                                                          plugin_info)
 
         else:
             # FIXME: exception type

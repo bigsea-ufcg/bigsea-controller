@@ -4,11 +4,11 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 setup(
-    name='Controller',
+    name='controller',
 
     version='0.1.0',
 
-    description='Controllering component',
+    description='Controller component of BIGSEA Asperathos framework',
 
     url='',
 

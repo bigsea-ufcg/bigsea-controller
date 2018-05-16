@@ -18,29 +18,16 @@ from controller.exceptions.kvm import InstanceNotFoundException
 from controller.exceptions.infra import AuthorizationFailedException
 from controller.utils.authorizer import Authorizer
 
-# TODO: documentation
-
 
 class KVMActuator(Actuator):
-
-    def __init__(self, instance_locator, remote_kvm, authorization_data, default_io_cap):
+    def __init__(self, instance_locator, remote_kvm, default_io_cap):
         self.instance_locator = instance_locator
         self.remote_kvm = remote_kvm
-        self.authorizer = Authorizer()
-        self.auth_data = authorization_data
         self.default_io_cap = default_io_cap
 
     # TODO: validation
     # This method receives as argument a map {vm-id:CPU cap}
     def adjust_resources(self, vm_data):
-        authorization = self.authorizer.get_authorization(
-            self.auth_data['authorization_url'],
-            self.auth_data['bigsea_username'],
-            self.auth_data['bigsea_password']
-        )
-
-        if not authorization['success']:
-            raise AuthorizationFailedException()
 
         # Discover vm_id - compute nodes map
         for instance in vm_data.keys():
@@ -52,19 +39,12 @@ class KVMActuator(Actuator):
                     instance_location, instance, int(vm_data[instance]))
                 self.remote_kvm.change_io_quota(
                     instance_location, instance, self.default_io_cap)
+
             except InstanceNotFoundException:
                 print "instance not found:%s" % (instance)
 
     # TODO: validation
     def get_allocated_resources(self, vm_id):
-        authorization = self.authorizer.get_authorization(
-            self.auth_data['authorization_url'],
-            self.auth_data['bigsea_username'],
-            self.auth_data['bigsea_password']
-        )
-
-        if not authorization['success']:
-            raise AuthorizationFailedException()
 
         # Access compute nodes to discover vm location
         host = self.instance_locator.locate(vm_id)

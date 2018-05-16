@@ -13,14 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from controller.utils.monasca.monitor import MonascaMonitor
+from controller.utils.monasca.client import MonascaClient
 from controller.plugins.metric_source.base import MetricSource
 import datetime
 
 
 class MonascaMetricSource(MetricSource):
     def __init__(self, parameters):
-        self.monasca = MonascaMonitor()
+        self.monasca = MonascaClient()
         self.parameters = parameters
 
     def get_most_recent_value(self, metric_name, options):
