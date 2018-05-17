@@ -26,7 +26,7 @@ rest = u.Rest('v10', __name__)
 """ Setup environment.
 
     Normal response codes: 204
-    Error response codes: 400
+    Error response codes: 400, 401
 """
 @rest.post('/setup', 204)
 def setup_environment(data):
@@ -36,7 +36,7 @@ def setup_environment(data):
 """ Start scaling.
 
     Normal response codes: 204
-    Error response codes: 400
+    Error response codes: 400, 401
 """
 @rest.post('/scaling/<app_id>', 204)
 def start_scaling(app_id, data):
@@ -46,11 +46,11 @@ def start_scaling(app_id, data):
 """ Stop scaling.
 
     Normal response codes: 204
-    Error response codes: 400
+    Error response codes: 400, 401
 """
 @rest.put('/scaling/<app_id>/stop')
 def stop_scaling(app_id, data):
-    return u.render(api.stop_scaling(app_id))
+    return u.render(api.stop_scaling(app_id, data))
 
 
 """ Controller status.

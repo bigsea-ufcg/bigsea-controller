@@ -87,16 +87,31 @@ def start_scaling(app_id, data):
         scaled_apps[app_id] = controller
 
 
-def stop_scaling(app_id):
-    if app_id in scaled_apps:
-        API_LOG.log("Removing application id: %s" % (app_id))
+def stop_scaling(app_id, data):
+    if ('plugin' not in data or 'password' not in data):
+        API_LOG.log("Missing parameters in request")
+        raise ex.BadRequestException()
 
-        executor = scaled_apps[app_id]
-        executor.stop_application_scaling()
-        scaled_apps.pop(app_id)
+    username = data['username']
+    password = data['password']
+
+    authorization = authorizer.get_authorization(api.authorization_url,
+                                                 username, password)
+
+    if not authorization['success']:
+        API_LOG.log("Unauthorized request")
+        raise ex.UnauthorizedException()
 
     else:
-        API_LOG.log("Application %s not found" % (app_id))
+        if app_id in scaled_apps:
+            API_LOG.log("Removing application id: %s" % (app_id))
+
+            executor = scaled_apps[app_id]
+            executor.stop_application_scaling()
+            scaled_apps.pop(app_id)
+
+        else:
+            raise ex.BadRequestException()
 
 
 def controller_status():

@@ -3,7 +3,7 @@
 ## Overview
 The Controller is responsible for adjusting the amount of resources allocated to the virtual infrastructure where the applications run, in order to guarantee application’s QoS.
 
-To more info, see [details.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/details.md)
+To more info about Broker and how does it works in BIGSEA Asperathos environment, see [details.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/details.md) and [asperathos-workflow.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/asperathos-workflow.md).
 
 ## How does it works?
 The controller is implemented following a **plugin architecture**, providing flexibility to add or remove plugins when necessary. It works with usage of three types of plugins: **Actuator**, **Controller** and **Metric Source**.
