@@ -6,13 +6,9 @@ This plugin uses ssh to access instances in remote hosts and modify the amount o
 
 The "kvm" plugin requires the following parameters in "controller.cfg"
 
-#### compute_nodes
+* **compute_nodes**: The ips of the compute nodes, separated by comma.
 
-The ips of the compute nodes, separated by comma.
-
-#### keypair_compute_nodes
-
-The path of the key used to access the compute nodes.
+* **keypair_compute_nodes**: The path of the key used to access the compute nodes.
 
 ### Example 
 
