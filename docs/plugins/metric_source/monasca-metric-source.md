@@ -1,21 +1,14 @@
 # Metric Source plugin - "monasca"
-
 This plugin uses the monasca client library to get metrics from an available monasca deployment.
 
 ## Configuration
-
-The "monasca" plugin requires the following parameters in "scaler.cfg"
+The "monasca" plugin requires the following parameters in "controller.cfg"
 
 * **monasca_endpoint**: The endpoint for the Monasca's service.
-
 * **username**: The username with permissions to publish and get metrics from monasca.
-
 * **password**: The above-mentioned user's password.
-
 * **project_name**: The above-mentioned user's keystone project.
-
 * **auth_url**: The keystone authentication endpoint.
-
 * **api_version**: Monasca API version.
 
 ## Example

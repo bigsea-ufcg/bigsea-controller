@@ -1,13 +1,10 @@
 # Actuator plugin - "kvm"
-
 This plugin uses ssh to access instances in remote hosts and modify the amount of allocated resources.
 
 ## Configuration
-
 The "kvm" plugin requires the following parameters in "controller.cfg"
 
 * **compute_nodes**: The ips of the compute nodes, separated by comma.
-
 * **keypair_compute_nodes**: The path of the key used to access the compute nodes.
 
 ### Example 
