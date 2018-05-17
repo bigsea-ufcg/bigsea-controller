@@ -3,7 +3,7 @@
 ## Overview
 The Controller is responsible for adjusting the amount of resources allocated to the virtual infrastructure where the applications run, in order to guarantee application’s QoS.
 
-To more info, see [details.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/details.md)
+To more info, see [details.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/details.md)
 
 ## How does it works?
 The controller is implemented following a **plugin architecture**, providing flexibility to add or remove plugins when necessary. It works with usage of three types of plugins: **Actuator**, **Controller** and **Metric Source**.
@@ -12,41 +12,46 @@ The controller is implemented following a **plugin architecture**, providing fle
 * The **Metric Source** plugin is responsible for getting application metrics from a metric source, such as Monasca, and returning them to the Controller.
 
 ## How to develop a plugin?
-See [plugin-development.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugin-development.md).
+See [plugin-development.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugin-development.md).
 
 ## Requirements
 * Python 2.7 or Python 3.5
 * Linux packages: python-dev and python-pip
 * Python packages: setuptools, tox and flake8
 
-To **apt** distros, you can use [pre-install.sh](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/tools/pre-install.sh) to install the requirements.
+To **apt** distros, you can use [pre-install.sh](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/tools/pre-install.sh) to install the requirements.
 
 ## Install
-First of all, install **git**. After, you just need to clone the [Controller repository](https://github.com/bigsea-ufcg/bigsea-controller.git) in your machine.
+Clone the [Controller repository](https://github.com/bigsea-ufcg/bigsea-controller.git) in your machine.
 
 ### Configuration
 A configuration file is required to run the Controller. **Edit and fill your controller.cfg in the root of Controller directory.** Make sure you have fill up all fields before run.
-You can find a template in [config-example.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/config-example.md). 
+You can find a template in [config-example.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/config-example.md). 
 
 ### Run
-In the Controller root directory, start the service using tox command:
+In the Controller root directory, start the service using run script:
+```
+$ ./run.sh
+```
+
+Or using tox command:
 ```
 $ tox -e venv -- controller
 ```
 
 ## Controller REST API
-Endpoints is avaliable on [restapi-endpoints.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/restapi-endpoints.md) documentation.
+Endpoints are avaliable on [restapi-endpoints.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/restapi-endpoints.md) documentation.
 
 ## Avaliable plugins
 ### Controller
-* [Progress error](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/progress-error.md)
-* [Proportional](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/proportional-controller.md)
-* [Proportional derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/proportional-derivative-controller.md)
-* [Proportional integrative derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/pid-controller.md)
+* [Progress error](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/progress-error.md)
+* [Proportional](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/proportional-controller.md)
+* [Proportional derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/proportional-derivative-controller.md)
+* [Proportional integrative derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/pid-controller.md)
 
 ### Actuator
-* [KVM](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/kvm-actuator.md)
-* [KVM I/O](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/kvm-io-actuator.md)
+* [KVM](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/kvm-actuator.md)
+* [KVM I/O](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/kvm-io-actuator.md)
 
 ### Metric source
-* [Monasca](https://github.com/bigsea-ufcg/bigsea-controller/tree/refactor/docs/plugins/monasca-metric-source.md)
+* [Monasca](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/monasca-metric-source.md)
