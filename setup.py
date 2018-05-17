@@ -8,7 +8,7 @@ setup(
 
     version='0.1.0',
 
-    description='Controller component of BIGSEA Asperathos framework',
+    description='Controller component of BIGSEA Asperathos',
 
     url='',
 

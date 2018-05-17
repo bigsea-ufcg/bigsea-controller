@@ -78,7 +78,9 @@ def start_scaling(app_id, data):
         plugin = data["plugin"]
         plugin_info = data['plugin_info']
 
-        controller = controller_builder.get_controller(plugin, app_id, plugin_info)
+        controller = controller_builder.get_controller(plugin, app_id,
+                                                       plugin_info)
+
         executor = Thread(target=controller.start_application_scaling)
 
         executor.start()

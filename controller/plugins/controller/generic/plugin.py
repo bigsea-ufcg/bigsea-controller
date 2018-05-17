@@ -22,6 +22,7 @@ from controller.plugins.controller.base import Controller
 from controller.plugins.controller.generic.alarm import GenericAlarm
 from controller.utils.logger import ScalingLog
 
+
 """ This class dictates the pace of the scaling process. It controls when
     GenericAlarm is called to check application state and when
     is necessary to wait. """
@@ -54,8 +55,7 @@ class GenericController(Controller):
             self.metric_source_type, plugin_info)
 
         # Gets a new actuator plugin using the given name
-        actuator = ActuatorBuilder().get_actuator(self.actuator_type,
-                                                  plugin_info)
+        actuator = ActuatorBuilder().get_actuator(self.actuator_type)
 
         """ The alarm here is responsible for deciding whether to scale up
             or down, or even do nothing """

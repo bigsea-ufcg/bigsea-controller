@@ -26,7 +26,9 @@ class Authorizer:
     def get_authorization(self, authorizer_url, username, password):
         data = self._get_authorization_data(username, password)
         r = requests.post(authorizer_url, data=data)
-        content_dict = eval(r.content.replace("true", "True").replace("false", "False"))
+        content_dict = eval(r.content.replace("true", "True").\
+                           replace("false", "False"))
+
         return content_dict
 
 def get_authorization(authorizer_url, username, password):
