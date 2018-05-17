@@ -1,38 +1,31 @@
-1. Write a new python class
+# Plugin development
+This is an important step to enjoy all flexibility and features that this framework provides.
 
-It must implement the methods __init__, start_application_scaling and stop_application_scaling.
+## The Controller, Actuator and Metric Source
+The controller is implemented following a **plugin architecture**, providing flexibility to add or remove plugins when necessary. It works with usage of three types of plugins: **Actuator**, **Controller** and **Metric Source**.
+* The **Controller**, based on metrics such as application progress and CPU usage, decides the amount of resources to allocate to the applications.
+* The **Actuator** is responsible for connecting to the underlying infrastructure (such as a Mesos or an OpenStack Sahara platform) and triggering the commands or API calls that allocate or deallocate resources, based on the Controller’s requests.
+* The **Metric Source** plugin is responsible for getting application metrics from a metric source, such as Monasca, and returning them to the Controller.
 
-__init__(self, application_id, parameters)
-Creates a new controller which scales the given application using the given parameters.
-app_id: application id to scale.
-parameters: a dictionary containing scaling parameters.
+## Steps
+1. In *controller/plugins* folder, exists three directories (*controller*, *actuator* and *metric_source*). Choose what kind of plugin you will develop and create a new folder under one of these directories with the desired plugin name and add *__init__.py*. In this tutorial, we will use MyNewControllerPlugin to represent a new controller plugin.
+ 
+2. Write a new python class under *controller/plugins/mynewcontrollerplugin*
+ 
+It must implement the methods *__init__*, *start_application_scaling* and *stop_application_scaling*.
 
-	Example:
+- **init__(self, app_id, plugin_info)**
+  - Creates a new controller which scales the given application using the given parameters.
 
-{
-"instances": [instance_id_0, instance_id_1, …, instance_id_n],
-"check_interval": 5,
-"trigger_down": 10,
-"trigger_up": 10,
-"min_cap": 10,
-"max_cap": 100,
-"actuation_size": 25,
-"metric_rounding": 2,
-"actuator": “basic”,
-"metric_source": “monasca”,
-“application_type”: “os_generic”
-}
+- **start_application_scaling(self)**
+  - Starts scaling for an application. This method is used as a run method by a thread.
 
-start_application_scaling(self)
-Starts scaling for an application.
-This method is used as a run method by a thread.
+- **stop_application_scaling(self)**
+  - Stops scaling of an application.
 
-stop_application_scaling(self)
-Stops scaling of an application.
-
-Example:
-
-class MyController:
+### Example:
+```
+class MyNewControllerPlugin:
 
     def __init__(self, application_id, parameters):
         # set things up
@@ -45,44 +38,37 @@ class MyController:
     def stop_application_scaling(self):
         # stop logic
         pass
+```
 
+2. Add the class to controller project into the plugins directory.
 
-2. Add the class to scaler project into the plugins directory.
+3. Edit ControllerBuilder
+- Add a new condition to get_controller. Instantiate the plugin using the new condition.
 
-3. Edit Controller_Builder
-Add a new condition to get_controller. Instantiate the plugin using the new condition.
-
-Example:
-
+### Example:
+```
 ...
 elif name == "mycontroller":
             # prepare parameters
-            return MyController(application_id, parameters)
+            return MyNewControllerPlugin(application_id, parameters)
 ...
+```
+
 
 The string used in the condition must be passed in the request to start scaling as the value to “plugin” parameter.
 
-The example of scaler plugin contained in the repository is composed of two classes: the Generic_Controller and the Generic_Alarm. The Generic_Alarm contains the logic used to adjust the amount of resources allocated to applications. The Generic_Controller dictates the pace of the scaling process. It controls when Generic_Alarm is called to check the application state and when is necessary to wait.
+The example of controller plugin contained in the repository is composed of two classes: the GenericController and the GenericAlarm. The GenericAlarm contains the logic used to adjust the amount of resources allocated to applications. The GenericController dictates the pace of the scaling process. It controls when GenericAlarm is called to check the application state and when is necessary to wait.
 
-The Actuator plugin
-
+## The Actuator plugin
 Our actuation plugin (“basic”) can act on KVM virtual machines, getting and changing the amount of allocated resources through virsh. It uses SSH to access the compute nodes.
 
+The “basic” plugin implements the following methods:
 
-The “basic” plugin implements the following methods.
+- **prepare_environment(self, vm_data)**
+  - Sets up environment properties, like allocated resources, using vm_data as parameter. Usually is used before starting the application. In the “basic” plugin implementation, vm_data is a map “virtual machine to CPU cap“. The plugin uses this map to set the cap of each vm.
 
-prepare_environment(self, vm_data)
-Sets up environment properties, like allocated resources, using vm_data as parameter. Usually is used before starting the application.
+- **adjust_resources(self, vm_data)**
+  - Modifies the environment properties using vm_data as parameter. Usually is used when the application is already running. In the “basic” plugin implementation, vm_data is a map “virtual machine to CPU cap“. The plugin uses this map to set the cap of each vm.
 
-In the “basic” plugin implementation, vm_data is a map “virtual machine to CPU cap“. The plugin uses this map to set the cap of each vm.
-
-
-adjust_resources(self, vm_data)
-Modifies the environment properties using vm_data as parameter. Usually is used when the application is already running.
-
-In the “basic” plugin implementation, vm_data is a map “virtual machine to CPU cap“. The plugin uses this map to set the cap of each vm.
-
-get_allocated_resources(self, vm_id)
-It returns the cap of the given virtual machine.
-
-An example of actuator plugin is available in the scaler repository.
+- **get_allocated_resources(self, vm_id)**
+  - It returns the cap of the given virtual machine. In example of actuator plugin is available in the controller repository.
