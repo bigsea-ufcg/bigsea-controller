@@ -9,7 +9,6 @@ PrettyTable
 paramiko
 python-keystoneclient
 python-novaclient
-python-saharaclient
 python-swiftclient
 python-monascaclient==1.5.0
 keystoneauth1
