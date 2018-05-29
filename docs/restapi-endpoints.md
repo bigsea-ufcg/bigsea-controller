@@ -28,7 +28,7 @@ This section provides a detailed list of avaliable endpoints in Controller REST 
 ## Start scaling 
   Adds the application to the set of applications the Controller scales.
 
-* **URL**: `/scaling/<app_id>`
+* **URL**: `/scaling/:app_id`
 * **Method:** `POST`
 
 * **JSON Request:**
@@ -49,7 +49,7 @@ This section provides a detailed list of avaliable endpoints in Controller REST 
 ## Stop scaling 
   Removes the application from the set of applications the Controller scales.
 
-* **URL**: `/scaling/<app_id>/stop`
+* **URL**: `/scaling/:app_id/stop`
 * **Method:** `PUT`
 
 * **Success Response:**
