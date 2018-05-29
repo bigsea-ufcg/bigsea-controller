@@ -10,8 +10,6 @@ This section provides a detailed list of avaliable endpoints in Controller REST 
 * **JSON Request:**
 	* ```javascript
 	  {
-	     username : [string],
-	     password : [string],
 	     actuator_plugin: [string],
 	     instances_cap : {
 	       "vm_id0":cap0,
@@ -25,7 +23,7 @@ This section provides a detailed list of avaliable endpoints in Controller REST 
   * **Code:** `204` <br />
 		
 * **Error Response:**
-  * **Code:** `400 BAD REQUEST` and `401 UNAUTHORIZED`<br />
+  * **Code:** `400 BAD REQUEST`
 
 ## Start scaling 
   Adds the application to the set of applications the Controller scales.
@@ -36,8 +34,6 @@ This section provides a detailed list of avaliable endpoints in Controller REST 
 * **JSON Request:**
 	* ```javascript
 	  {
-	     username : [string],
-	     password : [string],
 	     plugin: [string],
 	     plugin_info : {
 	       ...
@@ -48,7 +44,7 @@ This section provides a detailed list of avaliable endpoints in Controller REST 
   * **Code:** `204` <br />
 		
 * **Error Response:**
-  * **Code:** `400 BAD REQUEST` and `401 UNAUTHORIZED`<br />
+  * **Code:** `400 BAD REQUEST`
 
 ## Stop scaling 
   Removes the application from the set of applications the Controller scales.
@@ -56,18 +52,11 @@ This section provides a detailed list of avaliable endpoints in Controller REST 
 * **URL**: `/scaling/<app_id>/stop`
 * **Method:** `PUT`
 
-* **JSON Request:**
-	* ```javascript
-	  {
-	     username : [string],
-	     password : [string]
-	  }
-	  ```
 * **Success Response:**
   * **Code:** `204` <br />
 		
 * **Error Response:**
-  * **Code:** `401 UNAUTHORIZED`<br />
+  * **Code:** `400 BAD REQUEST`<br />
 
 ## Controller status
   Returns json data with detailed status of Controller.
