@@ -63,7 +63,7 @@ def start_scaling(app_id, data):
     scaled_apps[app_id] = controller
 
 
-def stop_scaling(app_id, data):
+def stop_scaling(app_id):
     if app_id in scaled_apps:
         API_LOG.log("Removing application id: %s" % (app_id))
     
