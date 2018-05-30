@@ -33,8 +33,8 @@ class GenericAlarm:
         self.trigger_up = trigger_up
         self.min_cap = min_cap
         self.max_cap = max_cap
-        self.actuation_size = actuation_size
         self.metric_rounding = metric_rounding
+        self.actuation_size = actuation_size
         self.application_id = application_id
         self.instances = instances
 
@@ -46,6 +46,7 @@ class GenericAlarm:
                                      "cap.log",
                                      application_id)
 
+        self.last_error = ""
         self.last_error_timestamp = datetime.datetime.strptime(
                                         "0001-01-01T00:00:00.0Z",
                                         '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -81,6 +82,11 @@ class GenericAlarm:
                                            str(self.application_id),
                                            str(self.cap)))
 
+                    print("%.0f|%s|%s" % (time.time(),
+                                          str(self.application_id),
+                                          str(self.cap)))
+
+                self.last_error = error
                 self.last_error_timestamp = error_timestamp
 
             else:
