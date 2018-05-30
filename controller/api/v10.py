@@ -49,7 +49,7 @@ def start_scaling(app_id, data):
     Error response codes: 400, 401
 """
 @rest.put('/scaling/<app_id>/stop')
-def stop_scaling(app_id):
+def stop_scaling(app_id, data):
     return u.render(api.stop_scaling(app_id))
 
 

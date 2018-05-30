@@ -19,6 +19,7 @@ from controller.plugins.controller.builder import ControllerBuilder
 from controller.utils.logger import Log
 from controller.utils import authorizer
 from controller.service import api
+from controller.exceptions import api as ex
 import time
 from threading import Thread
 
