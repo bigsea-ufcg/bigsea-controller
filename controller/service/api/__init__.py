@@ -22,25 +22,24 @@ import sys
 config = ConfigParser.RawConfigParser()
 config.read('./controller.cfg')
 
-host = config.get("flask", "host")
-port = config.getint("flask", "port")
+""" General configuration """
+host = config.get("general", "host")
+port = config.getint("general", "port")
 
-authorization_url = config.get("authorization", "authorization_url")
+""" Actuator plugins parameters """
+compute_nodes_str = config.get("actuator-plugins", "compute_nodes")
+compute_nodes_keypair = config.get("actuator-plugins", "key_pair")
+iops_reference = config.getint("actuator-plugins", "iops_reference")
+bs_reference = config.getint("actuator-plugins", "bs_reference")
+default_io_cap = config.getint("actuator-plugins", "default_io_cap")
+tunelling = config.get("actuator-plugins", "tunelling")
+ports_str = config.get("actuator-plugins", "tunnel_ports")
+actuator_port = config.get("actuator-plugins", "actuator_port")
 
+""" Monasca configuration """
 monasca_endpoint = config.get('monasca', 'monasca_endpoint')
 monasca_username = config.get('monasca', 'username')
 monasca_password = config.get('monasca', 'password')
 monasca_auth_url = config.get('monasca', 'auth_url')
 monasca_project_name = config.get('monasca', 'project_name')
 monasca_api_version = config.get('monasca', 'api_version')
-
-compute_nodes_str = config.get("actuator", "compute_nodes")
-compute_nodes_keypair = config.get("actuator", "keypair_compute_nodes")
-
-iops_reference = config.getint("actuator", "iops_reference")
-bs_reference = config.getint("actuator", "bs_reference")
-default_io_cap = config.getint("actuator", "default_io_cap")
-tunelling = config.get("actuator", "tunelling")
-
-ports_str = config.get("actuator", "tunnel_ports")
-actuator_port = config.get("actuator", "actuator_port")
