@@ -1,164 +1,62 @@
-# BigSea WP3 - Controller
+# Asperathos - Controller
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The Controller service is responsible for managing the applications performance, adjusting the amount of resources allocated to the virtual infrastructure where the applications run, in order to ensure application’s QoS goals.
+## Overview
+The **Controller** is responsible for adjusting the amount of resources allocated to the virtual infrastructure where the applications run, in order to guarantee application’s QoS.
 
-This service includes the actuator and the controller components. The Controller, based on metrics such as application progress and CPU usage, decides the amount of resources to allocate to the applications. The Actuator is responsible for connecting to the underlying infrastructure (such as a Mesos or an OpenStack Sahara platform) and triggering the commands or API calls that allocate or deallocate resources, based on the Controller’s requests.
+**Asperathos** was developed by the [**LSD-UFCG**](https://www.lsd.ufcg.edu.br/#/) *(Distributed Systems Laboratory at Federal University of Campina Grande)* as one of the existing tools in **EUBra-BIGSEA** ecosystem.
 
-# Deploy
+**EUBra-BIGSEA** is committed to making a significant contribution to the **cooperation between Europe and Brazil** in the *area of advanced cloud services for Big Data applications*. See more about in [EUBra-BIGSEA website](http://www.eubra-bigsea.eu/).
 
-To install, configure and run the Controller component you will need a virtual machine with the configurations described below.
+To more info about **Controller** and how does it works in **BIGSEA Asperathos environment**, see [details.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/details.md) and [asperathos-workflow.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/asperathos-workflow.md).
 
-**Minimal configuration**
-```
-OS: Ubuntu 14.04
-CPU: 1 core
-Memory: 2GB of RAM
-Disk: 20GB
-```
+## How does it works?
+The controller is implemented following a **plugin architecture**, providing flexibility to add or remove plugins when necessary. It works with usage of three types of plugins: **Actuator**, **Controller** and **Metric Source**.
+* The **Controller**, based on metrics such as application progress and CPU usage, decides the amount of resources to allocate to the applications.
+* The **Actuator** is responsible for connecting to the underlying infrastructure (such as a Mesos or an OpenStack Sahara platform) and triggering the commands or API calls that allocate or deallocate resources, based on the Controller’s requests.
+* The **Metric Source** plugin is responsible for getting application metrics from a metric source, such as Monasca, and returning them to the Controller.
 
-In the virtual machine that you want to install the Controller follow the steps below:
+## How to develop a plugin?
+See [plugin-development.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugin-development.md).
+
+## Requirements
+* Python 2.7 or Python 3.5
+* Linux packages: python-dev and python-pip
+* Python packages: setuptools, tox and flake8
+
+To **apt** distros, you can use [pre-install.sh](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/tools/pre-install.sh) to install the requirements.
 
 ## Install
-1. Install git
-    ```bash
-    $ sudo apt-get install git
-    ```
-2. Clone the BigSea Controller repository
-    ```bash
-    $ git clone https://github.com/bigsea-ufcg/bigsea-controller.git
-    ```
-3. Access the bigsea-controller folder and run the setup script
-    ```bash
-    $ ./setup.sh # You must run this command as superuser to install some requirements
-    ```
+Clone the [Controller repository](https://github.com/bigsea-ufcg/bigsea-controller.git) in your machine.
 
-## Configure
+### Configuration
+A configuration file is required to run the Controller. **Edit and fill your controller.cfg in the root of Controller directory.** Make sure you have fill up all fields before run.
+You can find a template in [config-example.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/config-example.md). 
 
-A configuration file is required to run the Controller. You can find a template in the main directory called controller.cfg.template, rename the template to controller.cfg. Make sure to fill up all fields before run.
-
-```
-[flask]
-host = <host_ip>
-port = <port_number>
-
-[actuator]
-compute_nodes = 
-keypair_compute_nodes =
-tunnel_ports = 
-actuator_port = 
-iops_reference = 
-bs_reference =  
-
-[monasca]
-monasca_endpoint = http://<ip:port>
-username = <monasca_user>
-password = <password>
-project_name = <monasca_project_name>
-auth_url = http://<ip>:<port>/v3/
-api_version = 2_0
-```
-
-## Run
-Start the service running the run.sh script.
+### Run
+In the Controller root directory, start the service using run script:
 ```
 $ ./run.sh
 ```
 
-## API usage
-
-## General information
-This section defines the API usage. 
-
-## Endpoints
-
-### Prepare Environment
-
-`POST scaler/setup_env`
-
-Sets the amount of resources allocated to instances. 
-
-This call expects a JSON on the body with the client’s specification of the instances to adjust.
-
-#### Request parameters
-
-```javascript
-{
-	"plugin":<actuation plugin>,
-	"vm_id0":cap0,
-	"vm_id1":cap1,
-	...
-	"vm_idn":capn
-}
+Or using tox command:
+```
+$ tox -e venv -- controller
 ```
 
-#### Request example
+## Controller REST API
+Endpoints are avaliable on [restapi-endpoints.md](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/restapi-endpoints.md) documentation.
 
-```javascript
-{
-	"plugin":"kvm",
-	"ffc16820-d3c8-47c3-b9b0-9d5aeacbcd49":50,
-	"01c23a15-f21b-4cf0-9065-e36b590bf16c":70
-}
-```
+## Avaliable plugins
+### Controller
+* [Progress error](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/progress-error.md)
+* [Proportional](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/proportional-controller.md)
+* [Proportional derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/proportional-derivative-controller.md)
+* [Proportional integrative derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/pid-controller.md)
 
-### Start Scaling
+### Actuator
+* [KVM](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/kvm-actuator.md)
+* [KVM I/O](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/kvm-io-actuator.md)
 
-`POST scaler/start_scaling/<app_id>`
-
-Adds the application to the set of applications the Controller scales. 
-
-This call expects a JSON on the body with the controller plugin parameters.
-
-#### Request parameters
-
-| Name | Type | Description |
-| --- | --- | --- |
-| plugin | string | The Controller plugin to use |
-| scaling_parameters | dictionary | A dictionary containing all the parameters for the scaling plugin |
-
-
-#### Request example
-
-```javascript
-{
-	"plugin":"proportional",
-	"scaling_parameters":
-				{"actuator":"kvm", 
-				"metric_source":"monasca",
-				"instances":["ffc16820-d3c8-47c3-b9b0-9d5aeacbcd49", "01c23a15-f21b-4cf0-9065-e36b590bf16c"],
-				"check_interval":10,
-				"trigger_down":10,
-				"trigger_up":10,
-				"min_cap":10,
-				"max_cap":100,
-				"metric_rounding":2
-				"heuristic_options":options}
-}
-```
-
-### Stop scaling
-
-`POST scaler/stop_scaling/<app_id>`
-
-Removes the application from the set of applications the Controller scales.
-
-
-## Plugins
-
-### Controller plugins available
-
-[Progress error controller](doc/progress-error.md)
-
-[Proportional controller](doc/proportional-controller.md)
-
-[Proportional derivative controller](doc/proportional-derivative-controller.md)
-
-### Actuation plugins available
-
-[KVM actuator](doc/kvm-actuator.md)
-
-[KVM I/O actuator](doc/kvm-io-actuator.md)
-
-### Metric source plugins available
-
-[Monasca metric source](doc/monasca-metric-source.md)
+### Metric source
+* [Monasca](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/monasca-metric-source.md)
