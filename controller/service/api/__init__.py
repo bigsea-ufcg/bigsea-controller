@@ -25,21 +25,22 @@ config.read('./controller.cfg')
 """ General configuration """
 host = config.get("general", "host")
 port = config.getint("general", "port")
+actuator_plugins = config.get('general', 'actuator_plugins').split(',')
+metric_source_plugins = config.get('general', 'metric_source_plugins').split(',')
 
-""" Actuator plugins parameters """
-compute_nodes_str = config.get("actuator-plugins", "compute_nodes")
-compute_nodes_keypair = config.get("actuator-plugins", "key_pair")
-iops_reference = config.getint("actuator-plugins", "iops_reference")
-bs_reference = config.getint("actuator-plugins", "bs_reference")
-default_io_cap = config.getint("actuator-plugins", "default_io_cap")
-tunelling = config.get("actuator-plugins", "tunelling")
-ports_str = config.get("actuator-plugins", "tunnel_ports")
-actuator_port = config.get("actuator-plugins", "actuator_port")
+if 'kvm_io' in actuator_plugins:
+    compute_nodes_str = config.get("kvm_io", "compute_nodes")
+    compute_nodes_keypair = config.get("kvm_io", "key_pair")
+    iops_reference = config.getint("kvm_io", "iops_reference")
+    bs_reference = config.getint("kvm_io", "bs_reference")
+    default_io_cap = config.getint("kvm_io", "default_io_cap")
+    tunelling = config.get("kvm_io", "tunelling")
+    ports_str = config.get("kvm_io", "tunnel_ports")
 
-""" Monasca configuration """
-monasca_endpoint = config.get('monasca', 'monasca_endpoint')
-monasca_username = config.get('monasca', 'username')
-monasca_password = config.get('monasca', 'password')
-monasca_auth_url = config.get('monasca', 'auth_url')
-monasca_project_name = config.get('monasca', 'project_name')
-monasca_api_version = config.get('monasca', 'api_version')
+if 'monasca' in metric_source_plugins:
+    monasca_endpoint = config.get('monasca', 'monasca_endpoint')
+    monasca_username = config.get('monasca', 'username')
+    monasca_password = config.get('monasca', 'password')
+    monasca_auth_url = config.get('monasca', 'auth_url')
+    monasca_project_name = config.get('monasca', 'project_name')
+    monasca_api_version = config.get('monasca', 'api_version')
