@@ -24,7 +24,7 @@ See [plugin-development.md](https://github.com/bigsea-ufcg/bigsea-controller/tre
 * Linux packages: python-dev and python-pip
 * Python packages: setuptools, tox and flake8
 
-To **apt** distros, you can use [pre-install.sh](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/tools/pre-install.sh) to install the requirements.
+To **apt** distros, you can use [pre-install.sh](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/pre-install.sh) to install the requirements.
 
 ## Install
 Clone the [Controller repository](https://github.com/bigsea-ufcg/bigsea-controller.git) in your machine.
@@ -49,14 +49,14 @@ Endpoints are avaliable on [restapi-endpoints.md](https://github.com/bigsea-ufcg
 
 ## Avaliable plugins
 ### Controller
-* [Progress error](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/progress-error.md)
-* [Proportional](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/proportional-controller.md)
-* [Proportional derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/proportional-derivative-controller.md)
-* [Proportional integrative derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/pid-controller.md)
+* [Progress error](https://github.com/bigsea-ufcg/bigsea-controller/blob/master/docs/plugins/controller/progress-error.md)
+* [Proportional](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/controller/proportional-controller.md)
+* [Proportional derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/controller/proportional-derivative-controller.md)
+* [Proportional integrative derivative](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/controller/proportional-derivative-controller.md)
 
 ### Actuator
-* [KVM](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/kvm-actuator.md)
-* [KVM I/O](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/kvm-io-actuator.md)
+* [KVM](https://github.com/bigsea-ufcg/bigsea-controller/blob/master/docs/plugins/actuator/kvm-actuator.md)
+* [KVM I/O](https://github.com/bigsea-ufcg/bigsea-controller/blob/master/docs/plugins/actuator/kvm-io-actuator.md)
 
 ### Metric source
-* [Monasca](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/monasca-metric-source.md)
+* [Monasca](https://github.com/bigsea-ufcg/bigsea-controller/tree/master/docs/plugins/metric_source/monasca-metric-source.md)
