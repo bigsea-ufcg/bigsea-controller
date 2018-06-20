@@ -18,29 +18,43 @@ import os
 import sys
 
 
-# Conf reading
-config = ConfigParser.RawConfigParser()
-config.read('./controller.cfg')
+try:
+    # Conf reading
+    config = ConfigParser.RawConfigParser()
+    config.read('./controller.cfg')
+    
+    """ General configuration """
+    host = config.get("general", "host")
+    port = config.getint("general", "port")
+    actuator_plugins = config.get('general', 'actuator_plugins').split(',')
+    metric_source_plugins = config.get('general', 'metric_source_plugins').split(',')
 
-""" General configuration """
-host = config.get("general", "host")
-port = config.getint("general", "port")
-actuator_plugins = config.get('general', 'actuator_plugins').split(',')
-metric_source_plugins = config.get('general', 'metric_source_plugins').split(',')
+    """ Validate if really exists a section to listed plugins """
+    for plugin in actuator_plugins:
+        if plugin not in config.sections():
+            raise Exception("plugin '%s' section missing" % plugin)
 
-if 'kvm_io' in actuator_plugins:
-    compute_nodes_str = config.get("kvm_io", "compute_nodes")
-    compute_nodes_keypair = config.get("kvm_io", "key_pair")
-    iops_reference = config.getint("kvm_io", "iops_reference")
-    bs_reference = config.getint("kvm_io", "bs_reference")
-    default_io_cap = config.getint("kvm_io", "default_io_cap")
-    tunelling = config.get("kvm_io", "tunelling")
-    ports_str = config.get("kvm_io", "tunnel_ports")
+    for plugin in metric_source_plugins:
+        if plugin not in config.sections():
+            raise Exception("plugin '%s' section missing" % plugin)
+    
+    if 'kvm_io' in actuator_plugins:
+        compute_nodes_str = config.get("kvm_io", "compute_nodes")
+        compute_nodes_keypair = config.get("kvm_io", "key_pair")
+        iops_reference = config.getint("kvm_io", "iops_reference")
+        bs_reference = config.getint("kvm_io", "bs_reference")
+        default_io_cap = config.getint("kvm_io", "default_io_cap")
+        tunelling = config.get("kvm_io", "tunelling")
+        ports_str = config.get("kvm_io", "tunnel_ports")
+    
+    if 'monasca' in metric_source_plugins:
+        monasca_endpoint = config.get('monasca', 'monasca_endpoint')
+        monasca_username = config.get('monasca', 'username')
+        monasca_password = config.get('monasca', 'password')
+        monasca_auth_url = config.get('monasca', 'auth_url')
+        monasca_project_name = config.get('monasca', 'project_name')
+        monasca_api_version = config.get('monasca', 'api_version')
 
-if 'monasca' in metric_source_plugins:
-    monasca_endpoint = config.get('monasca', 'monasca_endpoint')
-    monasca_username = config.get('monasca', 'username')
-    monasca_password = config.get('monasca', 'password')
-    monasca_auth_url = config.get('monasca', 'auth_url')
-    monasca_project_name = config.get('monasca', 'project_name')
-    monasca_api_version = config.get('monasca', 'api_version')
+except Exception as e:
+    print "Error: %s" % e.message
+    quit()
